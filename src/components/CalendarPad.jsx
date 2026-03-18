@@ -4,10 +4,12 @@ import PageStack from './PageStack';
 import NavigationHint from './NavigationHint';
 import MonthStrip from './MonthStrip';
 import MonthView from './MonthView';
+import TeluguMonthView from './TeluguMonthView';
 import ShareButton from './ShareButton';
 import FestivalWishes from './FestivalWishes';
 import { computeClipPath, drawFlip } from '../physics/drawFlip';
 import { getAllPanchangam, getTodayIndex, generateAllDates } from '../data/panchangam';
+import { TELUGU_MONTHS, getTeluguMonth } from '../data/teluguMonths';
 
 const allData = getAllPanchangam();
 
@@ -22,7 +24,7 @@ export default function CalendarPad({ onDateChange }) {
   const [currentIndex, setCurrentIndex] = useState(() => getTodayIndex());
   const [hasInteracted, setHasInteracted] = useState(false);
   const [showMonthStrip, setShowMonthStrip] = useState(false);
-  const [viewMode, setViewMode] = useState('day'); // 'day' | 'month'
+  const [viewMode, setViewMode] = useState('day'); // 'day' | 'month' | 'telugu-month'
 
   // For conditional DOM rendering (under-page, canvas)
   const [flipping, setFlipping] = useState(false);
@@ -368,9 +370,16 @@ export default function CalendarPad({ onDateChange }) {
   }, []);
 
   // Month strip
-  const handleSelectMonth = useCallback((index) => {
-    setCurrentIndex(index);
-    setShowMonthStrip(false);
+  const handleSelectMonth = useCallback((dayIndex, teluguIdx) => {
+    // teluguIdx is the index into TELUGU_MONTHS array
+    if (teluguIdx !== undefined) {
+      setTeluguMonthIdx(teluguIdx);
+      setShowMonthStrip(false);
+      setViewMode('telugu-month');
+    } else {
+      setCurrentIndex(dayIndex);
+      setShowMonthStrip(false);
+    }
   }, []);
 
   // Clear clip-path AFTER React has rendered the new page content
@@ -429,17 +438,31 @@ export default function CalendarPad({ onDateChange }) {
   const [monthViewYear, setMonthViewYear] = useState(currentDate.getFullYear());
   const [monthViewMonth, setMonthViewMonth] = useState(currentDate.getMonth());
 
-  // Sync month view to current page when switching to month mode
-  const toggleView = useCallback(() => {
-    if (viewMode === 'day') {
-      const d = allDates[currentIndex];
-      if (d) {
-        setMonthViewYear(d.getFullYear());
-        setMonthViewMonth(d.getMonth());
-      }
+  // Telugu month index state
+  const [teluguMonthIdx, setTeluguMonthIdx] = useState(() => {
+    // Find which Telugu month the current date falls in
+    const d = allDates[0] || new Date(2026, 2, 19);
+    const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    const idx = TELUGU_MONTHS.findIndex(m => dateStr >= m.start && dateStr <= m.end);
+    return idx >= 0 ? idx : 0;
+  });
+
+  const switchToEnglishMonth = useCallback(() => {
+    const d = allDates[currentIndex];
+    if (d) {
+      setMonthViewYear(d.getFullYear());
+      setMonthViewMonth(d.getMonth());
     }
-    setViewMode(v => v === 'day' ? 'month' : 'day');
-  }, [viewMode, allDates, currentIndex]);
+    setViewMode('month');
+  }, [allDates, currentIndex]);
+
+  const switchToTeluguMonth = useCallback(() => {
+    setShowMonthStrip(true);
+  }, []);
+
+  const switchToDay = useCallback(() => {
+    setViewMode('day');
+  }, []);
 
   const handleMonthSelectDate = useCallback((day) => {
     // Find the index in allData for this date
@@ -468,6 +491,25 @@ export default function CalendarPad({ onDateChange }) {
     });
   }, []);
 
+  // Telugu month navigation
+  const handlePrevTeluguMonth = useCallback(() => {
+    setTeluguMonthIdx(i => Math.max(0, i - 1));
+  }, []);
+  const handleNextTeluguMonth = useCallback(() => {
+    setTeluguMonthIdx(i => Math.min(TELUGU_MONTHS.length - 1, i + 1));
+  }, []);
+  const handleTeluguMonthSelectDate = useCallback((year, month, day) => {
+    const target = new Date(year, month, day);
+    target.setHours(0, 0, 0, 0);
+    const start = new Date(2026, 2, 19);
+    start.setHours(0, 0, 0, 0);
+    const idx = Math.round((target - start) / 86400000);
+    if (idx >= 0 && idx < allData.length) {
+      setCurrentIndex(idx);
+      setViewMode('day');
+    }
+  }, []);
+
   // Wheel navigation for month view
   const monthWheelCooldown = useRef(false);
   const onMonthWheel = useCallback((e) => {
@@ -491,7 +533,7 @@ export default function CalendarPad({ onDateChange }) {
     <div
       ref={containerRef}
       style={styles.padOuter}
-      onWheel={viewMode === 'day' ? onWheel : onMonthWheel}
+      onWheel={viewMode === 'day' ? onWheel : viewMode === 'month' ? onMonthWheel : undefined}
       onMouseDown={viewMode === 'day' ? onPointerDown : undefined}
       onMouseMove={viewMode === 'day' ? onPointerMove : undefined}
       onMouseUp={viewMode === 'day' ? onPointerUp : undefined}
@@ -529,7 +571,7 @@ export default function CalendarPad({ onDateChange }) {
             </div>
             <PageStack dayIndex={currentIndex} totalDays={allData.length} />
           </>
-        ) : (
+        ) : viewMode === 'month' ? (
           <MonthView
             year={monthViewYear}
             month={monthViewMonth}
@@ -537,27 +579,34 @@ export default function CalendarPad({ onDateChange }) {
             onPrevMonth={handlePrevMonth}
             onNextMonth={handleNextMonth}
           />
+        ) : (
+          <TeluguMonthView
+            teluguMonthIndex={teluguMonthIdx}
+            onPrev={handlePrevTeluguMonth}
+            onNext={handleNextTeluguMonth}
+            onSelectDate={handleTeluguMonthSelectDate}
+          />
         )}
       </div>
 
       {/* Controls below the calendar */}
       <div style={styles.belowPad}>
         <div style={styles.buttonRow}>
-          <button style={styles.viewToggle} onClick={toggleView}>
-            {viewMode === 'day' ? (
-              <>
-                <span style={styles.toggleIcon}>▦</span>
-                <span style={styles.toggleText}>నెల</span>
-              </>
-            ) : (
-              <>
-                <span style={styles.toggleIcon}>◉</span>
-                <span style={styles.toggleText}>రోజు</span>
-              </>
-            )}
-          </button>
-          {viewMode === 'day' && (
-            <ShareButton data={allData[currentIndex]} />
+          {viewMode === 'day' ? (
+            <>
+              <button style={styles.viewToggle} onClick={switchToTeluguMonth}>
+                <span style={styles.toggleText}>తెలుగు నెల</span>
+              </button>
+              <button style={styles.viewToggle} onClick={switchToEnglishMonth}>
+                <span style={styles.toggleText}>ఇంగ్లీష్ నెల</span>
+              </button>
+              <ShareButton data={allData[currentIndex]} />
+            </>
+          ) : (
+            <button style={styles.viewToggle} onClick={switchToDay}>
+              <span style={styles.toggleIcon}>◉</span>
+              <span style={styles.toggleText}>రోజు</span>
+            </button>
           )}
         </div>
         {viewMode === 'day' && (

@@ -37,7 +37,7 @@ const MonthStrip = memo(function MonthStrip({ visible, onSelectMonth, currentMon
                 ...styles.btn,
                 ...(i === activeMonth ? styles.activeBtn : {}),
               }}
-              onClick={() => onSelectMonth(month.index)}
+              onClick={() => onSelectMonth(month.index, i)}
             >
               <span style={styles.btnTelugu}>{month.telugu}</span>
               <span style={styles.btnEnglish}>{month.short}</span>
