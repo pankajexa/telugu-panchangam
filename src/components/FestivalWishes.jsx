@@ -3,7 +3,7 @@ import { SAMVATSARAM } from '../data/constants';
 
 const SARVAM_API_URL = 'https://api.sarvam.ai/v1/chat/completions';
 const SARVAM_API_KEY = import.meta.env.VITE_SARVAM_API_KEY || '';
-const MODEL = 'sarvam-m';
+const MODEL = 'sarvam-105b';
 
 async function generateWish(festival) {
   const festivalName = festival.telugu;
@@ -15,20 +15,35 @@ async function generateWish(festival) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      messages: [{
-        role: 'user',
-        content: `"${festivalName}" పండుగ శుభాకాంక్షల సందేశం ఒక paragraph లో రాయండి. పూర్తిగా తెలుగులో రాయాలి. ఇంగ్లీష్ వద్దు. emoji వద్దు. ఒక్క paragraph మాత్రమే output ఇవ్వండి. వేరే ఏమీ రాయకండి.`,
-      }],
+      messages: [
+        {
+          role: 'system',
+          content: 'మీరు తెలుగు పండుగ శుభాకాంక్షలు రాసే కవి. సరిగ్గా 3 లైన్లు మాత్రమే రాయండి. అచ్చమైన తెలుగులో, వ్యాకరణ తప్పులు లేకుండా రాయాలి. సంతోషం, సమృద్ధి, ఆశీర్వాదాలు మాత్రమే.',
+        },
+        {
+          role: 'user',
+          content: 'దీపావళి శుభాకాంక్షలు రాయండి',
+        },
+        {
+          role: 'assistant',
+          content: 'దీపావళి వెలుగులు మీ ఇంటిని ఆనందంతో నింపాలి!\nసిరిసంపదలు, ఆరోగ్యం మీ కుటుంబాన్ని చేరాలి!\nఈ పండుగ మీ జీవితంలో కొత్త వెలుగులు తేవాలని ఆశిస్తున్నాం!',
+        },
+        {
+          role: 'user',
+          content: `${festivalName} శుభాకాంక్షలు రాయండి`,
+        },
+      ],
       model: MODEL,
-      temperature: 0.9,
-      max_tokens: 500,
+      temperature: 0.6,
+      max_tokens: 4000,
     }),
   });
 
   if (!response.ok) throw new Error(`API ${response.status}`);
 
   const data = await response.json();
-  let text = data.choices?.[0]?.message?.content?.trim() || '';
+  const msg = data.choices?.[0]?.message;
+  let text = (msg?.content || '').trim();
 
   // Strip <think>...</think> reasoning block
   text = text.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();

@@ -9,17 +9,19 @@ function to12Hr(time24) {
   return { time: `${h}:${mm.toString().padStart(2, '0')}`, period };
 }
 
+const SUN_COLOR = '#d45500'; // reddish-orange
+
 function SunriseIcon() {
   return (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style={{ display: 'block' }}>
-      <line x1="1" y1="18" x2="23" y2="18" stroke="currentColor" strokeWidth="0.7" opacity="0.35" />
-      <path d="M6 18 A6 6 0 0 1 18 18" fill="none" stroke="currentColor" strokeWidth="1.5" />
-      <line x1="12" y1="5" x2="12" y2="8.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-      <line x1="7.2" y1="7" x2="9" y2="9.2" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
-      <line x1="16.8" y1="7" x2="15" y2="9.2" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
-      <line x1="4" y1="12" x2="6.8" y2="12.5" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
-      <line x1="20" y1="12" x2="17.2" y2="12.5" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
-      <polyline points="10,5.5 12,3.2 14,5.5" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
+      <line x1="1" y1="18" x2="23" y2="18" stroke={SUN_COLOR} strokeWidth="0.7" opacity="0.35" />
+      <path d="M6 18 A6 6 0 0 1 18 18" fill="none" stroke={SUN_COLOR} strokeWidth="1.5" />
+      <line x1="12" y1="5" x2="12" y2="8.5" stroke={SUN_COLOR} strokeWidth="1.2" strokeLinecap="round" />
+      <line x1="7.2" y1="7" x2="9" y2="9.2" stroke={SUN_COLOR} strokeWidth="1" strokeLinecap="round" />
+      <line x1="16.8" y1="7" x2="15" y2="9.2" stroke={SUN_COLOR} strokeWidth="1" strokeLinecap="round" />
+      <line x1="4" y1="12" x2="6.8" y2="12.5" stroke={SUN_COLOR} strokeWidth="1" strokeLinecap="round" />
+      <line x1="20" y1="12" x2="17.2" y2="12.5" stroke={SUN_COLOR} strokeWidth="1" strokeLinecap="round" />
+      <polyline points="10,5.5 12,3.2 14,5.5" fill="none" stroke={SUN_COLOR} strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -27,15 +29,15 @@ function SunriseIcon() {
 function SunsetIcon() {
   return (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style={{ display: 'block' }}>
-      <line x1="1" y1="18" x2="23" y2="18" stroke="currentColor" strokeWidth="0.7" opacity="0.35" />
-      <path d="M6 18 A6 6 0 0 1 18 18" fill="none" stroke="currentColor" strokeWidth="1.5" />
-      <line x1="12" y1="6" x2="12" y2="9" stroke="currentColor" strokeWidth="1" strokeLinecap="round" opacity="0.5" />
-      <line x1="7.5" y1="8" x2="9" y2="10" stroke="currentColor" strokeWidth="0.9" strokeLinecap="round" opacity="0.4" />
-      <line x1="16.5" y1="8" x2="15" y2="10" stroke="currentColor" strokeWidth="0.9" strokeLinecap="round" opacity="0.4" />
-      <line x1="4" y1="12" x2="6.8" y2="12.5" stroke="currentColor" strokeWidth="0.9" strokeLinecap="round" opacity="0.4" />
-      <line x1="20" y1="12" x2="17.2" y2="12.5" stroke="currentColor" strokeWidth="0.9" strokeLinecap="round" opacity="0.4" />
-      <line x1="12" y1="18.5" x2="12" y2="22" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" opacity="0.6" />
-      <polyline points="10,20.5 12,22.5 14,20.5" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" opacity="0.6" />
+      <line x1="1" y1="18" x2="23" y2="18" stroke={SUN_COLOR} strokeWidth="0.7" opacity="0.35" />
+      <path d="M6 18 A6 6 0 0 1 18 18" fill="none" stroke={SUN_COLOR} strokeWidth="1.5" />
+      <line x1="12" y1="6" x2="12" y2="9" stroke={SUN_COLOR} strokeWidth="1" strokeLinecap="round" opacity="0.5" />
+      <line x1="7.5" y1="8" x2="9" y2="10" stroke={SUN_COLOR} strokeWidth="0.9" strokeLinecap="round" opacity="0.4" />
+      <line x1="16.5" y1="8" x2="15" y2="10" stroke={SUN_COLOR} strokeWidth="0.9" strokeLinecap="round" opacity="0.4" />
+      <line x1="4" y1="12" x2="6.8" y2="12.5" stroke={SUN_COLOR} strokeWidth="0.9" strokeLinecap="round" opacity="0.4" />
+      <line x1="20" y1="12" x2="17.2" y2="12.5" stroke={SUN_COLOR} strokeWidth="0.9" strokeLinecap="round" opacity="0.4" />
+      <line x1="12" y1="18.5" x2="12" y2="22" stroke={SUN_COLOR} strokeWidth="1.1" strokeLinecap="round" opacity="0.6" />
+      <polyline points="10,20.5 12,22.5 14,20.5" fill="none" stroke={SUN_COLOR} strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" opacity="0.6" />
     </svg>
   );
 }
@@ -246,13 +248,14 @@ const styles = {
     alignItems: 'baseline',
   },
   subText:       { fontFamily: SERIF, fontWeight: 500, fontSize: '11px', color: INK3, letterSpacing: '0.4px' },
-  subTextCenter: { fontFamily: SERIF, fontWeight: 600, fontSize: '13px', color: INK2, letterSpacing: '2.5px' },
+  subTextCenter: { fontFamily: SERIF, fontWeight: 700, fontSize: '14px', color: INK2, letterSpacing: '3px', textTransform: 'uppercase' },
 
   // Date block
   dateBlock: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
+    gap: '4px',
     margin: '4px 0 2px',
   },
   sunCol: {
@@ -260,15 +263,13 @@ const styles = {
     flexDirection: 'column',
     alignItems: 'center',
     gap: '1px',
-    minWidth: '50px',
-    color: INK,
   },
   sunIcon:    { lineHeight: 0 },
   sunTime:    { fontFamily: SERIF, fontWeight: 700, fontSize: '16px', color: INK, letterSpacing: '0.3px', lineHeight: 1.1 },
   sunPeriod:  { fontFamily: SERIF, fontWeight: 500, fontSize: '10px', color: INK3, letterSpacing: '1px' },
   dateNumber: {
     fontFamily: DATE_NUM, fontWeight: 400, fontSize: '90px', color: FEST,
-    textAlign: 'center', lineHeight: 0.88, letterSpacing: '-1px', flex: 1,
+    textAlign: 'center', lineHeight: 0.88, letterSpacing: '-1px', padding: '0 20px',
   },
   sundayDate:   { textShadow: `1.5px 0 0 ${INK}, -0.5px 0 0 ${INK}, 0 1px 0 rgba(58,21,10,0.15)` },
   festivalDate: {},
