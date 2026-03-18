@@ -18,7 +18,7 @@ May this year be as balanced and beautiful as the Ugadi Pachadi.`,
     message: `కొత్త ఆశలు, కొత్త ఆశయాలతో ఈ నూతన సంవత్సరం
 మీ ఇంట్లో సిరిసంపదలను, విజయాలను కురిపించాలని ఆకాంక్షిస్తున్నాను.
 మీ ప్రతి అడుగు విజయానికి నాంది కావాలి.
-అందరికీ శ్రీ క్రోధినామ సంవత్సర ఉగాది శుభాకాంక్షలు!
+అందరికీ శ్రీ పరాభవ నామ సంవత్సర ఉగాది శుభాకాంక్షలు!
 
 Wishing you a year of immense growth and breakthrough success.`,
   },
@@ -68,7 +68,7 @@ May our family bond grow stronger and sweeter with every passing year.`,
     message: `ఈ ఉగాది మీ లైఫ్‌లో ఒక కొత్త బిగినింగ్ కావాలని,
 మీరు అనుకున్న పనులన్నీ సజావుగా సాగిపోవాలని కోరుకుంటున్నాను.
 నెగెటివిటీని వదిలేసి, పాజిటివ్ వైబ్స్‌తో ముందుకు సాగుదాం.
-హ్యాపీ ఉగాది 2026!
+శ్రీ పరాభవ నామ సంవత్సర ఉగాది శుభాకాంక్షలు!
 
 Wishing you a fresh start filled with positive vibes and new opportunities.`,
   },

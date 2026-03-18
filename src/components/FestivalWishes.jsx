@@ -5,27 +5,19 @@ const WA = '#25D366';
 const TELUGU = "'Noto Serif Telugu', serif";
 const SERIF = "'Inter', system-ui, sans-serif";
 const INK = '#3a150a';
-const INK2 = '#6b2d15';
 const INK3 = '#915838';
 const INK4 = '#b88050';
 
 function shareToWhatsApp(message, festivalName) {
   const text = `🙏 *${festivalName} శుభాకాంక్షలు* 🙏\n\n${message}\n\nShared from ManaCalendar.com`;
-  const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
-  window.location.href = url;
+  window.location.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
 }
 
 export default function FestivalWishes({ festival }) {
   const [showPicker, setShowPicker] = useState(false);
 
-  const handleOpen = useCallback(() => {
-    setShowPicker(true);
-  }, []);
-
-  const handleClose = useCallback(() => {
-    setShowPicker(false);
-  }, []);
-
+  const handleOpen = useCallback(() => setShowPicker(true), []);
+  const handleClose = useCallback(() => setShowPicker(false), []);
   const handleSelect = useCallback((template) => {
     setShowPicker(false);
     shareToWhatsApp(template.message, festival.telugu);
@@ -42,22 +34,12 @@ export default function FestivalWishes({ festival }) {
 
       {showPicker && (
         <div style={styles.overlay} onClick={handleClose}>
-          <div style={styles.panel} onClick={e => e.stopPropagation()}>
-            <div style={styles.panelHeader}>
-              <span style={styles.panelTitle}>సందేశం ఎంచుకోండి</span>
-              <button style={styles.closeBtn} onClick={handleClose}>✕</button>
-            </div>
-            <div style={styles.templateList}>
+          <div style={styles.strip} onClick={e => e.stopPropagation()}>
+            <div style={styles.grid}>
               {WISH_TEMPLATES.map((t, i) => (
                 <button key={i} style={styles.templateBtn} onClick={() => handleSelect(t)}>
-                  <div style={styles.templateTheme}>
-                    <span style={styles.themeIcon}>✦</span>
-                    <span style={styles.themeName}>{t.theme}</span>
-                    <span style={styles.themeEn}>{t.themeEn}</span>
-                  </div>
-                  <div style={styles.templatePreview}>
-                    {t.message.split('\n')[0].slice(0, 50)}...
-                  </div>
+                  <span style={styles.themeName}>{t.theme}</span>
+                  <span style={styles.themeEn}>{t.themeEn}</span>
                 </button>
               ))}
             </div>
@@ -82,101 +64,53 @@ const styles = {
   icon: { fontSize: '16px', color: WA },
   text: { fontFamily: TELUGU, fontWeight: 700, fontSize: '14px', color: WA },
 
-  // Full-screen overlay
+  // Same overlay style as MonthStrip
   overlay: {
-    position: 'fixed',
-    inset: 0,
-    background: 'rgba(0,0,0,0.6)',
-    zIndex: 100,
-    display: 'flex',
-    alignItems: 'flex-end',
-    justifyContent: 'center',
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    zIndex: 20,
+    padding: '0 4px',
   },
-
-  // Bottom panel
-  panel: {
+  strip: {
     width: '100%',
-    maxWidth: '432px',
-    maxHeight: '70vh',
-    background: 'linear-gradient(to top, #1a120e, #2a1e14)',
-    borderRadius: '16px 16px 0 0',
-    display: 'flex',
-    flexDirection: 'column',
-    overflow: 'hidden',
+    background: 'linear-gradient(to top, rgba(214, 168, 32, 0.98), rgba(240, 194, 48, 0.96))',
+    borderTop: '1px solid rgba(58, 21, 10, 0.12)',
+    borderRadius: '10px 10px 0 0',
+    boxShadow: '0 -6px 20px rgba(60, 30, 10, 0.2)',
+    padding: '10px 6px 14px',
   },
-  panelHeader: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: '14px 18px 10px',
-    borderBottom: '1px solid rgba(214,168,32,0.15)',
-  },
-  panelTitle: {
-    fontFamily: TELUGU,
-    fontWeight: 700,
-    fontSize: '16px',
-    color: '#d6a820',
-  },
-  closeBtn: {
-    background: 'none',
-    border: 'none',
-    fontSize: '18px',
-    color: '#d6a820',
-    opacity: 0.5,
-    cursor: 'pointer',
-    padding: '4px 8px',
-  },
-
-  // Template list
-  templateList: {
-    flex: 1,
-    overflowY: 'auto',
-    padding: '8px 12px 20px',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '8px',
+  grid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(4, 1fr)',
+    gap: '4px',
+    padding: '0 4px',
   },
   templateBtn: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '4px',
-    background: 'rgba(214,168,32,0.06)',
-    border: '1px solid rgba(214,168,32,0.15)',
-    borderRadius: '10px',
-    padding: '10px 14px',
-    cursor: 'pointer',
-    textAlign: 'left',
-    transition: 'background 150ms',
-  },
-  templateTheme: {
-    display: 'flex',
     alignItems: 'center',
-    gap: '6px',
-  },
-  themeIcon: {
-    fontSize: '10px',
-    color: '#d6a820',
-    opacity: 0.6,
+    gap: '1px',
+    padding: '6px 2px',
+    background: 'none',
+    border: '1px solid transparent',
+    borderRadius: '4px',
+    cursor: 'pointer',
   },
   themeName: {
     fontFamily: TELUGU,
     fontWeight: 700,
-    fontSize: '14px',
-    color: '#d6a820',
+    fontSize: '11px',
+    color: INK,
+    lineHeight: 1.3,
   },
   themeEn: {
     fontFamily: SERIF,
     fontWeight: 500,
-    fontSize: '10px',
-    color: INK4,
+    fontSize: '8px',
+    color: INK3,
     letterSpacing: '0.5px',
-  },
-  templatePreview: {
-    fontFamily: TELUGU,
-    fontWeight: 400,
-    fontSize: '11px',
-    color: '#b88050',
-    lineHeight: 1.4,
-    opacity: 0.7,
+    textTransform: 'uppercase',
   },
 };
