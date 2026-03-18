@@ -26,13 +26,22 @@ export default function CalendarContainer() {
         opacity: fontsLoaded ? 1 : 0,
         transition: 'opacity 500ms ease',
       }}>
-        {/* Decorations are absolutely positioned — they never shift the calendar */}
+        {/* Brand name */}
+        <div style={styles.brandRow}>
+          <span style={styles.brandMana}>మన</span>
+          <span style={styles.brandCalendar}>Calendar</span>
+          <span style={styles.brandDot}>.com</span>
+        </div>
+
+        {/* Festival decoration — below brand, above calendar */}
         <FestivalDecorations festival={currentFestival} position="top" />
-        <FestivalDecorations festival={currentFestival} position="bottom" />
 
         <div style={styles.calendarArea}>
           <CalendarPad onDateChange={handleDateChange} />
         </div>
+
+        {/* Festival decoration — below calendar */}
+        <FestivalDecorations festival={currentFestival} position="bottom" />
       </div>
 
       {!fontsLoaded && (
@@ -47,19 +56,51 @@ export default function CalendarContainer() {
 const styles = {
   wall: {
     width: '100%',
-    height: '100vh',
-    height: '100dvh',
+    minHeight: '100vh',
+    minHeight: '100dvh',
     background: '#1a120e',
     display: 'flex',
+    flexDirection: 'column',
     alignItems: 'center',
-    justifyContent: 'center',
-    overflow: 'hidden',
+    justifyContent: 'flex-start',
+    paddingTop: '12px',
+    paddingBottom: '12px',
+    overflow: 'auto',
     position: 'relative',
+    boxSizing: 'border-box',
   },
   calendarWrapper: {
     position: 'relative',
     width: '100%',
     maxWidth: '432px',
+  },
+  brandRow: {
+    display: 'flex',
+    alignItems: 'baseline',
+    justifyContent: 'center',
+    gap: '2px',
+    paddingBottom: '10px',
+  },
+  brandMana: {
+    fontFamily: "'Noto Serif Telugu', serif",
+    fontWeight: 800,
+    fontSize: '22px',
+    color: '#d6a820',
+    letterSpacing: '0.5px',
+  },
+  brandCalendar: {
+    fontFamily: "'Inter', system-ui, sans-serif",
+    fontWeight: 700,
+    fontSize: '20px',
+    color: '#d6a820',
+    letterSpacing: '0.5px',
+  },
+  brandDot: {
+    fontFamily: "'Inter', system-ui, sans-serif",
+    fontWeight: 500,
+    fontSize: '14px',
+    color: '#b88050',
+    opacity: 0.6,
   },
   calendarArea: {
     width: '100%',

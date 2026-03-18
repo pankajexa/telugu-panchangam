@@ -5,6 +5,7 @@ import NavigationHint from './NavigationHint';
 import MonthStrip from './MonthStrip';
 import MonthView from './MonthView';
 import TeluguMonthView from './TeluguMonthView';
+import EnglishMonthStrip from './EnglishMonthStrip';
 import ShareButton from './ShareButton';
 import FestivalWishes from './FestivalWishes';
 import { computeClipPath, drawFlip } from '../physics/drawFlip';
@@ -24,6 +25,7 @@ export default function CalendarPad({ onDateChange }) {
   const [currentIndex, setCurrentIndex] = useState(() => getTodayIndex());
   const [hasInteracted, setHasInteracted] = useState(false);
   const [showMonthStrip, setShowMonthStrip] = useState(false);
+  const [showEngMonthStrip, setShowEngMonthStrip] = useState(false);
   const [viewMode, setViewMode] = useState('day'); // 'day' | 'month' | 'telugu-month'
 
   // For conditional DOM rendering (under-page, canvas)
@@ -448,13 +450,15 @@ export default function CalendarPad({ onDateChange }) {
   });
 
   const switchToEnglishMonth = useCallback(() => {
-    const d = allDates[currentIndex];
-    if (d) {
-      setMonthViewYear(d.getFullYear());
-      setMonthViewMonth(d.getMonth());
-    }
+    setShowEngMonthStrip(true);
+  }, []);
+
+  const handleEngMonthSelect = useCallback((year, month) => {
+    setMonthViewYear(year);
+    setMonthViewMonth(month);
+    setShowEngMonthStrip(false);
     setViewMode('month');
-  }, [allDates, currentIndex]);
+  }, []);
 
   const switchToTeluguMonth = useCallback(() => {
     setShowMonthStrip(true);
@@ -620,6 +624,12 @@ export default function CalendarPad({ onDateChange }) {
         visible={showMonthStrip}
         onSelectMonth={handleSelectMonth}
         currentMonthIndex={currentIndex}
+      />
+      <EnglishMonthStrip
+        visible={showEngMonthStrip}
+        onSelectMonth={handleEngMonthSelect}
+        currentYear={monthViewYear}
+        currentMonth={monthViewMonth}
       />
     </div>
   );
