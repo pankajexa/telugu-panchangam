@@ -1,142 +1,72 @@
 import React, { useState, useCallback } from 'react';
-import { SAMVATSARAM } from '../data/constants';
-
-const SARVAM_API_URL = 'https://api.sarvam.ai/v1/chat/completions';
-const SARVAM_API_KEY = import.meta.env.VITE_SARVAM_API_KEY || '';
-const MODEL = 'sarvam-105b';
-
-async function generateWish(festival) {
-  const festivalName = festival.telugu;
-
-  const response = await fetch(SARVAM_API_URL, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${SARVAM_API_KEY}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      messages: [
-        {
-          role: 'system',
-          content: 'మీరు తెలుగు పండుగ శుభాకాంక్షలు రాసే కవి. సరిగ్గా 3 లైన్లు మాత్రమే రాయండి. అచ్చమైన తెలుగులో, వ్యాకరణ తప్పులు లేకుండా రాయాలి. సంతోషం, సమృద్ధి, ఆశీర్వాదాలు మాత్రమే.',
-        },
-        {
-          role: 'user',
-          content: 'దీపావళి శుభాకాంక్షలు రాయండి',
-        },
-        {
-          role: 'assistant',
-          content: 'దీపావళి వెలుగులు మీ ఇంటిని ఆనందంతో నింపాలి!\nసిరిసంపదలు, ఆరోగ్యం మీ కుటుంబాన్ని చేరాలి!\nఈ పండుగ మీ జీవితంలో కొత్త వెలుగులు తేవాలని ఆశిస్తున్నాం!',
-        },
-        {
-          role: 'user',
-          content: `${festivalName} శుభాకాంక్షలు రాయండి`,
-        },
-      ],
-      model: MODEL,
-      temperature: 0.6,
-      max_tokens: 4000,
-    }),
-  });
-
-  if (!response.ok) throw new Error(`API ${response.status}`);
-
-  const data = await response.json();
-  const msg = data.choices?.[0]?.message;
-  let text = (msg?.content || '').trim();
-
-  // Strip <think>...</think> reasoning block
-  text = text.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
-  if (text.includes('<think>')) {
-    text = text.replace(/<think>[\s\S]*/gi, '').trim();
-  }
-
-  // Keep only Telugu text
-  const teluguParts = text.split('\n').filter(line => /[\u0C00-\u0C7F]/.test(line));
-  let wish = teluguParts.join(' ').trim();
-
-  // Remove any trailing garbage (non-Telugu at end)
-  wish = wish.replace(/[a-zA-Z][\w\-]*$/g, '').trim();
-
-  if (!wish) throw new Error('Empty');
-
-  return `🙏 *${festivalName} శుభాకాంక్షలు* 🙏\n\n${wish}\n\n_${SAMVATSARAM}_\n\nShared from ManaCalendar.com`;
-}
-
-export default function FestivalWishes({ festival }) {
-  const [state, setState] = useState('idle');
-  const [message, setMessage] = useState('');
-
-  const handleTap = useCallback(async () => {
-    if (!festival || state === 'loading') return;
-
-    setState('loading');
-    try {
-      const text = await generateWish(festival);
-      setMessage(text);
-      setState('ready');
-    } catch (e) {
-      console.error('Wish gen failed:', e);
-      setState('error');
-      setTimeout(() => setState('idle'), 2000);
-    }
-  }, [festival, state]);
-
-  const handleShare = useCallback(() => {
-    if (!message) return;
-    // This runs directly from a user click — no popup blocker issue
-    const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
-    window.location.href = url;
-  }, [message]);
-
-  const handleRegen = useCallback(() => {
-    setState('idle');
-    setMessage('');
-  }, []);
-
-  if (!festival || !festival.major) return null;
-
-  // Step 1: Generate
-  if (state === 'idle' || state === 'loading' || state === 'error') {
-    return (
-      <button
-        style={{ ...styles.btn, ...(state === 'loading' ? styles.btnLoading : {}) }}
-        onClick={handleTap}
-        disabled={state === 'loading'}
-      >
-        {state === 'loading' ? (
-          <>
-            <span style={styles.dots}>···</span>
-            <span style={styles.text}>సిద్ధమవుతోంది</span>
-          </>
-        ) : state === 'error' ? (
-          <span style={styles.text}>మళ్ళీ ప్రయత్నించండి</span>
-        ) : (
-          <>
-            <span style={styles.icon}>✦</span>
-            <span style={styles.text}>శుభాకాంక్షలు పంపండి</span>
-          </>
-        )}
-      </button>
-    );
-  }
-
-  // Step 2: Message ready — show share + regenerate buttons
-  return (
-    <div style={styles.readyRow}>
-      <button style={styles.shareBtn} onClick={handleShare}>
-        <span style={styles.shareIcon}>↗</span>
-        <span style={styles.text}>WhatsApp పంపండి</span>
-      </button>
-      <button style={styles.regenBtn} onClick={handleRegen}>
-        <span style={styles.regenText}>↻</span>
-      </button>
-    </div>
-  );
-}
+import { WISH_TEMPLATES } from '../data/wishTemplates';
 
 const WA = '#25D366';
 const TELUGU = "'Noto Serif Telugu', serif";
+const SERIF = "'Inter', system-ui, sans-serif";
+const INK = '#3a150a';
+const INK2 = '#6b2d15';
+const INK3 = '#915838';
+const INK4 = '#b88050';
+
+function shareToWhatsApp(message, festivalName) {
+  const text = `🙏 *${festivalName} శుభాకాంక్షలు* 🙏\n\n${message}\n\nShared from ManaCalendar.com`;
+  const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+  window.location.href = url;
+}
+
+export default function FestivalWishes({ festival }) {
+  const [showPicker, setShowPicker] = useState(false);
+
+  const handleOpen = useCallback(() => {
+    setShowPicker(true);
+  }, []);
+
+  const handleClose = useCallback(() => {
+    setShowPicker(false);
+  }, []);
+
+  const handleSelect = useCallback((template) => {
+    setShowPicker(false);
+    shareToWhatsApp(template.message, festival.telugu);
+  }, [festival]);
+
+  if (!festival || !festival.major) return null;
+
+  return (
+    <>
+      <button style={styles.btn} onClick={handleOpen}>
+        <span style={styles.icon}>✦</span>
+        <span style={styles.text}>శుభాకాంక్షలు పంపండి</span>
+      </button>
+
+      {showPicker && (
+        <div style={styles.overlay} onClick={handleClose}>
+          <div style={styles.panel} onClick={e => e.stopPropagation()}>
+            <div style={styles.panelHeader}>
+              <span style={styles.panelTitle}>సందేశం ఎంచుకోండి</span>
+              <button style={styles.closeBtn} onClick={handleClose}>✕</button>
+            </div>
+            <div style={styles.templateList}>
+              {WISH_TEMPLATES.map((t, i) => (
+                <button key={i} style={styles.templateBtn} onClick={() => handleSelect(t)}>
+                  <div style={styles.templateTheme}>
+                    <span style={styles.themeIcon}>✦</span>
+                    <span style={styles.themeName}>{t.theme}</span>
+                    <span style={styles.themeEn}>{t.themeEn}</span>
+                  </div>
+                  <div style={styles.templatePreview}>
+                    {t.message.split('\n')[0].slice(0, 50)}...
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
 
 const styles = {
   btn: {
@@ -149,40 +79,104 @@ const styles = {
     padding: '10px 22px',
     cursor: 'pointer',
   },
-  btnLoading: {
-    opacity: 0.7,
-    cursor: 'wait',
-  },
   icon: { fontSize: '16px', color: WA },
   text: { fontFamily: TELUGU, fontWeight: 700, fontSize: '14px', color: WA },
-  dots: { fontSize: '18px', color: WA, letterSpacing: '2px', animation: 'pulse 1s ease-in-out infinite' },
 
-  readyRow: {
+  // Full-screen overlay
+  overlay: {
+    position: 'fixed',
+    inset: 0,
+    background: 'rgba(0,0,0,0.6)',
+    zIndex: 100,
+    display: 'flex',
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+  },
+
+  // Bottom panel
+  panel: {
+    width: '100%',
+    maxWidth: '432px',
+    maxHeight: '70vh',
+    background: 'linear-gradient(to top, #1a120e, #2a1e14)',
+    borderRadius: '16px 16px 0 0',
+    display: 'flex',
+    flexDirection: 'column',
+    overflow: 'hidden',
+  },
+  panelHeader: {
     display: 'flex',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: '14px 18px 10px',
+    borderBottom: '1px solid rgba(214,168,32,0.15)',
+  },
+  panelTitle: {
+    fontFamily: TELUGU,
+    fontWeight: 700,
+    fontSize: '16px',
+    color: '#d6a820',
+  },
+  closeBtn: {
+    background: 'none',
+    border: 'none',
+    fontSize: '18px',
+    color: '#d6a820',
+    opacity: 0.5,
+    cursor: 'pointer',
+    padding: '4px 8px',
+  },
+
+  // Template list
+  templateList: {
+    flex: 1,
+    overflowY: 'auto',
+    padding: '8px 12px 20px',
+    display: 'flex',
+    flexDirection: 'column',
     gap: '8px',
   },
-  shareBtn: {
+  templateBtn: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '4px',
+    background: 'rgba(214,168,32,0.06)',
+    border: '1px solid rgba(214,168,32,0.15)',
+    borderRadius: '10px',
+    padding: '10px 14px',
+    cursor: 'pointer',
+    textAlign: 'left',
+    transition: 'background 150ms',
+  },
+  templateTheme: {
     display: 'flex',
     alignItems: 'center',
     gap: '6px',
-    background: 'rgba(37,211,102,0.12)',
-    border: '1.5px solid rgba(37,211,102,0.45)',
-    borderRadius: '28px',
-    padding: '10px 22px',
-    cursor: 'pointer',
   },
-  shareIcon: { fontSize: '16px', color: WA },
-  regenBtn: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    background: 'none',
-    border: '1.5px solid rgba(214,168,32,0.25)',
-    borderRadius: '50%',
-    width: '38px',
-    height: '38px',
-    cursor: 'pointer',
+  themeIcon: {
+    fontSize: '10px',
+    color: '#d6a820',
+    opacity: 0.6,
   },
-  regenText: { fontSize: '18px', color: '#d6a820', opacity: 0.7 },
+  themeName: {
+    fontFamily: TELUGU,
+    fontWeight: 700,
+    fontSize: '14px',
+    color: '#d6a820',
+  },
+  themeEn: {
+    fontFamily: SERIF,
+    fontWeight: 500,
+    fontSize: '10px',
+    color: INK4,
+    letterSpacing: '0.5px',
+  },
+  templatePreview: {
+    fontFamily: TELUGU,
+    fontWeight: 400,
+    fontSize: '11px',
+    color: '#b88050',
+    lineHeight: 1.4,
+    opacity: 0.7,
+  },
 };
