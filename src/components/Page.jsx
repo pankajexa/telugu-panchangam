@@ -1,0 +1,373 @@
+import React, { memo } from 'react';
+import BindingStrip from './BindingStrip';
+import { SAMVATSARAM, CITY } from '../data/constants';
+
+function to12Hr(time24) {
+  const [hh, mm] = time24.split(':').map(Number);
+  const period = hh >= 12 ? 'PM' : 'AM';
+  const h = hh % 12 || 12;
+  return { time: `${h}:${mm.toString().padStart(2, '0')}`, period };
+}
+
+function SunriseIcon() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style={{ display: 'block' }}>
+      <line x1="1" y1="18" x2="23" y2="18" stroke="currentColor" strokeWidth="0.7" opacity="0.35" />
+      <path d="M6 18 A6 6 0 0 1 18 18" fill="none" stroke="currentColor" strokeWidth="1.5" />
+      <line x1="12" y1="5" x2="12" y2="8.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+      <line x1="7.2" y1="7" x2="9" y2="9.2" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
+      <line x1="16.8" y1="7" x2="15" y2="9.2" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
+      <line x1="4" y1="12" x2="6.8" y2="12.5" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
+      <line x1="20" y1="12" x2="17.2" y2="12.5" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
+      <polyline points="10,5.5 12,3.2 14,5.5" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function SunsetIcon() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style={{ display: 'block' }}>
+      <line x1="1" y1="18" x2="23" y2="18" stroke="currentColor" strokeWidth="0.7" opacity="0.35" />
+      <path d="M6 18 A6 6 0 0 1 18 18" fill="none" stroke="currentColor" strokeWidth="1.5" />
+      <line x1="12" y1="6" x2="12" y2="9" stroke="currentColor" strokeWidth="1" strokeLinecap="round" opacity="0.5" />
+      <line x1="7.5" y1="8" x2="9" y2="10" stroke="currentColor" strokeWidth="0.9" strokeLinecap="round" opacity="0.4" />
+      <line x1="16.5" y1="8" x2="15" y2="10" stroke="currentColor" strokeWidth="0.9" strokeLinecap="round" opacity="0.4" />
+      <line x1="4" y1="12" x2="6.8" y2="12.5" stroke="currentColor" strokeWidth="0.9" strokeLinecap="round" opacity="0.4" />
+      <line x1="20" y1="12" x2="17.2" y2="12.5" stroke="currentColor" strokeWidth="0.9" strokeLinecap="round" opacity="0.4" />
+      <line x1="12" y1="18.5" x2="12" y2="22" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" opacity="0.6" />
+      <polyline points="10,20.5 12,22.5 14,20.5" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" opacity="0.6" />
+    </svg>
+  );
+}
+
+const Page = memo(function Page({ data, dayIndex, totalDays }) {
+  if (!data) return null;
+
+  const isSunday = data.isSunday;
+  const hasFestival = !!data.festival;
+  const isMajor = hasFestival && data.festival.major;
+  const isMuhurtham = data.festival?.isMuhurtham;
+
+  const rise = to12Hr(data.sunrise);
+  const set = to12Hr(data.sunset);
+
+  return (
+    <div className="paper-texture page-paper" style={styles.page}>
+      <BindingStrip />
+
+      <div style={styles.content}>
+
+        {/* ── Header: Telugu day + month ── */}
+        <div style={styles.headerRow}>
+          <span style={styles.teluguDay}>{data.vaaram}</span>
+          <span style={styles.teluguMonth}>{data.masam.telugu}</span>
+        </div>
+
+        {/* ── Sub-header: English ── */}
+        <div style={styles.subHeaderRow}>
+          <span style={styles.subText}>{data.englishDay}</span>
+          <span style={styles.subTextCenter}>{data.englishMonth} {data.year}</span>
+          <span style={styles.subText}>{data.masam.english}</span>
+        </div>
+
+        {/* ── Centerpiece: Sunrise · Date · Sunset ── */}
+        <div style={styles.dateBlock}>
+          <div style={styles.sunCol}>
+            <div style={styles.sunIcon}><SunriseIcon /></div>
+            <div style={styles.sunTime}>{rise.time}</div>
+            <div style={styles.sunPeriod}>{rise.period}</div>
+          </div>
+
+          <div style={{
+            ...styles.dateNumber,
+            ...(isSunday ? styles.sundayDate : {}),
+            ...(isMajor ? styles.festivalDate : {}),
+          }}>
+            {isMuhurtham && <span style={styles.star}>✦</span>}
+            {data.dateNum}
+          </div>
+
+          <div style={styles.sunCol}>
+            <div style={styles.sunIcon}><SunsetIcon /></div>
+            <div style={styles.sunTime}>{set.time}</div>
+            <div style={styles.sunPeriod}>{set.period}</div>
+          </div>
+        </div>
+
+        {/* ── Festival name — woven into the date identity, not a separate block ── */}
+        {hasFestival ? (
+          <div style={styles.festivalZone}>
+            {isMajor && <div style={styles.festivalOrnament}>✦&ensp;✦&ensp;✦</div>}
+            <div style={isMajor ? styles.festivalNameMajor : styles.festivalName}>
+              {data.festival.telugu}
+            </div>
+            {data.festival.description && (
+              <div style={styles.festivalDesc}>{data.festival.description}</div>
+            )}
+          </div>
+        ) : (
+          /* Non-festival days: just a small flourish */
+          <div style={styles.flourish}>
+            <svg width="50" height="6" viewBox="0 0 50 6">
+              <path d="M5,3 Q12,0 18,3 T32,3 T45,3"
+                fill="none" stroke={INK4} strokeWidth="0.8" opacity="0.4" />
+            </svg>
+          </div>
+        )}
+
+        {/* ── Paksha · Tithi with start/end times ── */}
+        <div style={styles.tithiLine}>
+          <TithiDT dt={data.tithi.start} />
+          <span style={styles.tithiDash}>──</span>
+          <span style={styles.tithiText}>{data.paksha} {data.tithi.name}</span>
+          <span style={styles.tithiDash}>──</span>
+          <TithiDT dt={data.tithi.end} />
+        </div>
+
+        {/* ── Nakshatra ── */}
+        <div style={styles.nakshatraBlock}>
+          <div style={styles.nakshatraLabel}>నక్షత్రం</div>
+          <div style={styles.nakshatraName}>{data.nakshatra.name}</div>
+          <div style={styles.nakshatraTimes}>
+            <NakshatraDT dt={data.nakshatra.start} />
+            <span style={styles.nakshatraSep}> ─ </span>
+            <NakshatraDT dt={data.nakshatra.end} />
+          </div>
+        </div>
+
+        {/* ── Yogam · Karanam ── */}
+        <div style={styles.panchRow}>
+          <div style={styles.panchItem}>
+            <span style={styles.panchLabel}>యోగం</span>
+            <span style={styles.panchValue}>{data.yogam.name}</span>
+          </div>
+          <div style={styles.panchDot}>·</div>
+          <div style={styles.panchItem}>
+            <span style={styles.panchLabel}>కరణం</span>
+            <span style={styles.panchValue}>{data.karanam.name}</span>
+          </div>
+        </div>
+
+        {/* ── Separator ── */}
+        <div style={styles.sep} />
+
+        {/* ── Inauspicious timings ── */}
+        <div style={styles.timingsBlock}>
+          <div style={styles.timingsRow}>
+            <Timing label="రాహు" value={data.rahuKalam} />
+            <Timing label="వర్జ్యం" value={data.varjyam} />
+            <Timing label="దుర్ము." value={data.durmuhurtham} />
+          </div>
+        </div>
+
+        {/* ── Footer ── */}
+        <div style={styles.footer}>
+          {SAMVATSARAM} · {CITY}
+        </div>
+      </div>
+    </div>
+  );
+});
+
+function TithiDT({ dt }) {
+  if (dt.sameDay) {
+    return <span style={styles.tithiTime}>{dt.time}</span>;
+  }
+  return (
+    <span style={styles.tithiTime}>
+      <span style={styles.tithiTimeDate}>{dt.date} </span>{dt.time}
+    </span>
+  );
+}
+
+function NakshatraDT({ dt }) {
+  if (dt.sameDay) {
+    return <span style={styles.nakshatraTime}>{dt.time}</span>;
+  }
+  return (
+    <span style={styles.nakshatraTime}>
+      <span style={styles.nakshatraDate}>{dt.date}, </span>{dt.time}
+    </span>
+  );
+}
+
+function Timing({ label, value }) {
+  return (
+    <div style={styles.timingItem}>
+      <div style={styles.timingLabel}>{label}</div>
+      <div style={styles.timingValue}>{value}</div>
+    </div>
+  );
+}
+
+export default Page;
+
+// ─────────────────────────────────────────────
+const INK  = '#3a150a';
+const INK2 = '#6b2d15';
+const INK3 = '#915838';
+const INK4 = '#b88050';
+const FEST = '#d45500';  // festival orange
+const SERIF = "'Inter', system-ui, sans-serif";
+const DATE_NUM = "'Abril Fatface', Georgia, serif";
+const TELUGU = "'Noto Serif Telugu', serif";
+
+const styles = {
+  page: {
+    width: '100%',
+    aspectRatio: '1 / 1.15',
+    borderRadius: '3px',
+    display: 'flex',
+    flexDirection: 'column',
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  content: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    padding: '3px 16px 8px',
+    overflow: 'hidden',
+  },
+
+  // Header
+  headerRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'baseline',
+    marginTop: '3px',
+  },
+  teluguDay:   { fontFamily: TELUGU, fontWeight: 700, fontSize: '18px', color: INK },
+  teluguMonth: { fontFamily: TELUGU, fontWeight: 600, fontSize: '15px', color: INK2 },
+
+  subHeaderRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'baseline',
+  },
+  subText:       { fontFamily: SERIF, fontWeight: 500, fontSize: '11px', color: INK3, letterSpacing: '0.4px' },
+  subTextCenter: { fontFamily: SERIF, fontWeight: 600, fontSize: '13px', color: INK2, letterSpacing: '2.5px' },
+
+  // Date block
+  dateBlock: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    margin: '4px 0 2px',
+  },
+  sunCol: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: '1px',
+    minWidth: '50px',
+    color: INK,
+  },
+  sunIcon:    { lineHeight: 0 },
+  sunTime:    { fontFamily: SERIF, fontWeight: 700, fontSize: '16px', color: INK, letterSpacing: '0.3px', lineHeight: 1.1 },
+  sunPeriod:  { fontFamily: SERIF, fontWeight: 500, fontSize: '10px', color: INK3, letterSpacing: '1px' },
+  dateNumber: {
+    fontFamily: DATE_NUM, fontWeight: 400, fontSize: '90px', color: FEST,
+    textAlign: 'center', lineHeight: 0.88, letterSpacing: '-1px', flex: 1,
+  },
+  sundayDate:   { textShadow: `1.5px 0 0 ${INK}, -0.5px 0 0 ${INK}, 0 1px 0 rgba(58,21,10,0.15)` },
+  festivalDate: {},
+  star: { fontSize: '14px', verticalAlign: 'super', color: INK2, marginRight: '2px' },
+
+  // Festival zone — sits in the same space as the flourish, no extra height
+  festivalZone: {
+    textAlign: 'center',
+    margin: '0 0 1px',
+  },
+  festivalOrnament: {
+    fontSize: '6px',
+    color: INK3,
+    letterSpacing: '3px',
+    opacity: 0.6,
+    lineHeight: 1,
+    marginBottom: '1px',
+  },
+  festivalNameMajor: {
+    fontFamily: TELUGU,
+    fontWeight: 900,
+    fontSize: '18px',
+    color: FEST,
+    lineHeight: 1.25,
+  },
+  festivalName: {
+    fontFamily: TELUGU,
+    fontWeight: 700,
+    fontSize: '15px',
+    color: FEST,
+    lineHeight: 1.25,
+  },
+  festivalDesc: {
+    fontFamily: TELUGU,
+    fontWeight: 400,
+    fontSize: '11px',
+    color: INK3,
+    lineHeight: 1.2,
+  },
+
+  // Non-festival flourish
+  flourish: {
+    textAlign: 'center',
+    margin: '0 0 1px',
+    lineHeight: 0,
+  },
+
+  // Tithi
+  tithiLine: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '4px',
+    margin: '4px 0 3px',
+  },
+  tithiDash: { color: INK4, fontSize: '8px', letterSpacing: '1px', opacity: 0.5 },
+  tithiText: { fontFamily: TELUGU, fontWeight: 700, fontSize: '15px', color: INK, whiteSpace: 'nowrap' },
+  tithiTime: { fontFamily: SERIF, fontWeight: 500, fontSize: '8px', color: INK3, whiteSpace: 'nowrap' },
+  tithiTimeDate: { fontSize: '7px', color: INK4 },
+
+  // Nakshatra
+  nakshatraBlock: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    margin: '4px 0 3px',
+    padding: '4px 0',
+    borderTop: `1px solid rgba(58,21,10,0.06)`,
+    borderBottom: `1px solid rgba(58,21,10,0.06)`,
+  },
+  nakshatraLabel: { fontFamily: TELUGU, fontWeight: 500, fontSize: '9px', color: INK4, letterSpacing: '1.5px' },
+  nakshatraName:  { fontFamily: TELUGU, fontWeight: 800, fontSize: '18px', color: INK, lineHeight: 1.3 },
+  nakshatraTimes: { display: 'flex', alignItems: 'center', marginTop: '2px' },
+  nakshatraTime:  { fontFamily: SERIF, fontWeight: 600, fontSize: '13px', color: INK2, whiteSpace: 'nowrap' },
+  nakshatraDate:  { fontWeight: 500, fontSize: '10px', color: INK3 },
+  nakshatraSep:   { fontFamily: SERIF, fontSize: '11px', color: INK4, margin: '0 3px' },
+
+  // Yogam · Karanam
+  panchRow: {
+    display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: '8px', margin: '3px 0',
+  },
+  panchItem:  { display: 'flex', alignItems: 'baseline', gap: '5px' },
+  panchLabel: { fontFamily: TELUGU, fontWeight: 500, fontSize: '11px', color: INK3 },
+  panchValue: { fontFamily: TELUGU, fontWeight: 700, fontSize: '14px', color: INK },
+  panchDot:   { fontFamily: SERIF, fontSize: '14px', color: INK4, opacity: 0.5 },
+
+  // Separator
+  sep: { width: '70%', margin: '3px auto', borderTop: '1px solid rgba(58,21,10,0.07)' },
+
+  // Timings
+  timingsBlock: { margin: '2px 0' },
+  timingsRow: { display: 'flex', justifyContent: 'space-between', gap: '6px', padding: '0 2px' },
+  timingItem:  { display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1 },
+  timingLabel: { fontFamily: TELUGU, fontWeight: 500, fontSize: '9px', color: INK3, marginBottom: '1px' },
+  timingValue: { fontFamily: SERIF, fontWeight: 600, fontSize: '9px', color: INK2, letterSpacing: '0.1px', whiteSpace: 'nowrap' },
+
+  // Footer
+  footer: {
+    fontFamily: TELUGU, fontWeight: 400, fontSize: '9px', color: INK4,
+    textAlign: 'center', marginTop: 'auto', paddingTop: '3px', letterSpacing: '0.3px',
+  },
+};

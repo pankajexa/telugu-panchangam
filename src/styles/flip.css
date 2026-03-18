@@ -1,0 +1,22 @@
+/* Physics-based flip — all rendering is done via Canvas + clip-path.
+   This file only contains the navigation hint animation. */
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+@keyframes pulseUp {
+  0%, 100% {
+    transform: translateY(0);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translateY(-10px);
+    opacity: 0.9;
+  }
+}
+
+.nav-hint {
+  animation: pulseUp 2s ease-in-out infinite;
+}
