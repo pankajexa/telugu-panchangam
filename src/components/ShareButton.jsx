@@ -59,6 +59,8 @@ function buildShareText(data) {
 
   lines.push(`_${SAMVATSARAM}_`);
   lines.push(`_${CITY} పంచాంగం_`);
+  lines.push(``);
+  lines.push(`Shared from ManaCalendar.com`);
 
   return lines.join('\n');
 }

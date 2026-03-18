@@ -60,7 +60,7 @@ async function generateWish(festival) {
 
   if (!wish) throw new Error('Empty');
 
-  return `🙏 *${festivalName} శుభాకాంక్షలు* 🙏\n\n${wish}\n\n_${SAMVATSARAM}_`;
+  return `🙏 *${festivalName} శుభాకాంక్షలు* 🙏\n\n${wish}\n\n_${SAMVATSARAM}_\n\nShared from ManaCalendar.com`;
 }
 
 export default function FestivalWishes({ festival }) {
