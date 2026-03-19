@@ -26,37 +26,25 @@ function buildShareText(data) {
 
   let lines = [];
 
-  lines.push(`🍃🌺🍃🌺🍃🪷🍃🌺🍃🌺🍃`);
+  lines.push(`*శుభోదయం*`);
   lines.push(``);
-  lines.push(`🙏 *శుభోదయం* 🙏`);
-  lines.push(``);
-  lines.push(`📅 *${dateStr}*`);
+  lines.push(`*${dateStr}*`);
   lines.push(`${data.masam.telugu} | ${data.paksha} ${data.tithi.name}`);
 
-  // Festival
   if (data.festival) {
-    lines.push(``);
-    lines.push(`✦ *${data.festival.telugu}* ✦`);
-    if (data.festival.description) {
-      lines.push(`   ${data.festival.description}`);
-    }
+    lines.push(`*${data.festival.telugu}*`);
   }
 
   lines.push(``);
-  lines.push(`┌─────────────────────┐`);
-  lines.push(`│ 🌅 సూర్యోదయం   *${to12Hr(data.sunrise)}*`);
-  lines.push(`│ 🌇 సూర్యాస్తమయం *${to12Hr(data.sunset)}*`);
-  lines.push(`│ ⭐ నక్షత్రం       *${data.nakshatra.name}*`);
-  lines.push(`│ 🕉 యోగం           ${data.yogam.name}`);
-  lines.push(`└─────────────────────┘`);
-
+  lines.push(`సూర్యోదయం *${to12Hr(data.sunrise)}*`);
+  lines.push(`సూర్యాస్తమయం *${to12Hr(data.sunset)}*`);
+  lines.push(`నక్షత్రం *${data.nakshatra.name}*`);
+  lines.push(`యోగం ${data.yogam.name}`);
   lines.push(``);
-  lines.push(`⚠ రాహు ${data.rahuKalam}`);
-  lines.push(`⚠ వర్జ్యం ${data.varjyam}`);
-  lines.push(`⚠ దుర్ము. ${data.durmuhurtham}`);
-
+  lines.push(`రాహు ${data.rahuKalam}`);
+  lines.push(`వర్జ్యం ${data.varjyam}`);
+  lines.push(`దుర్ము. ${data.durmuhurtham}`);
   lines.push(``);
-  lines.push(`🍃🌺🍃🌺🍃🪷🍃🌺🍃🌺🍃`);
   lines.push(`_${SAMVATSARAM}_`);
   lines.push(`_${CITY} పంచాంగం_`);
   lines.push(``);

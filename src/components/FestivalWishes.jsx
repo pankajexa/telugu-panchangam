@@ -9,7 +9,7 @@ const INK3 = '#915838';
 const INK4 = '#b88050';
 
 function shareToWhatsApp(message, festivalName) {
-  const text = `🍃🌺🍃🌺🍃🪷🍃🌺🍃🌺🍃\n\n🙏 *శ్రీ పరాభవ నామ సంవత్సర ${festivalName} శుభాకాంక్షలు* 🙏\n\n${message}\n\n🍃🌺🍃🌺🍃🪷🍃🌺🍃🌺🍃\n\n_shared from manacalendar.com_`;
+  const text = `*శ్రీ పరాభవ నామ సంవత్సర ${festivalName} శుభాకాంక్షలు*\n\n${message}\n\n_shared from manacalendar.com_`;
   window.location.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
 }
 
