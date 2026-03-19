@@ -1,4 +1,5 @@
 import React, { useCallback } from 'react';
+import { track } from '@vercel/analytics';
 import { SAMVATSARAM, CITY } from '../data/constants';
 
 const TELUGU_MONTHS_MAP = {
@@ -56,6 +57,7 @@ function buildShareText(data) {
 export default function ShareButton({ data }) {
   const handleShare = useCallback(() => {
     if (!data) return;
+    track('share_tithi', { date: data.date, festival: data.festival?.english || 'none' });
 
     const text = buildShareText(data);
 

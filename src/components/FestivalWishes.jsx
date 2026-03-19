@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react';
+import { track } from '@vercel/analytics';
 import { WISH_TEMPLATES } from '../data/wishTemplates';
 
 const WA = '#25D366';
@@ -20,6 +21,7 @@ export default function FestivalWishes({ festival }) {
   const handleClose = useCallback(() => setShowPicker(false), []);
   const handleSelect = useCallback((template) => {
     setShowPicker(false);
+    track('share_wishes', { festival: festival.english, theme: template.themeEn });
     shareToWhatsApp(template.message, festival.telugu);
   }, [festival]);
 
