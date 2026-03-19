@@ -1,22 +1,24 @@
-/* Physics-based flip — all rendering is done via Canvas + clip-path.
-   This file only contains the navigation hint animation. */
+/* Page flip animations */
 
 @keyframes pulse {
   0%, 100% { opacity: 0.3; }
   50% { opacity: 1; }
 }
 
-@keyframes pulseUp {
-  0%, 100% {
-    transform: translateY(0);
-    opacity: 0.5;
+/* Corner curl — stays flat, gentle lift, settle back */
+@keyframes pageLift {
+  0%, 60%, 100% {
+    transform: scale(1);
   }
-  50% {
-    transform: translateY(-10px);
-    opacity: 0.9;
+  75% {
+    transform: scale(1.3);
+  }
+  88% {
+    transform: scale(1.05);
   }
 }
 
-.nav-hint {
-  animation: pulseUp 2s ease-in-out infinite;
+.page-lift-hint {
+  animation: pageLift 3.5s ease-in-out infinite;
+  transform-origin: bottom right;
 }

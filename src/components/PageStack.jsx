@@ -2,25 +2,23 @@ import React from 'react';
 
 export default function PageStack({ dayIndex, totalDays }) {
   const remaining = totalDays - dayIndex;
-  const stackLayers = Math.max(1, Math.min(3, Math.ceil(remaining / 128)));
+  const stackLayers = Math.max(2, Math.min(4, Math.ceil(remaining / 96)));
 
   return (
     <div style={styles.container}>
       {Array.from({ length: stackLayers }).map((_, i) => {
-        const offset = (i + 1) * 2;
+        const offset = (i + 1) * 3;
         return (
           <div
             key={i}
             style={{
-              position: 'absolute',
-              bottom: -offset + 'px',
-              left: offset + 'px',
-              right: offset + 'px',
-              height: '2px',
-              background: `rgb(${196 - i * 12}, ${152 - i * 10}, ${24 - i * 4})`,
-              borderRadius: '0 0 2px 2px',
-              zIndex: -1 - i,
-              boxShadow: `0 1px 2px rgba(60,30,10,${0.08 + i * 0.04})`,
+              position: 'relative',
+              width: `calc(100% - ${(offset + 1) * 2}px)`,
+              margin: '0 auto',
+              height: '3px',
+              background: `rgb(${210 - i * 15}, ${168 - i * 12}, ${32 - i * 5})`,
+              borderRadius: '0 0 3px 3px',
+              boxShadow: `0 1px 3px rgba(60,30,10,${0.1 + i * 0.05})`,
             }}
           />
         );
@@ -31,8 +29,6 @@ export default function PageStack({ dayIndex, totalDays }) {
 
 const styles = {
   container: {
-    position: 'relative',
     width: '100%',
-    height: 0,
   },
 };

@@ -17,36 +17,36 @@ export function UgadiTop() {
   return (
     <svg viewBox="0 0 360 110" style={svgStyle}>
       <g transform="translate(180,24)" opacity="0.65">
-        {/* === KALASHA === */}
-        {/* Pot body — filled with golden glow */}
-        <path d="M-14,70 Q-18,65 -20,55 Q-22,42 -18,32 Q-14,25 -10,22
-                 L-8,22 Q-10,18 -10,15 L10,15 Q10,18 8,22
-                 L10,22 Q14,25 18,32 Q22,42 20,55 Q18,65 14,70"
+        {/* === KALASHA — wide round belly === */}
+        {/* Pot body — wide, round, like a real brass lota */}
+        <path d="M-18,70 Q-28,64 -34,50 Q-36,38 -30,28 Q-24,22 -14,20
+                 L-12,20 Q-14,17 -14,14 L14,14 Q14,17 12,20
+                 L14,20 Q24,22 30,28 Q36,38 34,50 Q28,64 18,70"
           stroke={G} strokeWidth="1.4" fill="#d6a820" fillOpacity="0.15" />
         {/* Inner glow on pot belly */}
-        <path d="M-12,60 Q-14,50 -12,38 Q-8,30 0,28 Q8,30 12,38 Q14,50 12,60"
+        <path d="M-20,60 Q-26,46 -20,34 Q-10,26 0,24 Q10,26 20,34 Q26,46 20,60"
           fill="#f5d050" fillOpacity="0.1" stroke="none" />
         {/* Flat base */}
-        <path d="M-14,70 Q-10,73 0,74 Q10,73 14,70" {...sw(1.2)} />
-        <line x1="-11" y1="74" x2="11" y2="74" {...sw(1)} />
-        {/* Pot mouth rim — filled */}
-        <ellipse cx="0" cy="15" rx="12" ry="3.5"
+        <path d="M-18,70 Q-10,74 0,75 Q10,74 18,70" {...sw(1.2)} />
+        <line x1="-14" y1="75" x2="14" y2="75" {...sw(1)} />
+        {/* Pot mouth rim — wider than neck */}
+        <ellipse cx="0" cy="14" rx="16" ry="4"
           stroke={G} strokeWidth="1.2" fill="#d6a820" fillOpacity="0.2" />
         {/* === Decorative designs on belly === */}
         {/* Om symbol in center of pot */}
-        <text x="0" y="44" textAnchor="middle" fontFamily="serif"
-          fontSize="14" fill={G} fillOpacity="0.35" stroke="none">ॐ</text>
+        <text x="0" y="46" textAnchor="middle" fontFamily="serif"
+          fontSize="16" fill={G} fillOpacity="0.35" stroke="none">ॐ</text>
         {/* Decorative bands */}
-        <path d="M-20,35 Q0,31 20,35" {...sw2(0.7)} opacity="0.5" />
-        <path d="M-20,37 Q0,33 20,37" {...sw2(0.5)} opacity="0.4" />
-        <path d="M-19,54 Q0,50 19,54" {...sw2(0.7)} opacity="0.5" />
-        <path d="M-19,56 Q0,52 19,56" {...sw2(0.5)} opacity="0.4" />
+        <path d="M-32,32 Q0,27 32,32" {...sw2(0.7)} opacity="0.5" />
+        <path d="M-31,34 Q0,29 31,34" {...sw2(0.5)} opacity="0.4" />
+        <path d="M-32,56 Q0,51 32,56" {...sw2(0.7)} opacity="0.5" />
+        <path d="M-31,58 Q0,53 31,58" {...sw2(0.5)} opacity="0.4" />
         {/* Small paisley/mango motifs on belly sides */}
-        <path d="M-12,44 Q-14,40 -10,38 Q-8,40 -10,44" {...sw2(0.5)} opacity="0.35" />
-        <path d="M12,44 Q14,40 10,38 Q8,40 10,44" {...sw2(0.5)} opacity="0.35" />
+        <path d="M-20,44 Q-23,39 -18,36 Q-15,39 -18,44" {...sw2(0.5)} opacity="0.35" />
+        <path d="M20,44 Q23,39 18,36 Q15,39 18,44" {...sw2(0.5)} opacity="0.35" />
         {/* Dots between bands */}
-        {[-8, -3, 3, 8].map(x => (
-          <circle key={x} cx={x} cy={46} r="0.8" fill={G} opacity="0.3" />
+        {[-14, -7, 0, 7, 14].map(x => (
+          <circle key={x} cx={x} cy={48} r="1" fill={G} opacity="0.3" />
         ))}
         {/* === MANGO LEAVES — large, fanning from behind coconut === */}
         {/* Left leaves */}
@@ -59,26 +59,26 @@ export function UgadiTop() {
         <path d="M-8,6 Q-16,-2 -20,-6" {...sw2(0.3)} opacity="0.25" />
         <path d="M8,6 Q16,-2 20,-6" {...sw2(0.3)} opacity="0.25" />
 
-        {/* === COCONUT — large egg shape sitting upright on leaves === */}
-        <path d="M-9,12 Q-11,2 -9,-10 Q-6,-20 0,-24 Q6,-20 9,-10 Q11,2 9,12"
+        {/* === COCONUT — wide round body, pointed top like real coconut === */}
+        <path d="M-14,10 Q-16,2 -14,-6 Q-12,-14 -6,-20 Q-2,-24 0,-26 Q2,-24 6,-20 Q12,-14 14,-6 Q16,2 14,10"
           stroke={G} strokeWidth="1.4" fill="#d6a820" fillOpacity="0.25" />
-        {/* Fibrous texture — vertical lines */}
-        <path d="M-5,10 Q-6,-2 -4,-18" {...sw2(0.3)} opacity="0.2" />
-        <path d="M-2,11 Q-2,-4 -1,-22" {...sw2(0.3)} opacity="0.2" />
-        <path d="M2,11 Q2,-4 1,-22" {...sw2(0.3)} opacity="0.2" />
-        <path d="M5,10 Q6,-2 4,-18" {...sw2(0.3)} opacity="0.2" />
+        {/* Fibrous texture — vertical curved lines */}
+        <path d="M-9,8 Q-10,-2 -6,-18" {...sw2(0.35)} opacity="0.2" />
+        <path d="M-4,9 Q-4,-4 -2,-22" {...sw2(0.3)} opacity="0.18" />
+        <path d="M4,9 Q4,-4 2,-22" {...sw2(0.3)} opacity="0.18" />
+        <path d="M9,8 Q10,-2 6,-18" {...sw2(0.35)} opacity="0.2" />
         {/* Thread tied around middle */}
-        <path d="M-9,0 Q0,-2 9,0" stroke={G} strokeWidth="0.7" fill="none" opacity="0.4" />
-        <path d="M-9,1.5 Q0,-0.5 9,1.5" stroke={G} strokeWidth="0.5" fill="none" opacity="0.3" />
+        <path d="M-14,-2 Q0,-5 14,-2" stroke={G} strokeWidth="0.7" fill="none" opacity="0.4" />
+        <path d="M-14,-0.5 Q0,-3.5 14,-0.5" stroke={G} strokeWidth="0.5" fill="none" opacity="0.3" />
         {/* Kumkum dot */}
-        <circle cx="0" cy="-2" r="1.5" fill="#d45500" opacity="0.5" />
+        <circle cx="0" cy="-6" r="1.8" fill="#d45500" opacity="0.5" />
         {/* Three eyes near bottom */}
-        <circle cx="-2.5" cy="6" r="1" fill={G} opacity="0.3" />
-        <circle cx="2.5" cy="6" r="1" fill={G} opacity="0.3" />
-        <circle cx="0" cy="8" r="0.8" fill={G} opacity="0.25" />
+        <circle cx="-4" cy="5" r="1.2" fill={G} opacity="0.3" />
+        <circle cx="4" cy="5" r="1.2" fill={G} opacity="0.3" />
+        <circle cx="0" cy="7" r="1" fill={G} opacity="0.25" />
 
         {/* === MARIGOLD flower on top of coconut === */}
-        <g transform="translate(0,-26)" opacity="0.55">
+        <g transform="translate(0,-28)" opacity="0.55">
           <circle cx="0" cy="0" r="4" stroke={G} strokeWidth="0.8" fill="#d6a820" fillOpacity="0.3" />
           {/* Petals */}
           {[0, 45, 90, 135, 180, 225, 270, 315].map(a => (

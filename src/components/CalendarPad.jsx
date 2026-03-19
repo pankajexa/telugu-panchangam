@@ -1,7 +1,6 @@
 import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import Page from './Page';
 import PageStack from './PageStack';
-import NavigationHint from './NavigationHint';
 import MonthStrip from './MonthStrip';
 import MonthView from './MonthView';
 import TeluguMonthView from './TeluguMonthView';
@@ -212,7 +211,7 @@ export default function CalendarPad({ onDateChange }) {
     cancelAnimationFrame(rafRef.current);
     const currentP = progressRef.current;
     const remaining = 1 - currentP;
-    const duration = Math.max(200, remaining * 450);
+    const duration = Math.max(100, remaining * 200);
 
     animateTo(1, duration, easeOutCubic, () => {
       finishFlip();
@@ -232,7 +231,7 @@ export default function CalendarPad({ onDateChange }) {
       requestAnimationFrame(() => {
         setupCanvas();
         progressRef.current = 0.02; // small initial progress
-        animateTo(1, 480, easeOutCubic, () => {
+        animateTo(1, 220, easeOutCubic, () => {
           finishFlip();
         });
       });
@@ -571,6 +570,23 @@ export default function CalendarPad({ onDateChange }) {
                   dayIndex={currentIndex}
                   totalDays={allData.length}
                 />
+                {/* Page lift hint — corner curl that flicks up */}
+                {!flipping && (
+                  <div className="page-lift-hint" style={styles.pageLiftHint}>
+                    <svg width="70" height="70" viewBox="0 0 70 70" style={{ display: 'block' }}>
+                      <path d="M70,70 L70,18 Q55,32 18,70 Z"
+                        fill="rgba(20,12,5,0.4)" />
+                      <path d="M70,70 L70,20 Q56,34 20,70 Z"
+                        fill="#1a120e" />
+                      <path d="M70,70 L70,24 Q58,36 24,70 Z"
+                        fill="#c49818" opacity="0.5" />
+                      <path d="M70,70 L70,28 Q60,38 28,70 Z"
+                        fill="#e8c030" opacity="0.8" />
+                      <path d="M70,22 Q56,36 22,70"
+                        fill="none" stroke="#f5d855" strokeWidth="1.5" opacity="0.7" />
+                    </svg>
+                  </div>
+                )}
               </div>
 
               {flipping && (
@@ -619,7 +635,6 @@ export default function CalendarPad({ onDateChange }) {
         {viewMode === 'day' && (
           <FestivalWishes festival={allData[currentIndex]?.festival} />
         )}
-        {viewMode === 'day' && !flipping && <NavigationHint />}
         {viewMode === 'month' && <MonthNavHint />}
       </div>
 
@@ -700,6 +715,7 @@ const styles = {
     cursor: 'grab',
     borderRadius: '3px',
     willChange: 'clip-path',
+    overflow: 'hidden',
   },
   canvas: {
     position: 'absolute',
@@ -710,6 +726,15 @@ const styles = {
   },
 
   // Below pad area
+  pageLiftHint: {
+    position: 'absolute',
+    bottom: '0',
+    right: '0',
+    width: '70px',
+    height: '70px',
+    pointerEvents: 'none',
+    zIndex: 4,
+  },
   belowPad: {
     display: 'flex',
     flexDirection: 'column',
