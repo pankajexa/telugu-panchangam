@@ -373,6 +373,8 @@ export default function CalendarPad({ onDateChange }) {
 
   // Month strip
   const handleSelectMonth = useCallback((dayIndex, teluguIdx) => {
+    // Dismiss on backdrop click
+    if (dayIndex === -1) { setShowMonthStrip(false); return; }
     // teluguIdx is the index into TELUGU_MONTHS array
     if (teluguIdx !== undefined) {
       setTeluguMonthIdx(teluguIdx);
@@ -454,6 +456,8 @@ export default function CalendarPad({ onDateChange }) {
   }, []);
 
   const handleEngMonthSelect = useCallback((year, month) => {
+    // Dismiss on backdrop click
+    if (year === null) { setShowEngMonthStrip(false); return; }
     setMonthViewYear(year);
     setMonthViewMonth(month);
     setShowEngMonthStrip(false);
@@ -604,7 +608,6 @@ export default function CalendarPad({ onDateChange }) {
               <button style={styles.viewToggle} onClick={switchToEnglishMonth}>
                 <span style={styles.toggleText}>ఇంగ్లీష్ నెల</span>
               </button>
-              <ShareButton data={allData[currentIndex]} />
             </>
           ) : (
             <button style={styles.viewToggle} onClick={switchToDay}>
@@ -726,9 +729,10 @@ const styles = {
     background: 'rgba(214,168,32,0.08)',
     border: '1.5px solid rgba(214,168,32,0.3)',
     borderRadius: '28px',
-    padding: '10px 24px',
+    padding: '10px 22px',
     cursor: 'pointer',
     transition: 'border-color 200ms, background 200ms',
+    whiteSpace: 'nowrap',
   },
   toggleIcon: {
     fontSize: '18px',

@@ -16,35 +16,78 @@ const sw2 = (w = 0.7) => ({ stroke: G2, strokeWidth: w, fill: 'none' });
 export function UgadiTop() {
   return (
     <svg viewBox="0 0 360 110" style={svgStyle}>
-      <g transform="translate(180,5)" opacity="0.65">
+      <g transform="translate(180,24)" opacity="0.65">
         {/* === KALASHA === */}
-        {/* Round bellied pot body — like a traditional lota */}
+        {/* Pot body — filled with golden glow */}
         <path d="M-14,70 Q-18,65 -20,55 Q-22,42 -18,32 Q-14,25 -10,22
                  L-8,22 Q-10,18 -10,15 L10,15 Q10,18 8,22
                  L10,22 Q14,25 18,32 Q22,42 20,55 Q18,65 14,70"
-          {...sw(1.4)} />
+          stroke={G} strokeWidth="1.4" fill="#d6a820" fillOpacity="0.15" />
+        {/* Inner glow on pot belly */}
+        <path d="M-12,60 Q-14,50 -12,38 Q-8,30 0,28 Q8,30 12,38 Q14,50 12,60"
+          fill="#f5d050" fillOpacity="0.1" stroke="none" />
         {/* Flat base */}
         <path d="M-14,70 Q-10,73 0,74 Q10,73 14,70" {...sw(1.2)} />
         <line x1="-11" y1="74" x2="11" y2="74" {...sw(1)} />
-        {/* Pot mouth rim — wider than neck */}
-        <ellipse cx="0" cy="15" rx="12" ry="3.5" {...sw(1.2)} />
-        {/* Decorative bands on belly */}
-        <path d="M-20,45 Q0,40 20,45" {...sw2(0.6)} opacity="0.5" />
-        <path d="M-19,50 Q0,46 19,50" {...sw2(0.6)} opacity="0.5" />
-        {/* === MANGO LEAVES from mouth === */}
-        <path d="M-6,13 Q-14,0 -18,-8 Q-15,-4 -10,2 Q-7,6 -5,12" {...sw(0.9)} />
-        <path d="M-4,12 Q-8,-2 -10,-12 Q-8,-6 -5,0 Q-3,5 -2,11" {...sw(0.9)} />
-        <path d="M0,12 Q0,-4 0,-15 Q0,-6 0,0 Q0,5 0,11" {...sw(0.9)} />
-        <path d="M4,12 Q8,-2 10,-12 Q8,-6 5,0 Q3,5 2,11" {...sw(0.9)} />
-        <path d="M6,13 Q14,0 18,-8 Q15,-4 10,2 Q7,6 5,12" {...sw(0.9)} />
-        {/* === COCONUT on top of leaves === */}
-        <circle cx="0" cy="-16" r="7" {...sw(1.3)} />
-        {/* Three eyes/marks on coconut */}
-        <circle cx="-2" cy="-18" r="1" {...sw2(0.5)} opacity="0.5" />
-        <circle cx="2" cy="-18" r="1" {...sw2(0.5)} opacity="0.5" />
-        <circle cx="0" cy="-15" r="1" {...sw2(0.5)} opacity="0.5" />
-        {/* Tuft on coconut */}
-        <path d="M-1,-23 Q0,-27 1,-23" {...sw2(0.6)} opacity="0.5" />
+        {/* Pot mouth rim — filled */}
+        <ellipse cx="0" cy="15" rx="12" ry="3.5"
+          stroke={G} strokeWidth="1.2" fill="#d6a820" fillOpacity="0.2" />
+        {/* === Decorative designs on belly === */}
+        {/* Om symbol in center of pot */}
+        <text x="0" y="44" textAnchor="middle" fontFamily="serif"
+          fontSize="14" fill={G} fillOpacity="0.35" stroke="none">ॐ</text>
+        {/* Decorative bands */}
+        <path d="M-20,35 Q0,31 20,35" {...sw2(0.7)} opacity="0.5" />
+        <path d="M-20,37 Q0,33 20,37" {...sw2(0.5)} opacity="0.4" />
+        <path d="M-19,54 Q0,50 19,54" {...sw2(0.7)} opacity="0.5" />
+        <path d="M-19,56 Q0,52 19,56" {...sw2(0.5)} opacity="0.4" />
+        {/* Small paisley/mango motifs on belly sides */}
+        <path d="M-12,44 Q-14,40 -10,38 Q-8,40 -10,44" {...sw2(0.5)} opacity="0.35" />
+        <path d="M12,44 Q14,40 10,38 Q8,40 10,44" {...sw2(0.5)} opacity="0.35" />
+        {/* Dots between bands */}
+        {[-8, -3, 3, 8].map(x => (
+          <circle key={x} cx={x} cy={46} r="0.8" fill={G} opacity="0.3" />
+        ))}
+        {/* === MANGO LEAVES — large, fanning from behind coconut === */}
+        {/* Left leaves */}
+        <path d="M-4,14 Q-16,2 -24,-8" stroke={G} strokeWidth="1.2" fill="#d6a820" fillOpacity="0.12" />
+        <path d="M-3,12 Q-12,-2 -18,-14" stroke={G} strokeWidth="1" fill="#d6a820" fillOpacity="0.08" />
+        {/* Right leaves */}
+        <path d="M4,14 Q16,2 24,-8" stroke={G} strokeWidth="1.2" fill="#d6a820" fillOpacity="0.12" />
+        <path d="M3,12 Q12,-2 18,-14" stroke={G} strokeWidth="1" fill="#d6a820" fillOpacity="0.08" />
+        {/* Leaf veins */}
+        <path d="M-8,6 Q-16,-2 -20,-6" {...sw2(0.3)} opacity="0.25" />
+        <path d="M8,6 Q16,-2 20,-6" {...sw2(0.3)} opacity="0.25" />
+
+        {/* === COCONUT — large egg shape sitting upright on leaves === */}
+        <path d="M-9,12 Q-11,2 -9,-10 Q-6,-20 0,-24 Q6,-20 9,-10 Q11,2 9,12"
+          stroke={G} strokeWidth="1.4" fill="#d6a820" fillOpacity="0.25" />
+        {/* Fibrous texture — vertical lines */}
+        <path d="M-5,10 Q-6,-2 -4,-18" {...sw2(0.3)} opacity="0.2" />
+        <path d="M-2,11 Q-2,-4 -1,-22" {...sw2(0.3)} opacity="0.2" />
+        <path d="M2,11 Q2,-4 1,-22" {...sw2(0.3)} opacity="0.2" />
+        <path d="M5,10 Q6,-2 4,-18" {...sw2(0.3)} opacity="0.2" />
+        {/* Thread tied around middle */}
+        <path d="M-9,0 Q0,-2 9,0" stroke={G} strokeWidth="0.7" fill="none" opacity="0.4" />
+        <path d="M-9,1.5 Q0,-0.5 9,1.5" stroke={G} strokeWidth="0.5" fill="none" opacity="0.3" />
+        {/* Kumkum dot */}
+        <circle cx="0" cy="-2" r="1.5" fill="#d45500" opacity="0.5" />
+        {/* Three eyes near bottom */}
+        <circle cx="-2.5" cy="6" r="1" fill={G} opacity="0.3" />
+        <circle cx="2.5" cy="6" r="1" fill={G} opacity="0.3" />
+        <circle cx="0" cy="8" r="0.8" fill={G} opacity="0.25" />
+
+        {/* === MARIGOLD flower on top of coconut === */}
+        <g transform="translate(0,-26)" opacity="0.55">
+          <circle cx="0" cy="0" r="4" stroke={G} strokeWidth="0.8" fill="#d6a820" fillOpacity="0.3" />
+          {/* Petals */}
+          {[0, 45, 90, 135, 180, 225, 270, 315].map(a => (
+            <path key={a} d="M0,-2 Q1.5,-5 0,-6.5 Q-1.5,-5 0,-2"
+              transform={`rotate(${a})`}
+              stroke={G} strokeWidth="0.5" fill="#d6a820" fillOpacity="0.2" />
+          ))}
+          <circle cx="0" cy="0" r="2" fill="#d6a820" fillOpacity="0.35" stroke="none" />
+        </g>
       </g>
       {/* Mango leaf toranam garlands on sides */}
       <path d="M166,22 Q130,12 95,18 Q65,26 35,18"

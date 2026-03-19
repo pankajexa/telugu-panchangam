@@ -27,8 +27,9 @@ const MonthStrip = memo(function MonthStrip({ visible, onSelectMonth, currentMon
   }
 
   return (
-    <div style={styles.overlay} onClick={(e) => e.stopPropagation()}>
-      <div style={styles.strip}>
+    <div style={styles.backdrop} onClick={() => onSelectMonth(-1)}>
+      <div style={styles.overlay} onClick={(e) => e.stopPropagation()}>
+        <div style={styles.strip}>
         <div style={styles.grid}>
           {MONTH_INDICES.map((month, i) => (
             <button
@@ -45,6 +46,7 @@ const MonthStrip = memo(function MonthStrip({ visible, onSelectMonth, currentMon
           ))}
         </div>
       </div>
+      </div>
     </div>
   );
 });
@@ -52,13 +54,21 @@ const MonthStrip = memo(function MonthStrip({ visible, onSelectMonth, currentMon
 export default MonthStrip;
 
 const styles = {
+  backdrop: {
+    position: 'fixed',
+    inset: 0,
+    zIndex: 19,
+    background: 'transparent',
+  },
   overlay: {
-    position: 'absolute',
+    position: 'fixed',
     bottom: 0,
     left: 0,
     right: 0,
     zIndex: 20,
     padding: '0 4px',
+    display: 'flex',
+    justifyContent: 'center',
   },
   strip: {
     width: '100%',
