@@ -1,254 +1,303 @@
-// Tier 3: Algorithmic approximation for panchangam data
-// Seeded from known reference points for Parabhava Nama Samvatsaram
-// This provides approximate data for all 384 days
+// Panchangam calculations powered by @ishubhamx/panchangam-js
+// Drik Ganita system, Lahiri ayanamsha — validated against Drik Panchang
 
-import { TITHIS, NAKSHATRAS, YOGAMS, KARANAMS, TELUGU_DAYS, ENGLISH_DAYS, ENGLISH_MONTHS } from './constants.js';
-import { getTeluguMonth } from './teluguMonths.js';
-import { getFestival } from './festivals.js';
+import {
+  getPanchangam as libGetPanchangam,
+  Observer,
+  findSankrantisInRange,
+} from '@ishubhamx/panchangam-js';
+import { TITHIS, NAKSHATRAS, YOGAMS, TELUGU_DAYS, ENGLISH_DAYS, ENGLISH_MONTHS } from './constants.js';
+import { getTimezoneOffsetMinutes } from './locations.js';
+import { getFestival as getHardcodedFestival } from './festivals.js';
 
 // ══════════════════════════════════════════════════════════════
-// REFERENCE DATA — sourced from drikpanchang.com / prokerala.com
-// for Ugadi 2026, March 19, Hyderabad (17.385°N, 78.4867°E)
-//
-// Uttara Bhadrapada nakshatra:  05:21 AM Mar 19 → 04:04 AM Mar 20
-// Shukla Pratipada tithi:       06:52 AM Mar 19 → 04:52 AM Mar 20
-// Sunrise: 06:21 AM, Sunset: 06:27 PM
+// Telugu name mappings for library output
 // ══════════════════════════════════════════════════════════════
 
-const REFERENCE_DATE = new Date(2026, 2, 19); // Mar 19, 2026 midnight
+const TELUGU_MASA = {
+  'Chaitra': 'చైత్రం', 'Vaishakha': 'వైశాఖం', 'Jyeshtha': 'జ్యేష్ఠం',
+  'Ashadha': 'ఆషాఢం', 'Shravana': 'శ్రావణం', 'Bhadrapada': 'భాద్రపదం',
+  'Ashwina': 'ఆశ్వయుజం', 'Kartika': 'కార్తీకం', 'Margashirsha': 'మార్గశిరం',
+  'Pausha': 'పుష్యం', 'Magha': 'మాఘం', 'Phalguna': 'ఫాల్గుణం',
+};
 
-// Nakshatra: Uttara Bhadrapada (index 25)
-// Started at 05:21 AM on Mar 19 = 5.35 hours after midnight
-// Ends at 04:04 AM on Mar 20 = 28.067 hours after midnight of Mar 19
-// Duration: 28.067 - 5.35 = 22.717 hours (this instance)
-const REFERENCE_NAKSHATRA_INDEX = 25;
-const NAKSHATRA_REF_START_OFFSET = 5 + 21 / 60; // 5.35 hours after midnight Mar 19
+const TELUGU_KARANA = {
+  'Bava': 'బవ', 'Balava': 'బాలవ', 'Kaulava': 'కౌలవ', 'Taitila': 'తైతిల',
+  'Gara': 'గర', 'Vanija': 'వణిజ', 'Vishti': 'విష్టి', 'Shakuni': 'శకుని',
+  'Chatushpada': 'చతుష్పాద', 'Naga': 'నాగ', 'Kimstughna': 'కింస్తుఘ్న',
+};
 
-// Tithi: Shukla Pratipada (index 0)
-// Started at 06:52 AM on Mar 19 = 6.867 hours after midnight
-// Ends at 04:52 AM on Mar 20 = 28.867 hours after midnight of Mar 19
-const REFERENCE_TITHI_INDEX = 0;
-const TITHI_REF_START_OFFSET = 6 + 52 / 60; // 6.867 hours after midnight Mar 19
+// Map library festival names → Telugu festival data
+const FESTIVAL_MAP = {
+  'Ugadi / Gudi Padwa': { telugu: 'ఉగాది', english: 'Ugadi', description: 'శ్రీ పరాభవ నామ సంవత్సరారంభం', major: true },
+  'Rama Navami': { telugu: 'శ్రీ రామ నవమి', english: 'Sri Rama Navami', major: true },
+  'Akshaya Tritiya': { telugu: 'అక్షయ తృతీయ', english: 'Akshaya Tritiya', major: true, isMuhurtham: true },
+  'Buddha Purnima': { telugu: 'వైశాఖ పూర్ణిమ / బుద్ధ పూర్ణిమ', english: 'Buddha Purnima', major: true },
+  'Varalakshmi Vratam': { telugu: 'వరలక్ష్మీ వ్రతం', english: 'Varalakshmi Vratam', major: true },
+  'Krishna Janmashtami': { telugu: 'శ్రీ కృష్ణ జన్మాష్టమి', english: 'Krishna Janmashtami', major: true },
+  'Ganesh Chaturthi': { telugu: 'వినాయక చవితి', english: 'Vinayaka Chavithi', major: true },
+  'Navaratri Ghatasthapana': { telugu: 'దసరా నవరాత్రులు ప్రారంభం', english: 'Dasara Navaratri begins', major: true },
+  'Durga Ashtami (Maha Ashtami)': { telugu: 'దుర్గాష్టమి', english: 'Durga Ashtami', major: true },
+  'Maha Navami': { telugu: 'మహా నవమి', english: 'Maha Navami', major: true },
+  'Vijaya Dashami (Dussehra)': { telugu: 'విజయదశమి', english: 'Vijaya Dashami', major: true },
+  'Naraka Chaturdashi (Choti Diwali)': { telugu: 'నరక చతుర్దశి', english: 'Naraka Chaturdashi', major: true },
+  'Diwali (Lakshmi Puja)': { telugu: 'దీపావళి', english: 'Deepavali', major: true },
+  'Dhanteras (Dhanatrayodashi)': { telugu: 'ధన త్రయోదశి', english: 'Dhanteras', major: true },
+  'Govardhan Puja': { telugu: 'గోవర్ధన పూజ', english: 'Govardhan Puja', major: false },
+  'Kartik Purnima / Dev Diwali': { telugu: 'కార్తీక పూర్ణిమ', english: 'Kartika Purnima', major: true },
+  'Maha Shivaratri': { telugu: 'మహా శివరాత్రి', english: 'Maha Shivaratri', major: true },
+  'Ratha Saptami': { telugu: 'రథ సప్తమి', english: 'Ratha Saptami', major: true },
+  'Bhogi': { telugu: 'భోగి', english: 'Bhogi', major: true },
+  'Holika Dahan': { telugu: 'హోళి', english: 'Holi', major: true },
+  'Holi': { telugu: 'హోళి', english: 'Holi', major: true },
+};
 
-const REFERENCE_YOGAM_INDEX = 22; // Shubha
-const REFERENCE_KARANAM_INDEX = 0; // Bava
+// Fixed-date festivals (not tithi-dependent, same date everywhere)
+const FIXED_FESTIVALS = {
+  '08-15': { telugu: 'స్వాతంత్ర్య దినోత్సవం', english: 'Independence Day', major: true },
+  '01-26': { telugu: 'గణతంత్ర దినోత్సవం', english: 'Republic Day', major: true },
+  '12-25': { telugu: 'క్రిస్మస్', english: 'Christmas', major: false },
+  '10-02': { telugu: 'గాంధీ జయంతి', english: 'Gandhi Jayanti', major: false },
+};
 
-// Approximate cycle lengths
-const TITHI_CYCLE = 29.53;  // Synodic month in days (30 tithis per cycle)
-const NAKSHATRA_CYCLE = 27.32; // Sidereal month in days (27 nakshatras)
-const YOGAM_CYCLE = 27.32;
-const KARANAM_HALF_TITHI = TITHI_CYCLE / 30 / 2;
+// Sankranti dates (computed once per location, cached)
+let _sankrantiCache = { locationId: null, dates: {} };
 
-// Accurate sunrise/sunset for Hyderabad using NOAA solar equations
-// Location: 17.385°N, 78.4867°E — IST (UTC+5:30)
-const LAT = 17.385;
-const LNG = 78.4867;
-const TZ_OFFSET = 5.5; // IST
-
-function getSunTimes(date) {
-  const year = date.getFullYear();
-  const month = date.getMonth() + 1;
-  const day = date.getDate();
-
-  // Julian day number
-  const a = Math.floor((14 - month) / 12);
-  const y = year + 4800 - a;
-  const m = month + 12 * a - 3;
-  const jdn = day + Math.floor((153 * m + 2) / 5) + 365 * y +
-              Math.floor(y / 4) - Math.floor(y / 100) + Math.floor(y / 400) - 32045;
-  const jd = jdn - 0.5; // Julian date at midnight UT
-  const n = jd - 2451545.0; // days since J2000.0
-
-  // Solar mean anomaly (degrees)
-  const M = (357.5291 + 0.98560028 * n) % 360;
-  const Mrad = M * Math.PI / 180;
-
-  // Equation of center
-  const C = 1.9148 * Math.sin(Mrad) + 0.02 * Math.sin(2 * Mrad) + 0.0003 * Math.sin(3 * Mrad);
-
-  // Ecliptic longitude
-  const lambda = (M + C + 180 + 102.9372) % 360;
-  const lambdaRad = lambda * Math.PI / 180;
-
-  // Solar declination
-  const sinDec = Math.sin(lambdaRad) * Math.sin(23.4393 * Math.PI / 180);
-  const decRad = Math.asin(sinDec);
-
-  // Equation of time (minutes) — approximate
-  const B = (360 / 365) * (n - 81) * Math.PI / 180;
-  const EoT = 9.87 * Math.sin(2 * B) - 7.53 * Math.cos(B) - 1.5 * Math.sin(B);
-
-  // Solar noon in local time (hours)
-  const solarNoon = 12 - (LNG / 15 - TZ_OFFSET) - EoT / 60;
-
-  // Hour angle for sunrise/sunset
-  const latRad = LAT * Math.PI / 180;
-  // Standard refraction correction: -0.833 degrees
-  const cosHA = (Math.sin(-0.833 * Math.PI / 180) - Math.sin(latRad) * sinDec) /
-                (Math.cos(latRad) * Math.cos(decRad));
-
-  // Clamp for polar edge cases (shouldn't happen at 17°N)
-  const clampedCosHA = Math.max(-1, Math.min(1, cosHA));
-  const HA = Math.acos(clampedCosHA) * 180 / Math.PI; // degrees
-  const HAhours = HA / 15; // convert to hours
-
-  const sunrise = solarNoon - HAhours;
-  const sunset = solarNoon + HAhours;
-
-  return {
-    sunrise: formatTime(sunrise),
-    sunset: formatTime(sunset),
-  };
+function getSankrantiDates(location) {
+  if (_sankrantiCache.locationId === location.id) return _sankrantiCache.dates;
+  const obs = new Observer(location.lat, location.lng, location.elev || 0);
+  const start = new Date(Date.UTC(2026, 2, 1));
+  const end = new Date(Date.UTC(2027, 4, 1));
+  const tzOffset = getTimezoneOffsetMinutes(location.tz, start);
+  const dates = {};
+  try {
+    const sankrantis = findSankrantisInRange(start, end, obs, tzOffset);
+    for (const s of sankrantis) {
+      if (s.name === 'Makar Sankranti') {
+        // Sankranti spans: Bhogi (day before), Sankranti, Kanuma (day after)
+        const exact = new Date(s.exactTime);
+        const sankrantiDate = new Date(exact.toLocaleString('en-US', { timeZone: location.tz }));
+        const sd = formatDateStr(sankrantiDate);
+        dates[sd] = { telugu: 'మకర సంక్రాంతి', english: 'Makara Sankranti', major: true };
+        // Bhogi (day before)
+        const bhogi = new Date(sankrantiDate);
+        bhogi.setDate(bhogi.getDate() - 1);
+        dates[formatDateStr(bhogi)] = { telugu: 'భోగి', english: 'Bhogi', major: true };
+        // Kanuma (day after)
+        const kanuma = new Date(sankrantiDate);
+        kanuma.setDate(kanuma.getDate() + 1);
+        dates[formatDateStr(kanuma)] = { telugu: 'కనుమ', english: 'Kanuma', major: true };
+      }
+    }
+  } catch (e) { /* ignore */ }
+  _sankrantiCache = { locationId: location.id, dates };
+  return dates;
 }
 
-function formatTime(decimalHours) {
-  const h = Math.floor(decimalHours);
-  const m = Math.round((decimalHours - h) * 60);
-  return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+// ══════════════════════════════════════════════════════════════
+// Formatting helpers
+// ══════════════════════════════════════════════════════════════
+
+function fmtInTz(date, tz, opts) {
+  if (!date) return '';
+  return date.toLocaleString('en-US', { timeZone: tz, ...opts });
 }
 
-function formatTime12(decimalHours) {
-  const h24 = Math.floor(((decimalHours % 24) + 24) % 24);
-  const m = Math.round((decimalHours - Math.floor(decimalHours)) * 60) % 60;
-  const period = h24 >= 12 ? 'PM' : 'AM';
-  const h12 = h24 % 12 || 12;
-  return `${h12}:${m.toString().padStart(2, '0')} ${period}`;
+function formatTime24(date, tz) {
+  if (!date) return '00:00';
+  const parts = date.toLocaleString('en-US', {
+    timeZone: tz, hour: '2-digit', minute: '2-digit', hour12: false,
+  }).split(':');
+  return `${parts[0].padStart(2, '0')}:${parts[1]}`;
 }
 
-function formatTimeRange(startDecimal, durationHours) {
-  const endDecimal = startDecimal + durationHours;
-  return `${formatTime12(startDecimal)}–${formatTime12(endDecimal)}`;
-}
-
-// Format a Date object to { time: "11:45 PM", date: "Mar 18", day: 18, month: 2, sameDay: bool }
-function formatDT(dt, referenceDate) {
-  const h = dt.getHours();
-  const m = dt.getMinutes();
+function formatDT(dateObj, referenceDate, tz) {
+  if (!dateObj) return { time: '--', date: '--', sameDay: true };
+  const h = parseInt(fmtInTz(dateObj, tz, { hour: 'numeric', hour12: false }));
+  const m = parseInt(fmtInTz(dateObj, tz, { minute: 'numeric' }));
   const period = h >= 12 ? 'PM' : 'AM';
   const h12 = h % 12 || 12;
   const timeStr = `${h12}:${m.toString().padStart(2, '0')} ${period}`;
-
-  const monthAbbr = ENGLISH_MONTHS[dt.getMonth()].slice(0, 3);
-  const dayNum = dt.getDate();
+  const monthAbbr = fmtInTz(dateObj, tz, { month: 'short' });
+  const dayNum = parseInt(fmtInTz(dateObj, tz, { day: 'numeric' }));
   const dateStr = `${monthAbbr} ${dayNum}`;
 
-  // Check if same calendar day as the reference
-  const sameDay = dt.getFullYear() === referenceDate.getFullYear() &&
-                  dt.getMonth() === referenceDate.getMonth() &&
-                  dt.getDate() === referenceDate.getDate();
+  // Same day check
+  const refDay = parseInt(fmtInTz(referenceDate, tz, { day: 'numeric' }));
+  const refMonth = fmtInTz(referenceDate, tz, { month: 'short' });
+  const sameDay = dayNum === refDay && monthAbbr === refMonth;
 
   return { time: timeStr, date: dateStr, sameDay };
 }
 
-// Rahu Kalam periods by day of week (Sunday=0)
-// Traditional Rahu Kalam slots: each 1.5 hours starting from sunrise
-const RAHU_KALAM_SLOTS = [8, 2, 7, 5, 6, 4, 3]; // slot index for each day
-const YAMAGANDAM_SLOTS = [5, 4, 3, 7, 2, 6, 8];
-const GULIKA_SLOTS = [7, 6, 5, 4, 3, 2, 8];
-
-function getInauspiciousTimes(date, sunrise) {
-  const day = date.getDay();
-  const sunriseDecimal = parseFloat(sunrise.split(':')[0]) + parseFloat(sunrise.split(':')[1]) / 60;
-  const slotDuration = 1.5;
-
-  const rahuStart = sunriseDecimal + (RAHU_KALAM_SLOTS[day] - 1) * slotDuration;
-  const yamaStart = sunriseDecimal + (YAMAGANDAM_SLOTS[day] - 1) * slotDuration;
-  const gulikaStart = sunriseDecimal + (GULIKA_SLOTS[day] - 1) * slotDuration;
-
-  // Approximate varjyam and durmuhurtham based on nakshatra
-  const daysSinceRef = Math.floor((date - REFERENCE_DATE) / 86400000);
-  const varjyamBase = 8 + (daysSinceRef * 0.7) % 12;
-  const durmuhurthamBase = 10 + (daysSinceRef * 0.3) % 8;
-
-  return {
-    rahuKalam: formatTimeRange(rahuStart, slotDuration),
-    yamagandam: formatTimeRange(yamaStart, slotDuration),
-    gulika: formatTimeRange(gulikaStart, slotDuration),
-    varjyam: formatTimeRange(varjyamBase % 24, 1.5),
-    durmuhurtham: formatTimeRange(durmuhurthamBase % 24, 0.8),
+function formatTimeRange(start, end, tz) {
+  if (!start || !end) return '--';
+  const fmt = (d) => {
+    const h = parseInt(fmtInTz(d, tz, { hour: 'numeric', hour12: false }));
+    const m = parseInt(fmtInTz(d, tz, { minute: 'numeric' }));
+    const period = h >= 12 ? 'PM' : 'AM';
+    const h12 = h % 12 || 12;
+    return `${h12}:${m.toString().padStart(2, '0')} ${period}`;
   };
+  return `${fmt(start)}\u2013${fmt(end)}`;
 }
 
-function daysBetween(date1, date2) {
-  return (date2 - date1) / 86400000;
+// ══════════════════════════════════════════════════════════════
+// Durmuhurtham — computed from sunrise/sunset with correct table
+// (Library uses wrong muhurta indices, so we compute our own)
+// Standard table per Drik Panchang / TTD / Prokerala:
+// ══════════════════════════════════════════════════════════════
+
+// Muhurta indices (1-indexed) that are inauspicious, by weekday (0=Sun)
+// Validated against Prokerala Telugu Panchangam for all 7 days
+const DUR_MUHURTA_TABLE = [
+  [14],     // Sunday
+  [9, 12],  // Monday
+  [4],      // Tuesday
+  [8],      // Wednesday
+  [6, 12],  // Thursday
+  [4, 9],   // Friday
+  [3],      // Saturday
+];
+
+function computeDurmuhurtham(sunrise, sunset, dayOfWeek, tz) {
+  if (!sunrise || !sunset) return ['--'];
+  const dayMs = sunset.getTime() - sunrise.getTime();
+  const muhurtaMs = dayMs / 15;
+  const indices = DUR_MUHURTA_TABLE[dayOfWeek] || [];
+  return indices.map(idx => {
+    const start = new Date(sunrise.getTime() + (idx - 1) * muhurtaMs);
+    const end = new Date(sunrise.getTime() + idx * muhurtaMs);
+    return formatTimeRange(start, end, tz);
+  });
 }
 
-export function getPanchangamForDate(date) {
-  const days = daysBetween(REFERENCE_DATE, date);
+// ══════════════════════════════════════════════════════════════
+// Festival resolution for a date
+// ══════════════════════════════════════════════════════════════
 
-  // Compute sunrise first — panchangam elements are evaluated at sunrise, not midnight
-  const sunTimes = getSunTimes(date);
-  const sunriseDecimal = parseFloat(sunTimes.sunrise.split(':')[0]) +
-                         parseFloat(sunTimes.sunrise.split(':')[1]) / 60;
+function resolveFestival(libraryFestivals, date, location) {
+  // 1. Check library festivals (location-aware, tithi-based)
+  if (libraryFestivals && libraryFestivals.length > 0) {
+    // Prefer major festivals, find the best match
+    const sorted = [...libraryFestivals].sort((a, b) =>
+      (b.category === 'major' ? 1 : 0) - (a.category === 'major' ? 1 : 0)
+    );
+    for (const f of sorted) {
+      // Skip standalone Amavasya/Purnima (shown via tithi display)
+      if (f.name === 'Amavasya' || f.name === 'Purnima') continue;
+      if (f.name.endsWith('Purnima') && !FESTIVAL_MAP[f.name]) continue;
+      // Skip generic Navratri day labels
+      if (/^Chaitra Navratri Day \d/.test(f.name)) continue;
+      if (/^Ganesh Chaturthi \(Day \d/.test(f.name)) continue;
+      if (/^Ganesh Panchami/.test(f.name)) continue;
+      if (/Day \d\)$/.test(f.name) && !FESTIVAL_MAP[f.name]) continue;
 
-  // Hours from midnight of the REFERENCE date to SUNRISE of the current date
-  const hoursFromRef = days * 24 + sunriseDecimal;
+      const mapped = FESTIVAL_MAP[f.name];
+      if (mapped) return { ...mapped };
 
-  // ─── Tithi calculation ───
-  const tithiDurationHours = (TITHI_CYCLE / 30) * 24; // ~23.62 hours per tithi
-  const hoursSinceTithiRefStart = hoursFromRef - TITHI_REF_START_OFFSET;
-  const tithisSinceRef = hoursSinceTithiRefStart / tithiDurationHours;
-  const tithiIndex = Math.floor(((REFERENCE_TITHI_INDEX + tithisSinceRef) % 30 + 30) % 30);
-  const paksha = tithiIndex < 15 ? 'శుక్ల' : 'కృష్ణ';
-  const tithiName = TITHIS[tithiIndex];
-
-  // Tithi fraction: how far through the current tithi at sunrise of this date
-  const tithiFraction = (((REFERENCE_TITHI_INDEX + tithisSinceRef) % 1) + 1) % 1;
-  const tithiElapsed = tithiFraction * tithiDurationHours;
-  const tithiRemaining = (1 - tithiFraction) * tithiDurationHours;
-
-  // Build actual Date objects for tithi start/end (same approach as nakshatra)
-  const tithiStartDT = new Date(date);
-  tithiStartDT.setHours(0, 0, 0, 0);
-  tithiStartDT.setMinutes(Math.round(sunriseDecimal * 60) + Math.round(-tithiElapsed * 60));
-
-  const tithiEndDT = new Date(date);
-  tithiEndDT.setHours(0, 0, 0, 0);
-  tithiEndDT.setMinutes(Math.round(sunriseDecimal * 60) + Math.round(tithiRemaining * 60));
-
-  // ─── Nakshatra calculation ───
-  const nakshatraDurationHours = (NAKSHATRA_CYCLE / 27) * 24; // ~24.28 hours
-  const hoursSinceNakRefStart = hoursFromRef - NAKSHATRA_REF_START_OFFSET;
-  const nakshatrasSinceRef = hoursSinceNakRefStart / nakshatraDurationHours;
-  const nakshatraIndex = Math.floor(((REFERENCE_NAKSHATRA_INDEX + nakshatrasSinceRef) % 27 + 27) % 27);
-
-  // Fraction through the current nakshatra at midnight of this date
-  const nakshatraFraction = (((REFERENCE_NAKSHATRA_INDEX + nakshatrasSinceRef) % 1) + 1) % 1;
-
-  // Elapsed and remaining hours measured from SUNRISE of this date
-  const nakshatraElapsed = nakshatraFraction * nakshatraDurationHours;
-  const nakshatraRemaining = (1 - nakshatraFraction) * nakshatraDurationHours;
-
-  // Build actual Date objects: base = sunrise of this date
-  const sunriseMinutes = Math.round(sunriseDecimal * 60);
-  const nakshatraStartDT = new Date(date);
-  nakshatraStartDT.setHours(0, 0, 0, 0);
-  nakshatraStartDT.setMinutes(sunriseMinutes + Math.round(-nakshatraElapsed * 60));
-
-  const nakshatraEndDT = new Date(date);
-  nakshatraEndDT.setHours(0, 0, 0, 0);
-  nakshatraEndDT.setMinutes(sunriseMinutes + Math.round(nakshatraRemaining * 60));
-
-  // ─── Yogam calculation ───
-  const yogamDurationHours = (YOGAM_CYCLE / 27) * 24;
-  const hoursSinceYogamRef = hoursFromRef - NAKSHATRA_REF_START_OFFSET;
-  const yogamsSinceRef = hoursSinceYogamRef / yogamDurationHours;
-  const yogamIndex = Math.floor(((REFERENCE_YOGAM_INDEX + yogamsSinceRef) % 27 + 27) % 27);
-  const yogamFraction = (((REFERENCE_YOGAM_INDEX + yogamsSinceRef) % 1) + 1) % 1;
-  const yogamRemainingHours = (1 - yogamFraction) * yogamDurationHours;
-  const yogamEndHour = (sunriseDecimal + yogamRemainingHours) % 24;
-
-  // Karanam calculation (2 per tithi, 60 per lunar month)
-  const karanamProgress = (hoursSinceTithiRefStart / tithiDurationHours) * 2;
-  const karanamIndex = Math.floor(((REFERENCE_KARANAM_INDEX + karanamProgress) % 11 + 11) % 11);
-
-  const inauspicious = getInauspiciousTimes(date, sunTimes.sunrise);
+      // Unmapped but major library festival — show with English name
+      if (f.category === 'major') {
+        return { telugu: f.name, english: f.name, major: true };
+      }
+    }
+  }
 
   const dateStr = formatDateStr(date);
-  const festival = getFestival(dateStr);
-  const teluguMonth = getTeluguMonth(dateStr);
 
-  return {
+  // 2. Check Sankranti dates (solar, computed per location)
+  const sankrantiDates = getSankrantiDates(location);
+  if (sankrantiDates[dateStr]) return { ...sankrantiDates[dateStr] };
+
+  // 3. Check fixed-date festivals
+  const mmdd = dateStr.slice(5); // "MM-DD"
+  if (FIXED_FESTIVALS[mmdd]) return { ...FIXED_FESTIVALS[mmdd] };
+
+  // 4. Fallback to hardcoded list (for regional/Telugu-specific festivals)
+  const hardcoded = getHardcodedFestival(dateStr);
+  if (hardcoded) return hardcoded;
+
+  return null;
+}
+
+// ══════════════════════════════════════════════════════════════
+// Main panchangam computation — replaces linear approximation
+// with astronomical library (Drik Ganita, Lahiri ayanamsha)
+// ══════════════════════════════════════════════════════════════
+
+// Cache for computed panchangam data (keyed by date+location)
+const _cache = new Map();
+
+export function clearCache() {
+  _cache.clear();
+  _sankrantiCache = { locationId: null, dates: {} };
+}
+
+export function getPanchangamForDate(date, location) {
+  const dateStr = formatDateStr(date);
+  const cacheKey = `${dateStr}-${location.id}-${location.lat.toFixed(4)}`;
+  if (_cache.has(cacheKey)) return _cache.get(cacheKey);
+
+  const obs = new Observer(location.lat, location.lng, location.elev || 0);
+  const tz = location.tz;
+  const tzOffset = getTimezoneOffsetMinutes(tz, date);
+
+  // Create UTC date representing ~6AM local time for this date
+  const utcHour = 6 - (tzOffset / 60);
+  const utcDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), Math.floor(utcHour), (utcHour % 1) * 60, 0));
+
+  const p = libGetPanchangam(utcDate, obs, { timezoneOffset: tzOffset, calendarType: 'amanta' });
+
+  // Telugu name mappings
+  const tithiName = TITHIS[p.tithi];
+  const paksha = p.tithi < 15 ? 'శుక్ల' : 'కృష్ణ';
+  const nakshatraName = NAKSHATRAS[p.nakshatra];
+  const yogamName = YOGAMS[p.yoga];
+  const karanaName = TELUGU_KARANA[p.karana] || p.karana;
+  const masaTelugu = TELUGU_MASA[p.masa?.name] || p.masa?.name || '';
+  const masaEnglish = p.masa?.name || '';
+
+  // Handle Adhika masa
+  const masaPrefix = p.masa?.isAdhika ? 'అధిక ' : '';
+
+  // Sunrise/sunset as HH:MM strings
+  const sunrise = formatTime24(p.sunrise, tz);
+  const sunset = formatTime24(p.sunset, tz);
+
+  // Reference date for same-day checks (sunrise in local tz)
+  const refDate = p.sunrise || utcDate;
+
+  // Tithi start/end
+  const tithiStart = formatDT(p.tithiStartTime, refDate, tz);
+  const tithiEnd = formatDT(p.tithiEndTime, refDate, tz);
+
+  // Nakshatra start/end
+  const nakshatraStart = formatDT(p.nakshatraStartTime, refDate, tz);
+  const nakshatraEnd = formatDT(p.nakshatraEndTime, refDate, tz);
+
+  // Yogam end
+  const yogamEnd = formatTime24(p.yogaEndTime, tz);
+
+  // Inauspicious timings
+  const rahuKalam = formatTimeRange(p.rahuKalamStart, p.rahuKalamEnd, tz);
+  const yamagandam = formatTimeRange(p.yamagandaKalam?.start, p.yamagandaKalam?.end, tz);
+
+  // Varjyam: library returns entries spanning 3 days — filter to current day only
+  // "Current day" = between this sunrise and next sunrise
+  const sunrise_dt = p.sunrise;
+  const nextSunrise = sunrise_dt ? new Date(sunrise_dt.getTime() + 24 * 3600 * 1000) : null;
+  const varjyamToday = (p.varjyam || []).find(v =>
+    v.start && sunrise_dt && nextSunrise && v.start >= sunrise_dt && v.start < nextSunrise
+  );
+  const varjyam = varjyamToday ? formatTimeRange(varjyamToday.start, varjyamToday.end, tz) : '--';
+
+  // Durmuhurtham: compute ourselves (library has wrong muhurta table)
+  const durmuhurtham = computeDurmuhurtham(p.sunrise, p.sunset, date.getDay(), tz);
+
+  // Festival
+  const festival = resolveFestival(p.festivals, date, location);
+
+  const result = {
     date: dateStr,
     dayOfWeek: date.getDay(),
     vaaram: TELUGU_DAYS[date.getDay()],
@@ -256,34 +305,24 @@ export function getPanchangamForDate(date) {
     dateNum: date.getDate(),
     englishMonth: ENGLISH_MONTHS[date.getMonth()],
     year: date.getFullYear(),
-    masam: teluguMonth,
+    masam: { telugu: masaPrefix + masaTelugu, english: masaEnglish },
     paksha,
-    tithi: {
-      name: tithiName,
-      start: formatDT(tithiStartDT, date),
-      end: formatDT(tithiEndDT, date),
-    },
-    nakshatra: {
-      name: NAKSHATRAS[nakshatraIndex],
-      start: formatDT(nakshatraStartDT, date),
-      end: formatDT(nakshatraEndDT, date),
-    },
-    yogam: {
-      name: YOGAMS[yogamIndex],
-      end: formatTime(yogamEndHour),
-    },
-    karanam: {
-      name: KARANAMS[karanamIndex],
-    },
-    sunrise: sunTimes.sunrise,
-    sunset: sunTimes.sunset,
-    rahuKalam: inauspicious.rahuKalam,
-    yamagandam: inauspicious.yamagandam,
-    varjyam: inauspicious.varjyam,
-    durmuhurtham: inauspicious.durmuhurtham,
+    tithi: { name: tithiName, start: tithiStart, end: tithiEnd },
+    nakshatra: { name: nakshatraName, start: nakshatraStart, end: nakshatraEnd },
+    yogam: { name: yogamName, end: yogamEnd },
+    karanam: { name: karanaName },
+    sunrise,
+    sunset,
+    rahuKalam,
+    yamagandam,
+    varjyam,
+    durmuhurtham,
     festival,
     isSunday: date.getDay() === 0,
   };
+
+  _cache.set(cacheKey, result);
+  return result;
 }
 
 export function formatDateStr(date) {
@@ -295,26 +334,15 @@ export function formatDateStr(date) {
 
 // Generate all dates from Ugadi 2026 to Ugadi 2027
 export function generateAllDates() {
-  const start = new Date(2026, 2, 19); // March 19, 2026
-  const end = new Date(2027, 3, 7);    // April 7, 2027
+  const start = new Date(2026, 2, 19);
+  const end = new Date(2027, 3, 7);
   const dates = [];
-
   const current = new Date(start);
   while (current <= end) {
     dates.push(new Date(current));
     current.setDate(current.getDate() + 1);
   }
-
   return dates;
-}
-
-// Pre-compute panchangam for all dates
-let _cache = null;
-export function getAllPanchangam() {
-  if (_cache) return _cache;
-  const dates = generateAllDates();
-  _cache = dates.map(d => getPanchangamForDate(d));
-  return _cache;
 }
 
 // Get the day index for today (or closest date in range)
@@ -325,9 +353,7 @@ export function getTodayIndex() {
   start.setHours(0, 0, 0, 0);
   const end = new Date(2027, 3, 7);
   end.setHours(0, 0, 0, 0);
-
   if (today < start) return 0;
   if (today > end) return 0;
-
   return Math.floor((today - start) / 86400000);
 }

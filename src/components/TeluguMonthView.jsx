@@ -1,6 +1,6 @@
 import React, { memo, useMemo, useCallback } from 'react';
-import { TELUGU_MONTHS } from '../data/teluguMonths';
-import { getFestival } from '../data/festivals';
+import { getPanchangamForDate } from '../data/panchangam';
+import { useLocation } from '../context/LocationContext';
 
 const ENG_MONTHS = [
   'January', 'February', 'March', 'April', 'May', 'June',
@@ -74,7 +74,7 @@ function buildCalGrid(year, month) {
 }
 
 // Mini English month calendar with highlighted date range
-const MiniMonth = memo(function MiniMonth({ year, month, startStr, endStr, onSelectDate }) {
+const MiniMonth = memo(function MiniMonth({ year, month, startStr, endStr, onSelectDate, location }) {
   const weeks = useMemo(() => buildCalGrid(year, month), [year, month]);
   const today = useMemo(() => new Date(), []);
 
@@ -97,7 +97,7 @@ const MiniMonth = memo(function MiniMonth({ year, month, startStr, endStr, onSel
             const isEnd = isRangeEnd(new Date(year, month, day), endStr);
             const isToday = isSameDay(date, today);
             const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-            const festival = getFestival(dateStr);
+            const festival = getPanchangamForDate(date, location)?.festival;
 
             return (
               <div
@@ -128,7 +128,8 @@ const MiniMonth = memo(function MiniMonth({ year, month, startStr, endStr, onSel
 });
 
 const TeluguMonthView = memo(function TeluguMonthView({ teluguMonthIndex, onPrev, onNext, onSelectDate }) {
-  const tm = TELUGU_MONTHS[teluguMonthIndex];
+  const { location, teluguMonths } = useLocation();
+  const tm = teluguMonths[teluguMonthIndex];
   if (!tm) return null;
 
   const startDate = parseDate(tm.start);
@@ -171,6 +172,7 @@ const TeluguMonthView = memo(function TeluguMonthView({ teluguMonthIndex, onPrev
             startStr={tm.start}
             endStr={tm.end}
             onSelectDate={onSelectDate}
+            location={location}
           />
         ))}
       </div>

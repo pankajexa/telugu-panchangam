@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react';
 import { track } from '@vercel/analytics';
-import { SAMVATSARAM, CITY } from '../data/constants';
+import { SAMVATSARAM } from '../data/constants';
+import { useLocation } from '../context/LocationContext';
 
 const TELUGU_MONTHS_MAP = {
   'January': 'జనవరి', 'February': 'ఫిబ్రవరి', 'March': 'మార్చి',
@@ -21,7 +22,7 @@ function formatNakDT(dt) {
   return `${dt.date}, ${dt.time}`;
 }
 
-function buildShareText(data) {
+function buildShareText(data, cityLabel) {
   const teluguMonth = TELUGU_MONTHS_MAP[data.englishMonth] || data.englishMonth;
   const dateStr = `${data.vaaram}, ${teluguMonth} ${data.dateNum}, ${data.year}`;
 
@@ -44,10 +45,11 @@ function buildShareText(data) {
   lines.push(``);
   lines.push(`రాహు ${data.rahuKalam}`);
   lines.push(`వర్జ్యం ${data.varjyam}`);
-  lines.push(`దుర్ము. ${data.durmuhurtham}`);
+  const durText = Array.isArray(data.durmuhurtham) ? data.durmuhurtham.join(', ') : data.durmuhurtham;
+  lines.push(`దుర్ము. ${durText}`);
   lines.push(``);
   lines.push(`_${SAMVATSARAM}_`);
-  lines.push(`_${CITY} పంచాంగం_`);
+  lines.push(`_${cityLabel} పంచాంగం_`);
   lines.push(``);
   lines.push(`_shared from manacalendar.com_`);
 
@@ -55,11 +57,12 @@ function buildShareText(data) {
 }
 
 export default function ShareButton({ data }) {
+  const { location } = useLocation();
   const handleShare = useCallback(() => {
     if (!data) return;
     track('share_tithi', { date: data.date, festival: data.festival?.english || 'none' });
 
-    const text = buildShareText(data);
+    const text = buildShareText(data, location.label);
 
     // Use navigator.share SYNCHRONOUSLY from the click — never blocked by Safari
     if (navigator.share) {

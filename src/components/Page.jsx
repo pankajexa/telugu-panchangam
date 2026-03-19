@@ -1,6 +1,7 @@
 import React, { memo } from 'react';
 import BindingStrip from './BindingStrip';
-import { SAMVATSARAM, CITY } from '../data/constants';
+import { SAMVATSARAM } from '../data/constants';
+import { useLocation } from '../context/LocationContext';
 
 function to12Hr(time24) {
   const [hh, mm] = time24.split(':').map(Number);
@@ -43,6 +44,7 @@ function SunsetIcon() {
 }
 
 const Page = memo(function Page({ data, dayIndex, totalDays }) {
+  const { location } = useLocation();
   if (!data) return null;
 
   const isSunday = data.isSunday;
@@ -164,7 +166,7 @@ const Page = memo(function Page({ data, dayIndex, totalDays }) {
 
         {/* ── Footer ── */}
         <div style={styles.footer}>
-          {SAMVATSARAM} · {CITY}
+          {SAMVATSARAM} · {location.label}
         </div>
       </div>
     </div>
@@ -194,10 +196,13 @@ function NakshatraDT({ dt }) {
 }
 
 function Timing({ label, value }) {
+  const values = Array.isArray(value) ? value : [value];
   return (
     <div style={styles.timingItem}>
       <div style={styles.timingLabel}>{label}</div>
-      <div style={styles.timingValue}>{value}</div>
+      {values.map((v, i) => (
+        <div key={i} style={styles.timingValue}>{v}</div>
+      ))}
     </div>
   );
 }

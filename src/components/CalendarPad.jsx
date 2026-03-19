@@ -9,10 +9,12 @@ import ShareButton from './ShareButton';
 import FestivalWishes from './FestivalWishes';
 import AddToHomeScreen from './AddToHomeScreen';
 import { computeClipPath, drawFlip } from '../physics/drawFlip';
-import { getAllPanchangam, getTodayIndex, generateAllDates } from '../data/panchangam';
-import { TELUGU_MONTHS, getTeluguMonth } from '../data/teluguMonths';
+import { getPanchangamForDate, getTodayIndex, generateAllDates } from '../data/panchangam';
+// teluguMonths come from LocationContext
+import { useLocation } from '../context/LocationContext';
 
-const allData = getAllPanchangam();
+const allDatesArray = generateAllDates();
+const TOTAL_DAYS = allDatesArray.length;
 
 // Easing functions
 function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
@@ -20,7 +22,15 @@ function easeOutBack(t) {
   return 1 + 2.70158 * Math.pow(t - 1, 3) + 1.70158 * Math.pow(t - 1, 2);
 }
 
+// Helper: get panchangam data for an index using location
+function getData(index, location) {
+  if (index < 0 || index >= TOTAL_DAYS) return null;
+  return getPanchangamForDate(allDatesArray[index], location);
+}
+
 export default function CalendarPad({ onDateChange }) {
+  const { location, teluguMonths } = useLocation();
+
   // === React state ===
   const [currentIndex, setCurrentIndex] = useState(() => getTodayIndex());
   const [hasInteracted, setHasInteracted] = useState(false);
@@ -167,7 +177,7 @@ export default function CalendarPad({ onDateChange }) {
     // Advance page — use dirRef (stable) not flipDirection (React state, possibly stale)
     const dir = dirRef.current;
     if (dir === 'forward') {
-      setCurrentIndex(prev => Math.min(prev + 1, allData.length - 1));
+      setCurrentIndex(prev => Math.min(prev + 1, TOTAL_DAYS - 1));
     } else if (dir === 'backward') {
       setCurrentIndex(prev => Math.max(prev - 1, 0));
     }
@@ -222,7 +232,7 @@ export default function CalendarPad({ onDateChange }) {
   // Quick flip (keyboard, wheel, click) — start and immediately commit
   const quickFlip = useCallback((direction) => {
     if (phaseRef.current !== 'idle') return;
-    if (direction === 'forward' && indexRef.current >= allData.length - 1) return;
+    if (direction === 'forward' && indexRef.current >= TOTAL_DAYS - 1) return;
     if (direction === 'backward' && indexRef.current <= 0) return;
 
     beginFlip(direction);
@@ -286,7 +296,7 @@ export default function CalendarPad({ onDateChange }) {
     const direction = delta > 0 ? 'forward' : 'backward';
 
     // Bounds check
-    if (direction === 'forward' && indexRef.current >= allData.length - 1) return;
+    if (direction === 'forward' && indexRef.current >= TOTAL_DAYS - 1) return;
     if (direction === 'backward' && indexRef.current <= 0) return;
 
     // Start flip if not already
@@ -332,7 +342,7 @@ export default function CalendarPad({ onDateChange }) {
     const rect = e.currentTarget.getBoundingClientRect();
     const ratio = (e.clientY - rect.top) / rect.height;
 
-    if (ratio < 0.4 && indexRef.current < allData.length - 1) {
+    if (ratio < 0.4 && indexRef.current < TOTAL_DAYS - 1) {
       quickFlip('forward');
     } else if (ratio > 0.6 && indexRef.current > 0) {
       quickFlip('backward');
@@ -375,7 +385,7 @@ export default function CalendarPad({ onDateChange }) {
   const handleSelectMonth = useCallback((dayIndex, teluguIdx) => {
     // Dismiss on backdrop click
     if (dayIndex === -1) { setShowMonthStrip(false); return; }
-    // teluguIdx is the index into TELUGU_MONTHS array
+    // teluguIdx is the index into teluguMonths array
     if (teluguIdx !== undefined) {
       setTeluguMonthIdx(teluguIdx);
       setShowMonthStrip(false);
@@ -408,11 +418,15 @@ export default function CalendarPad({ onDateChange }) {
     return () => window.removeEventListener('resize', measure);
   }, []);
 
+  // Compute panchangam data for current/adjacent pages
+  const currentData = useMemo(() => getData(currentIndex, location), [currentIndex, location]);
+  const nextData = useMemo(() => getData(currentIndex + 1, location), [currentIndex, location]);
+  const prevData = useMemo(() => getData(currentIndex - 1, location), [currentIndex, location]);
+
   // Report current festival to parent
   useEffect(() => {
-    const data = allData[currentIndex];
-    if (onDateChange) onDateChange(data?.festival);
-  }, [currentIndex, onDateChange]);
+    if (onDateChange) onDateChange(currentData?.festival);
+  }, [currentIndex, location, onDateChange, currentData]);
 
   // Global touch listeners — swipe works anywhere on the screen (day view only)
   useEffect(() => {
@@ -437,17 +451,16 @@ export default function CalendarPad({ onDateChange }) {
   //  MONTH VIEW LOGIC
   // =================================================================
   // Derive current month/year from the current day index
-  const allDates = useMemo(() => generateAllDates(), []);
-  const currentDate = allDates[currentIndex] || new Date(2026, 2, 19);
+  const currentDate = allDatesArray[currentIndex] || new Date(2026, 2, 19);
   const [monthViewYear, setMonthViewYear] = useState(currentDate.getFullYear());
   const [monthViewMonth, setMonthViewMonth] = useState(currentDate.getMonth());
 
   // Telugu month index state
   const [teluguMonthIdx, setTeluguMonthIdx] = useState(() => {
     // Find which Telugu month the current date falls in
-    const d = allDates[0] || new Date(2026, 2, 19);
+    const d = allDatesArray[0] || new Date(2026, 2, 19);
     const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-    const idx = TELUGU_MONTHS.findIndex(m => dateStr >= m.start && dateStr <= m.end);
+    const idx = teluguMonths.findIndex(m => dateStr >= m.start && dateStr <= m.end);
     return idx >= 0 ? idx : 0;
   });
 
@@ -479,7 +492,7 @@ export default function CalendarPad({ onDateChange }) {
     const start = new Date(2026, 2, 19);
     start.setHours(0, 0, 0, 0);
     const idx = Math.round((target - start) / 86400000);
-    if (idx >= 0 && idx < allData.length) {
+    if (idx >= 0 && idx < TOTAL_DAYS) {
       setCurrentIndex(idx);
       setViewMode('day');
     }
@@ -504,7 +517,7 @@ export default function CalendarPad({ onDateChange }) {
     setTeluguMonthIdx(i => Math.max(0, i - 1));
   }, []);
   const handleNextTeluguMonth = useCallback(() => {
-    setTeluguMonthIdx(i => Math.min(TELUGU_MONTHS.length - 1, i + 1));
+    setTeluguMonthIdx(i => Math.min(teluguMonths.length - 1, i + 1));
   }, []);
   const handleTeluguMonthSelectDate = useCallback((year, month, day) => {
     const target = new Date(year, month, day);
@@ -512,7 +525,7 @@ export default function CalendarPad({ onDateChange }) {
     const start = new Date(2026, 2, 19);
     start.setHours(0, 0, 0, 0);
     const idx = Math.round((target - start) / 86400000);
-    if (idx >= 0 && idx < allData.length) {
+    if (idx >= 0 && idx < TOTAL_DAYS) {
       setCurrentIndex(idx);
       setViewMode('day');
     }
@@ -532,9 +545,6 @@ export default function CalendarPad({ onDateChange }) {
   // =================================================================
   //  RENDER
   // =================================================================
-  const currentData = allData[currentIndex];
-  const nextData = currentIndex < allData.length - 1 ? allData[currentIndex + 1] : null;
-  const prevData = currentIndex > 0 ? allData[currentIndex - 1] : null;
   const underData = flipDirection === 'backward' ? prevData : nextData;
 
   return (
@@ -556,7 +566,7 @@ export default function CalendarPad({ onDateChange }) {
                   <Page
                     data={underData}
                     dayIndex={flipDirection === 'backward' ? currentIndex - 1 : currentIndex + 1}
-                    totalDays={allData.length}
+                    totalDays={TOTAL_DAYS}
                   />
                 </div>
               )}
@@ -569,7 +579,7 @@ export default function CalendarPad({ onDateChange }) {
                 <Page
                   data={currentData}
                   dayIndex={currentIndex}
-                  totalDays={allData.length}
+                  totalDays={TOTAL_DAYS}
                 />
                 {/* Page lift hint — corner curl that flicks up */}
                 {!flipping && (
@@ -594,7 +604,7 @@ export default function CalendarPad({ onDateChange }) {
                 <canvas ref={canvasRef} style={styles.canvas} />
               )}
             </div>
-            <PageStack dayIndex={currentIndex} totalDays={allData.length} />
+            <PageStack dayIndex={currentIndex} totalDays={TOTAL_DAYS} />
           </>
         ) : viewMode === 'month' ? (
           <MonthView
@@ -636,8 +646,8 @@ export default function CalendarPad({ onDateChange }) {
         {/* Row 2: Sharing */}
         {viewMode === 'day' && (
           <div style={styles.shareRow}>
-            <ShareButton data={allData[currentIndex]} />
-            <FestivalWishes festival={allData[currentIndex]?.festival} />
+            <ShareButton data={currentData} />
+            <FestivalWishes festival={currentData?.festival} />
           </div>
         )}
         {/* Row 3: PWA install */}

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import CalendarPad from './CalendarPad';
 import FestivalDecorations from './FestivalDecorations';
+import LocationPicker from './LocationPicker';
 
 export default function CalendarContainer() {
   const [fontsLoaded, setFontsLoaded] = useState(false);
@@ -26,11 +27,14 @@ export default function CalendarContainer() {
         opacity: fontsLoaded ? 1 : 0,
         transition: 'opacity 500ms ease',
       }}>
-        {/* Brand name */}
+        {/* Brand name + location picker */}
         <div style={styles.brandRow}>
           <span style={styles.brandMana}>మన</span>
           <span style={styles.brandCalendar}>Calendar</span>
           <span style={styles.brandDot}>.com</span>
+        </div>
+        <div style={styles.locationRow}>
+          <LocationPicker />
         </div>
 
         {/* Festival decoration — below brand, above calendar */}
@@ -101,6 +105,11 @@ const styles = {
     fontSize: '14px',
     color: '#b88050',
     opacity: 0.6,
+  },
+  locationRow: {
+    display: 'flex',
+    justifyContent: 'center',
+    marginBottom: '4px',
   },
   calendarArea: {
     width: '100%',

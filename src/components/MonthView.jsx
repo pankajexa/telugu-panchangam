@@ -1,5 +1,6 @@
 import React, { memo, useMemo, useCallback, useRef } from 'react';
 import { getPanchangamForDate } from '../data/panchangam';
+import { useLocation } from '../context/LocationContext';
 
 const TELUGU_DAY_SHORT = ['ఆది', 'సోమ', 'మంగళ', 'బుధ', 'గురు', 'శుక్ర', 'శని'];
 const MONTH_NAMES = [
@@ -57,6 +58,7 @@ function buildMonthGrid(year, month) {
 }
 
 const MonthView = memo(function MonthView({ year, month, onSelectDate, onPrevMonth, onNextMonth }) {
+  const { location } = useLocation();
   const { grid, numWeeks } = useMemo(() => buildMonthGrid(year, month), [year, month]);
 
   const today = useMemo(() => {
@@ -69,10 +71,10 @@ const MonthView = memo(function MonthView({ year, month, onSelectDate, onPrevMon
     const data = {};
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     for (let d = 1; d <= daysInMonth; d++) {
-      data[d] = getPanchangamForDate(new Date(year, month, d));
+      data[d] = getPanchangamForDate(new Date(year, month, d), location);
     }
     return data;
-  }, [year, month]);
+  }, [year, month, location]);
 
   // Swipe handling for month navigation
   const touchRef = useRef({ startX: 0, startY: 0 });

@@ -1,26 +1,33 @@
-import React, { memo } from 'react';
-import { TELUGU_MONTHS } from '../data/teluguMonths';
+import React, { memo, useMemo } from 'react';
 import { generateAllDates, formatDateStr } from '../data/panchangam';
+import { useLocation } from '../context/LocationContext';
 
-const MONTH_INDICES = (() => {
-  const dates = generateAllDates();
-  return TELUGU_MONTHS.map(month => {
-    const idx = dates.findIndex(d => formatDateStr(d) >= month.start);
+const allDates = generateAllDates();
+
+function buildMonthIndices(months) {
+  return months.map(month => {
+    const idx = allDates.findIndex(d => formatDateStr(d) >= month.start);
     return {
       telugu: month.telugu,
       english: month.english,
-      short: month.english.slice(0, 3),
+      short: month.english.replace('Adhika ', 'A.').slice(0, 5),
       index: idx >= 0 ? idx : 0,
     };
   });
-})();
+}
 
 const MonthStrip = memo(function MonthStrip({ visible, onSelectMonth, currentMonthIndex }) {
+  const { teluguMonths } = useLocation();
+
+  const monthIndices = useMemo(() => {
+    return buildMonthIndices(teluguMonths);
+  }, [teluguMonths]);
+
   if (!visible) return null;
 
   let activeMonth = 0;
-  for (let i = MONTH_INDICES.length - 1; i >= 0; i--) {
-    if (currentMonthIndex >= MONTH_INDICES[i].index) {
+  for (let i = monthIndices.length - 1; i >= 0; i--) {
+    if (currentMonthIndex >= monthIndices[i].index) {
       activeMonth = i;
       break;
     }
@@ -31,7 +38,7 @@ const MonthStrip = memo(function MonthStrip({ visible, onSelectMonth, currentMon
       <div style={styles.overlay} onClick={(e) => e.stopPropagation()}>
         <div style={styles.strip}>
         <div style={styles.grid}>
-          {MONTH_INDICES.map((month, i) => (
+          {monthIndices.map((month, i) => (
             <button
               key={i}
               style={{
