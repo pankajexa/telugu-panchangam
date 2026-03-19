@@ -7,6 +7,7 @@ import TeluguMonthView from './TeluguMonthView';
 import EnglishMonthStrip from './EnglishMonthStrip';
 import ShareButton from './ShareButton';
 import FestivalWishes from './FestivalWishes';
+import AddToHomeScreen from './AddToHomeScreen';
 import { computeClipPath, drawFlip } from '../physics/drawFlip';
 import { getAllPanchangam, getTodayIndex, generateAllDates } from '../data/panchangam';
 import { TELUGU_MONTHS, getTeluguMonth } from '../data/teluguMonths';
@@ -632,9 +633,15 @@ export default function CalendarPad({ onDateChange }) {
             </button>
           )}
         </div>
+        {/* Row 2: Sharing */}
         {viewMode === 'day' && (
-          <FestivalWishes festival={allData[currentIndex]?.festival} />
+          <div style={styles.shareRow}>
+            <ShareButton data={allData[currentIndex]} />
+            <FestivalWishes festival={allData[currentIndex]?.festival} />
+          </div>
         )}
+        {/* Row 3: PWA install */}
+        {viewMode === 'day' && <AddToHomeScreen />}
         {viewMode === 'month' && <MonthNavHint />}
       </div>
 
@@ -742,19 +749,25 @@ const styles = {
     gap: '8px',
     paddingTop: '8px',
   },
+  shareRow: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '10px',
+  },
   buttonRow: {
     display: 'flex',
     alignItems: 'center',
-    gap: '12px',
+    gap: '10px',
   },
   viewToggle: {
     display: 'flex',
     alignItems: 'center',
-    gap: '8px',
+    gap: '6px',
     background: 'rgba(214,168,32,0.08)',
     border: '1.5px solid rgba(214,168,32,0.3)',
-    borderRadius: '28px',
-    padding: '10px 22px',
+    borderRadius: '24px',
+    padding: '8px 16px',
     cursor: 'pointer',
     transition: 'border-color 200ms, background 200ms',
     whiteSpace: 'nowrap',
@@ -767,8 +780,9 @@ const styles = {
   toggleText: {
     fontFamily: "'Noto Serif Telugu', serif",
     fontWeight: 700,
-    fontSize: '16px',
+    fontSize: '14px',
     color: '#d6a820',
-    letterSpacing: '0.5px',
+    letterSpacing: '0.3px',
+    whiteSpace: 'nowrap',
   },
 };
