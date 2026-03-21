@@ -48,6 +48,7 @@ export default function CalendarPad() {
 
   // === Refs (imperative, no re-renders during animation) ===
   const containerRef = useRef(null);
+  const flipSceneRef = useRef(null);
   const currentPageRef = useRef(null);
   const canvasRef = useRef(null);
   const rafRef = useRef(null);
@@ -433,11 +434,11 @@ export default function CalendarPad() {
     return getDetailedPanchangam(allDatesArray[currentIndex], location, panchangamPrefs);
   }, [currentIndex, location, panchangamPrefs, isAnyGroupEnabled]);
 
-  // Touch listeners on the calendar container only (not document)
-  // Uses passive: false so we can preventDefault to stop page scroll during flip
+  // Touch listeners on the flip scene only (not the whole container)
+  // This prevents scroll gestures below the page from triggering flips
   useEffect(() => {
     if (viewMode !== 'day') return;
-    const el = containerRef.current;
+    const el = flipSceneRef.current;
     if (!el) return;
     const down = (e) => onPointerDown(e);
     const move = (e) => {
@@ -565,16 +566,20 @@ export default function CalendarPad() {
     <div
       ref={containerRef}
       style={styles.padOuter}
-      onWheel={viewMode === 'day' ? onWheel : viewMode === 'month' ? onMonthWheel : undefined}
-      onMouseDown={viewMode === 'day' ? onPointerDown : undefined}
-      onMouseMove={viewMode === 'day' ? onPointerMove : undefined}
-      onMouseUp={viewMode === 'day' ? onPointerUp : undefined}
+      onWheel={viewMode === 'month' ? onMonthWheel : undefined}
       tabIndex={0}
     >
       <div style={styles.pad}>
         {viewMode === 'day' ? (
           <>
-            <div style={styles.flipScene}>
+            <div
+              ref={flipSceneRef}
+              style={styles.flipScene}
+              onWheel={onWheel}
+              onMouseDown={onPointerDown}
+              onMouseMove={onPointerMove}
+              onMouseUp={onPointerUp}
+            >
               {flipping && underData && (
                 <div style={styles.underPage}>
                   <Page

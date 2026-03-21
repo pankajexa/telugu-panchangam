@@ -436,6 +436,16 @@ export function getPanchangamForDate(date, location) {
   const masaIndex = p.masa?.index ?? -1;
   const vrathams = resolveVrathams(p.festivals, p.tithi, masaIndex, date.getDay());
 
+  // Shubha muhurtams for main page display
+  const abhijitMuhurta = formatTimeRange(p.abhijitMuhurta?.start, p.abhijitMuhurta?.end, tz);
+  const sunrise_dt2 = p.sunrise;
+  const nextSunrise2 = sunrise_dt2 ? new Date(sunrise_dt2.getTime() + 24 * 3600 * 1000) : null;
+  const amritToday = (p.amritKalam || []).find(v =>
+    v.start && sunrise_dt2 && nextSunrise2 && v.start >= sunrise_dt2 && v.start < nextSunrise2
+  );
+  const amritKalam = amritToday ? formatTimeRange(amritToday.start, amritToday.end, tz) : '--';
+  const brahmaMuhurta = formatTimeRange(p.brahmaMuhurta?.start, p.brahmaMuhurta?.end, tz);
+
   const result = {
     date: dateStr,
     dayOfWeek: date.getDay(),
@@ -457,6 +467,9 @@ export function getPanchangamForDate(date, location) {
     yamagandam,
     varjyam,
     durmuhurtham,
+    abhijitMuhurta,
+    amritKalam,
+    brahmaMuhurta,
     festival,
     vrathams,
     isSunday: date.getDay() === 0,

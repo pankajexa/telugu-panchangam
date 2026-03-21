@@ -177,7 +177,16 @@ const Page = memo(function Page({ data, dayIndex, totalDays }) {
         {/* ── Separator ── */}
         <div style={styles.sep} />
 
-        {/* ── Inauspicious timings ── */}
+        {/* ── Auspicious timings (Shubha Muhurtham) ── */}
+        <div style={styles.timingsBlock}>
+          <div style={styles.timingsRow}>
+            <Timing label={pick('అభిజిత్', 'Abhijit')} value={data.abhijitMuhurta} font={font} />
+            <Timing label={pick('అమృతకాలం', 'Amrit')} value={data.amritKalam} font={font} />
+            <Timing label={pick('బ్రహ్మ ము.', 'Brahma')} value={data.brahmaMuhurta} font={font} />
+          </div>
+        </div>
+
+        {/* ── Inauspicious timings (Ashubha Muhurtham) ── */}
         <div style={styles.timingsBlock}>
           <div style={styles.timingsRow}>
             <Timing label={t('page.rahu')} value={data.rahuKalam} font={font} />

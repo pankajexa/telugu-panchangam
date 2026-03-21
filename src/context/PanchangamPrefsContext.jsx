@@ -4,14 +4,14 @@ const PanchangamPrefsContext = createContext(null);
 const STORAGE_KEY = 'manacalendar-panchangam-fields';
 
 const DEFAULT_PREFS = {
-  // Group 1: Shubha Muhurtham — DEFAULT ON
-  shubha: true,
+  // Group 1: Shubha Muhurtham — DEFAULT OFF (shown on main page already)
+  shubha: false,
   shubha_abhijit: true,
   shubha_amritKalam: true,
   shubha_brahmaMuhurta: true,
 
-  // Group 2: Ashubha Muhurtham — DEFAULT ON
-  ashubha: true,
+  // Group 2: Ashubha Muhurtham — DEFAULT OFF (opt-in via settings)
+  ashubha: false,
   ashubha_yamaganda: true,
   ashubha_gulika: true,
 
