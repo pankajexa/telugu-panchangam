@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { track } from '@vercel/analytics';
 import { useLocation } from '../context/LocationContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -83,6 +83,13 @@ export default function ShareButton({ data }) {
       setGenerating(false);
     }
   }, [data, language, location, generating]);
+
+  // Auto-trigger share when notification is tapped
+  useEffect(() => {
+    const handler = () => { if (data && !generating) handleShare(); };
+    window.addEventListener('share-panchangam', handler);
+    return () => window.removeEventListener('share-panchangam', handler);
+  }, [data, generating, handleShare]);
 
   if (!data) return null;
 

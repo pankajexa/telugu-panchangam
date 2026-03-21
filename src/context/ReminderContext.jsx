@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { scheduleDailyShare, cancelDailyShare, setupNotificationListener } from '../utils/notifications';
 
 const ReminderContext = createContext(null);
 const STORAGE_KEY = 'manacalendar-reminders';
@@ -6,9 +7,13 @@ const STORAGE_KEY = 'manacalendar-reminders';
 const DEFAULT_PREFS = {
   permissionGranted: false,
 
+  // Daily panchangam share reminder
+  dailyShare: false,
+  dailyShareTime: '06:00',
+
   // Festival reminders
   festivals: true,
-  festivalDays: [0, 1], // array: 0 = same day, 1 = day before, 2 = two days before
+  festivalDays: [0, 1],
   festivalTime: '06:00',
 
   // Vratham reminders
@@ -19,7 +24,7 @@ const DEFAULT_PREFS = {
   vrathamShivaratri: true,
   vrathamPurnima: false,
   vrathamAmavasya: false,
-  vrathamDays: [0, 1], // array: 0 = same day, 1 = day before, 2 = two days before
+  vrathamDays: [0, 1],
   vrathamTime: '06:00',
 
   // Puja reminder
@@ -28,7 +33,7 @@ const DEFAULT_PREFS = {
 
   // Sunrise/Sunset
   sunrise: false,
-  sunriseOffset: 0, // minutes before (0 = at sunrise)
+  sunriseOffset: 0,
   sunset: false,
   sunsetOffset: 0,
 };
@@ -78,13 +83,23 @@ export function ReminderProvider({ children }) {
     return false;
   }, [updatePref]);
 
-  // Check permission on mount
+  // Check permission on mount + set up notification listener
   useEffect(() => {
-    if (window.Capacitor?.isNativePlatform?.()) return; // checked at request time
+    setupNotificationListener();
+    if (window.Capacitor?.isNativePlatform?.()) return;
     if ('Notification' in window && Notification.permission === 'granted') {
       updatePref('permissionGranted', true);
     }
   }, []);
+
+  // Schedule/cancel daily share notification when prefs change
+  useEffect(() => {
+    if (prefs.dailyShare && prefs.permissionGranted) {
+      scheduleDailyShare(prefs.dailyShareTime);
+    } else {
+      cancelDailyShare();
+    }
+  }, [prefs.dailyShare, prefs.dailyShareTime, prefs.permissionGranted]);
 
   return (
     <ReminderContext.Provider value={{ prefs, updatePref, requestPermission }}>
