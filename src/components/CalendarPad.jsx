@@ -7,8 +7,10 @@ import TeluguMonthView from './TeluguMonthView';
 import EnglishMonthStrip from './EnglishMonthStrip';
 import ShareButton from './ShareButton';
 import FestivalWishes from './FestivalWishes';
+import DetailedPanchangam from './DetailedPanchangam';
 import { computeClipPath, drawFlip } from '../physics/drawFlip';
-import { getPanchangamForDate, getTodayIndex, generateAllDates } from '../data/panchangam';
+import { getPanchangamForDate, getDetailedPanchangam, getTodayIndex, generateAllDates } from '../data/panchangam';
+import { usePanchangamPrefs } from '../context/PanchangamPrefsContext';
 // teluguMonths come from LocationContext
 import { useLocation } from '../context/LocationContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -31,6 +33,7 @@ function getData(index, location) {
 export default function CalendarPad() {
   const { location, teluguMonths } = useLocation();
   const { t, font } = useLanguage();
+  const { prefs: panchangamPrefs, isAnyGroupEnabled } = usePanchangamPrefs();
 
   // === React state ===
   const [currentIndex, setCurrentIndex] = useState(() => getTodayIndex());
@@ -424,6 +427,12 @@ export default function CalendarPad() {
   const nextData = useMemo(() => getData(currentIndex + 1, location), [currentIndex, location]);
   const prevData = useMemo(() => getData(currentIndex - 1, location), [currentIndex, location]);
 
+  // Detailed panchangam — only computed when groups are enabled
+  const detailedData = useMemo(() => {
+    if (!isAnyGroupEnabled) return null;
+    return getDetailedPanchangam(allDatesArray[currentIndex], location, panchangamPrefs);
+  }, [currentIndex, location, panchangamPrefs, isAnyGroupEnabled]);
+
   // Touch listeners on the calendar container only (not document)
   // Uses passive: false so we can preventDefault to stop page scroll during flip
   useEffect(() => {
@@ -655,7 +664,11 @@ export default function CalendarPad() {
             <FestivalWishes festival={currentData?.festival} />
           </div>
         )}
-        {/* Row 3: PWA install */}
+        {/* Row 3: Detailed Panchangam */}
+        {viewMode === 'day' && detailedData && (
+          <DetailedPanchangam detailedData={detailedData} />
+        )}
+        {/* Row 4: Month nav hint */}
         {viewMode === 'month' && <MonthNavHint />}
       </div>
 

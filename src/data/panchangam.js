@@ -9,6 +9,10 @@ import {
 import { TITHIS, TITHIS_EN, NAKSHATRAS, NAKSHATRAS_EN, YOGAMS, YOGAMS_EN, PAKSHAS_EN, TELUGU_DAYS, ENGLISH_DAYS, ENGLISH_MONTHS } from './constants.js';
 import { getTimezoneOffsetMinutes } from './locations.js';
 import { getFestival as getHardcodedFestival } from './festivals.js';
+import {
+  isGandamool, getAnandadiYoga, RITU_TELUGU, AYANA_TELUGU,
+  DIRECTION_TELUGU, SAMVATSARA_NAMES_TE, RASHIS_TELUGU, RASHIS_EN,
+} from './customYogas.js';
 
 // ══════════════════════════════════════════════════════════════
 // Telugu name mappings for library output
@@ -346,9 +350,12 @@ function resolveFestival(libraryFestivals, date, location) {
 
 // Cache for computed panchangam data (keyed by date+location)
 const _cache = new Map();
+// Raw library result cache — used by getDetailedPanchangam()
+const _rawCache = new Map();
 
 export function clearCache() {
   _cache.clear();
+  _rawCache.clear();
   _sankrantiCache = { locationId: null, dates: {} };
 }
 
@@ -366,6 +373,10 @@ export function getPanchangamForDate(date, location) {
   const utcDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), Math.floor(utcHour), (utcHour % 1) * 60, 0));
 
   const p = libGetPanchangam(utcDate, obs, { timezoneOffset: tzOffset, calendarType: 'amanta' });
+
+  // Store raw result for detailed panchangam access
+  const rawKey = `${dateStr}-${location.id}`;
+  _rawCache.set(rawKey, { p, tz, obs, tzOffset, utcDate });
 
   // Telugu name mappings
   const tithiName = TITHIS[p.tithi];
@@ -452,6 +463,201 @@ export function getPanchangamForDate(date, location) {
   };
 
   _cache.set(cacheKey, result);
+  return result;
+}
+
+// ══════════════════════════════════════════════════════════════
+// Detailed panchangam — extracts additional fields from library
+// Only formats fields that are enabled in user preferences
+// ══════════════════════════════════════════════════════════════
+
+export function getDetailedPanchangam(date, location, prefs) {
+  const dateStr = formatDateStr(date);
+  const rawKey = `${dateStr}-${location.id}`;
+
+  // Ensure raw cache is populated
+  if (!_rawCache.has(rawKey)) {
+    getPanchangamForDate(date, location);
+  }
+  const cached = _rawCache.get(rawKey);
+  if (!cached) return null;
+
+  const { p, tz } = cached;
+  const result = {};
+
+  // Helper: format muhurta time range
+  const fmtRange = (mt) => {
+    if (!mt || !mt.start || !mt.end) return null;
+    return formatTimeRange(mt.start, mt.end, tz);
+  };
+
+  const fmtTime = (dt) => {
+    if (!dt) return null;
+    return formatTime24(dt, tz);
+  };
+
+  const fmtDT = (dt) => {
+    if (!dt) return null;
+    const refDate = p.sunrise || date;
+    return formatDT(dt, refDate, tz);
+  };
+
+  // ── Group 1: Shubha Muhurtham ──
+  if (prefs.shubha) {
+    const shubha = {};
+    if (prefs.shubha_abhijit) {
+      shubha.abhijit = fmtRange(p.abhijitMuhurta);
+    }
+    if (prefs.shubha_amritKalam) {
+      const sunrise_dt = p.sunrise;
+      const nextSunrise = sunrise_dt ? new Date(sunrise_dt.getTime() + 24 * 3600 * 1000) : null;
+      const amritToday = (p.amritKalam || []).find(v =>
+        v.start && sunrise_dt && nextSunrise && v.start >= sunrise_dt && v.start < nextSunrise
+      );
+      shubha.amritKalam = fmtRange(amritToday);
+    }
+    if (prefs.shubha_brahmaMuhurta) {
+      shubha.brahmaMuhurta = fmtRange(p.brahmaMuhurta);
+    }
+    result.shubha = shubha;
+  }
+
+  // ── Group 2: Ashubha Muhurtham ──
+  if (prefs.ashubha) {
+    const ashubha = {};
+    if (prefs.ashubha_yamaganda) {
+      ashubha.yamaganda = fmtRange(p.yamagandaKalam);
+    }
+    if (prefs.ashubha_gulika) {
+      ashubha.gulika = fmtRange(p.gulikaKalam);
+    }
+    result.ashubha = ashubha;
+  }
+
+  // ── Group 3: Calendar Systems ──
+  if (prefs.calendar) {
+    const cal = {};
+    if (prefs.cal_vikramSamvat && p.samvat) {
+      cal.vikramSamvat = p.samvat.vikram;
+    }
+    if (prefs.cal_shakaSamvat && p.samvat) {
+      cal.shakaSamvat = p.samvat.shaka;
+    }
+    if (prefs.cal_samvatsaraName && p.samvat) {
+      const idx = p.samvat.shaka ? (p.samvat.shaka + 11) % 60 : -1;
+      cal.samvatsaraName = {
+        telugu: SAMVATSARA_NAMES_TE[idx] || p.samvat.samvatsara,
+        english: p.samvat.samvatsara,
+      };
+    }
+    if (prefs.cal_amantaPurnimanta && p.masa) {
+      cal.amanta = { telugu: TELUGU_MASA[p.masa.name] || p.masa.name, english: p.masa.name };
+      // For purnimanta, we'd need a separate library call — approximate from amanta
+      cal.purnimanta = cal.amanta; // Same for most months; differs near full moon
+    }
+    if (prefs.cal_ritu && p.ritu) {
+      cal.ritu = { telugu: RITU_TELUGU[p.ritu] || p.ritu, english: p.ritu };
+    }
+    if (prefs.cal_ayana && p.ayana) {
+      cal.ayana = { telugu: AYANA_TELUGU[p.ayana] || p.ayana, english: p.ayana };
+    }
+    result.calendar = cal;
+  }
+
+  // ── Group 4: Detailed Timings ──
+  if (prefs.timings) {
+    const dt = {};
+    if (prefs.dt_tithiTransitions && p.tithiTransitions?.length) {
+      dt.tithiTransitions = p.tithiTransitions.map(t => ({
+        telugu: TITHIS[t.index] || t.name,
+        english: TITHIS_EN[t.index] || t.name,
+        start: fmtDT(t.startTime),
+        end: fmtDT(t.endTime),
+      }));
+    }
+    if (prefs.dt_nakshatraTransitions && p.nakshatraTransitions?.length) {
+      dt.nakshatraTransitions = p.nakshatraTransitions.map(t => ({
+        telugu: NAKSHATRAS[t.index] || t.name,
+        english: NAKSHATRAS_EN[t.index] || t.name,
+        start: fmtDT(t.startTime),
+        end: fmtDT(t.endTime),
+      }));
+    }
+    if (prefs.dt_yogaTransitions && p.yogaTransitions?.length) {
+      dt.yogaTransitions = p.yogaTransitions.map(t => ({
+        telugu: YOGAMS[t.index] || t.name,
+        english: YOGAMS_EN[t.index] || t.name,
+        start: fmtDT(t.startTime),
+        end: fmtDT(t.endTime),
+      }));
+    }
+    if (prefs.dt_karanaTransitions && p.karanaTransitions?.length) {
+      dt.karanaTransitions = p.karanaTransitions.map(t => ({
+        telugu: TELUGU_KARANA[t.name] || t.name,
+        english: t.name,
+        start: fmtDT(t.startTime),
+        end: fmtDT(t.endTime),
+      }));
+    }
+    if (prefs.dt_moonrise) {
+      dt.moonrise = fmtDT(p.moonrise);
+    }
+    if (prefs.dt_moonset) {
+      dt.moonset = fmtDT(p.moonset);
+    }
+    result.timings = dt;
+  }
+
+  // ── Group 5: Rashi & Graha ──
+  if (prefs.rashi) {
+    const rg = {};
+    if (prefs.rg_sunRashi && p.sunRashi) {
+      const idx = p.sunRashi.index ?? p.sunRashi;
+      rg.sunRashi = {
+        telugu: RASHIS_TELUGU[idx] || '',
+        english: RASHIS_EN[idx] || p.sunRashi.name || '',
+      };
+    }
+    if (prefs.rg_moonRashi && p.moonRashi) {
+      const idx = p.moonRashi.index ?? p.moonRashi;
+      rg.moonRashi = {
+        telugu: RASHIS_TELUGU[idx] || '',
+        english: RASHIS_EN[idx] || p.moonRashi.name || '',
+      };
+    }
+    if (prefs.rg_moonRashiTransition && p.moonRashiTransitions?.length > 1) {
+      rg.moonRashiTransitions = p.moonRashiTransitions.map(t => ({
+        telugu: RASHIS_TELUGU[t.rashi] || t.name,
+        english: RASHIS_EN[t.rashi] || t.name,
+        time: fmtDT(t.startTime),
+      }));
+    }
+    if (prefs.rg_dishaShoola && p.dishaShoola) {
+      rg.dishaShoola = {
+        telugu: DIRECTION_TELUGU[p.dishaShoola.inauspiciousDirection] || p.dishaShoola.inauspiciousDirection,
+        english: p.dishaShoola.inauspiciousDirection,
+      };
+    }
+    result.rashi = rg;
+  }
+
+  // ── Group 6: Special Yogas ──
+  if (prefs.yogas) {
+    const sy = {};
+    if (prefs.sy_specialYogas && p.specialYogas?.length) {
+      sy.specialYogas = p.specialYogas.map(y => ({
+        name: y.name || y,
+      }));
+    }
+    if (prefs.sy_gandamool) {
+      sy.gandamool = isGandamool(p.nakshatra);
+    }
+    if (prefs.sy_anandadiYoga) {
+      sy.anandadiYoga = getAnandadiYoga(p.vara, p.nakshatra);
+    }
+    result.yogas = sy;
+  }
+
   return result;
 }
 

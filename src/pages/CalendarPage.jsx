@@ -17,7 +17,7 @@ const styles = {
     maxWidth: '432px',
     margin: '0 auto',
     boxSizing: 'border-box',
-    overflow: 'hidden',
+    overflow: 'visible',
   },
   calendarArea: {
     width: '100%',

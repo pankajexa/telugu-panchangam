@@ -3,6 +3,7 @@ import { HashRouter, Routes, Route } from 'react-router-dom';
 import { LocationProvider } from './context/LocationContext';
 import { LanguageProvider } from './context/LanguageContext';
 import { ReminderProvider } from './context/ReminderContext';
+import { PanchangamPrefsProvider } from './context/PanchangamPrefsContext';
 import TabBar from './layout/TabBar';
 import { useLanguage } from './context/LanguageContext';
 import CalendarPage from './pages/CalendarPage';
@@ -60,10 +61,12 @@ export default function App() {
     <LocationProvider>
       <LanguageProvider>
         <ReminderProvider>
-          <HashRouter>
-            <AppShell />
-          </HashRouter>
-          {!isCapacitor && <VercelAnalytics />}
+          <PanchangamPrefsProvider>
+            <HashRouter>
+              <AppShell />
+            </HashRouter>
+            {!isCapacitor && <VercelAnalytics />}
+          </PanchangamPrefsProvider>
         </ReminderProvider>
       </LanguageProvider>
     </LocationProvider>
