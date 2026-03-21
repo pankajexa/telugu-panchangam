@@ -7,8 +7,6 @@ import { PanchangamPrefsProvider } from './context/PanchangamPrefsContext';
 import TabBar from './layout/TabBar';
 import { useLanguage } from './context/LanguageContext';
 import CalendarPage from './pages/CalendarPage';
-import PujaPage from './pages/PujaPage';
-import JyotishPage from './pages/JyotishPage';
 import SettingsPage from './pages/SettingsPage';
 import DivinePattern from './components/DivinePattern';
 import './styles/paper.css';
@@ -39,8 +37,6 @@ function AppShell() {
       }}>
         <Routes>
           <Route path="/" element={<CalendarPage />} />
-          <Route path="/puja" element={<PujaPage />} />
-          <Route path="/jyotish" element={<JyotishPage />} />
           <Route path="/settings" element={<SettingsPage />} />
         </Routes>
       </div>
