@@ -10,10 +10,10 @@
  *   Fold line sweeps top → bottom. Previous page descends from above.
  */
 
-const FRONT = [240, 195, 50];
-const BACK  = [210, 165, 35];
-const SHADOW_COLOR = '50, 20, 5';
-const HIGHLIGHT_COLOR = '250, 232, 130';
+const FRONT = [245, 228, 168];
+const BACK  = [232, 208, 128];
+const SHADOW_COLOR = '60, 40, 15';
+const HIGHLIGHT_COLOR = '255, 250, 220';
 
 /**
  * Compute clip-path for the current page DOM element.

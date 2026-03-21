@@ -29,7 +29,17 @@ export const TITHIS = [
   'ఏకాదశి', 'ద్వాదశి', 'త్రయోదశి', 'చతుర్దశి', 'అమావాస్య',
 ];
 
+export const TITHIS_EN = [
+  'Padyami', 'Vidiya', 'Tadiya', 'Chaviti', 'Panchami',
+  'Shashthi', 'Saptami', 'Ashtami', 'Navami', 'Dashami',
+  'Ekadashi', 'Dvadashi', 'Trayodashi', 'Chaturdashi', 'Purnima',
+  'Padyami', 'Vidiya', 'Tadiya', 'Chaviti', 'Panchami',
+  'Shashthi', 'Saptami', 'Ashtami', 'Navami', 'Dashami',
+  'Ekadashi', 'Dvadashi', 'Trayodashi', 'Chaturdashi', 'Amavasya',
+];
+
 export const PAKSHAS = ['శుక్ల', 'కృష్ణ'];
+export const PAKSHAS_EN = ['Shukla', 'Krishna'];
 
 // 27 Nakshatras
 export const NAKSHATRAS = [
@@ -39,6 +49,15 @@ export const NAKSHATRAS = [
   'విశాఖ', 'అనురాధ', 'జ్యేష్ఠ', 'మూల', 'పూర్వాషాఢ',
   'ఉత్తరాషాఢ', 'శ్రవణం', 'ధనిష్ఠ', 'శతభిషం', 'పూర్వాభాద్ర',
   'ఉత్తరాభాద్ర', 'రేవతి',
+];
+
+export const NAKSHATRAS_EN = [
+  'Ashwini', 'Bharani', 'Krittika', 'Rohini', 'Mrigashira',
+  'Ardra', 'Punarvasu', 'Pushyami', 'Ashlesha', 'Magha',
+  'Purva Phalguni', 'Uttara Phalguni', 'Hasta', 'Chitta', 'Swati',
+  'Vishakha', 'Anuradha', 'Jyeshtha', 'Moola', 'Purvashadha',
+  'Uttarashadha', 'Shravanam', 'Dhanishtha', 'Shatabhisham', 'Purvabhadra',
+  'Uttarabhadra', 'Revati',
 ];
 
 // 27 Yogams
@@ -51,19 +70,33 @@ export const YOGAMS = [
   'ఐంద్ర', 'వైధృతి',
 ];
 
+export const YOGAMS_EN = [
+  'Vishkambha', 'Priti', 'Ayushman', 'Saubhagya', 'Shobhana',
+  'Atiganda', 'Sukarma', 'Dhriti', 'Shoola', 'Ganda',
+  'Vriddhi', 'Dhruva', 'Vyaghata', 'Harshana', 'Vajra',
+  'Siddhi', 'Vyatipata', 'Variyan', 'Parigha', 'Shiva',
+  'Siddha', 'Sadhya', 'Shubha', 'Shukla', 'Brahma',
+  'Aindra', 'Vaidhriti',
+];
+
 // 11 Karanams (cycled)
 export const KARANAMS = [
   'బవ', 'బాలవ', 'కౌలవ', 'తైతిల', 'గర',
   'వణిజ', 'విష్టి', 'శకుని', 'చతుష్పాద', 'నాగ', 'కింస్తుఘ్న',
 ];
 
+export const KARANAMS_EN = [
+  'Bava', 'Balava', 'Kaulava', 'Taitila', 'Gara',
+  'Vanija', 'Vishti', 'Shakuni', 'Chatushpada', 'Naga', 'Kimstughna',
+];
+
 // Color palette — Golden Yellow
 export const COLORS = {
-  PAPER_BASE: '#f0c230',       // rich golden yellow
-  PAPER_LIGHT: '#f5d050',      // lighter golden
+  PAPER_BASE: '#F5E4A8',       // soft modern gold
+  PAPER_LIGHT: '#FBF0CA',      // light cream gold
   PAPER_DARK: '#d6a820',       // shadow / fold areas
-  PAPER_EDGE: '#c49818',       // cut edge of the pad
-  PAPER_BACK: '#dbb428',       // back of page during curl
+  PAPER_EDGE: '#D8C068',       // cut edge of the pad
+  PAPER_BACK: '#E5CC78',       // back of page during curl
 
   INK_PRIMARY: '#3a150a',      // deep maroon-black — main text
   INK_SECONDARY: '#6b2d15',    // medium maroon
@@ -74,4 +107,5 @@ export const COLORS = {
 };
 
 export const SAMVATSARAM = 'శ్రీ పరాభవ నామ సంవత్సరం';
+export const SAMVATSARAM_EN = 'Sri Parabhava Nama Samvatsaram';
 export const CITY = 'హైదరాబాద్';

@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { useLocation } from '../context/LocationContext';
+import { useLanguage } from '../context/LanguageContext';
 import { LOCATIONS, createCustomLocation } from '../data/locations';
 
 const TELUGU = "'Noto Serif Telugu', serif";
@@ -34,6 +35,8 @@ export default function LocationPicker() {
   const india = LOCATIONS.filter(l => l.country === 'IN');
   const us = LOCATIONS.filter(l => l.country === 'US');
 
+  const { t, font } = useLanguage();
+
   return (
     <>
       <button style={styles.trigger} onClick={() => setOpen(true)}>
@@ -44,17 +47,17 @@ export default function LocationPicker() {
       {open && (
         <div style={styles.backdrop} onClick={() => setOpen(false)}>
           <div style={styles.panel} onClick={e => e.stopPropagation()}>
-            <div style={styles.title}>ప్రాంతం ఎంచుకోండి</div>
-            <div style={styles.subtitle}>Select Location</div>
+            <div style={{ ...styles.title, fontFamily: font }}>{t('loc.title')}</div>
+            <div style={styles.subtitle}>{t('loc.subtitle')}</div>
 
             {/* India */}
-            <div style={styles.groupLabel}>భారతదేశం</div>
+            <div style={{ ...styles.groupLabel, fontFamily: font }}>{t('loc.india')}</div>
             {india.map(l => (
               <CityRow key={l.id} loc={l} active={location.id === l.id} onSelect={handleSelect} />
             ))}
 
             {/* US */}
-            <div style={styles.groupLabel}>అమెరికా (USA)</div>
+            <div style={{ ...styles.groupLabel, fontFamily: font }}>{t('loc.usa')}</div>
             <div style={styles.usGrid}>
               {us.map(l => (
                 <CityRow key={l.id} loc={l} active={location.id === l.id} onSelect={handleSelect} compact />
@@ -62,9 +65,9 @@ export default function LocationPicker() {
             </div>
 
             {/* Geolocation */}
-            <button style={styles.geoBtn} onClick={handleGeolocate} disabled={geoLoading}>
-              <span>{geoLoading ? 'గుర్తిస్తోంది...' : 'నా ఖచ్చితమైన లొకేషన్ వాడండి'}</span>
-              <span style={styles.geoSub}>{geoLoading ? 'Detecting...' : 'Use my exact location'}</span>
+            <button style={{ ...styles.geoBtn, fontFamily: font }} onClick={handleGeolocate} disabled={geoLoading}>
+              <span>{geoLoading ? t('loc.geoLoading') : t('loc.geoButton')}</span>
+              <span style={styles.geoSub}>{t('loc.geoSub')}</span>
             </button>
 
             {location.id === 'custom' && (
@@ -110,10 +113,10 @@ const styles = {
     fontFamily: SERIF,
     fontSize: '11px',
     fontWeight: 600,
-    color: '#d6a820',
+    color: '#C49B2A',
     letterSpacing: '0.3px',
     textDecoration: 'underline',
-    textDecorationColor: 'rgba(214,168,32,0.3)',
+    textDecorationColor: 'rgba(196,155,42,0.3)',
     textUnderlineOffset: '2px',
   },
   backdrop: {
@@ -130,23 +133,23 @@ const styles = {
     maxWidth: '420px',
     maxHeight: '80vh',
     overflowY: 'auto',
-    background: 'linear-gradient(to top, rgba(214,168,32,0.98), rgba(240,194,48,0.96))',
-    borderRadius: '14px 14px 0 0',
+    background: '#FFFFFF',
+    borderRadius: '20px 20px 0 0',
     padding: '16px 14px 20px',
-    boxShadow: '0 -8px 30px rgba(60,30,10,0.3)',
+    boxShadow: '0 -8px 30px rgba(45,24,16,0.12)',
   },
   title: {
     fontFamily: TELUGU,
     fontWeight: 800,
     fontSize: '18px',
-    color: '#3a150a',
+    color: '#2D1810',
     textAlign: 'center',
   },
   subtitle: {
     fontFamily: SERIF,
     fontWeight: 600,
     fontSize: '11px',
-    color: '#6b2d15',
+    color: '#8A7568',
     textAlign: 'center',
     letterSpacing: '1px',
     textTransform: 'uppercase',
@@ -156,9 +159,9 @@ const styles = {
     fontFamily: TELUGU,
     fontWeight: 700,
     fontSize: '13px',
-    color: '#6b2d15',
+    color: '#C49B2A',
     padding: '8px 4px 4px',
-    borderBottom: '1px solid rgba(58,21,10,0.1)',
+    borderBottom: '1px solid rgba(45,24,16,0.06)',
   },
   usGrid: {
     display: 'grid',
@@ -182,21 +185,21 @@ const styles = {
     padding: '6px 8px',
   },
   cityBtnActive: {
-    background: 'rgba(58,21,10,0.08)',
-    border: '1.5px solid rgba(58,21,10,0.2)',
+    background: 'rgba(196,155,42,0.06)',
+    border: '1.5px solid rgba(196,155,42,0.3)',
   },
   cityTelugu: {
     fontFamily: TELUGU,
     fontWeight: 700,
     fontSize: '14px',
-    color: '#3a150a',
+    color: '#2D1810',
     lineHeight: 1.3,
   },
   cityEnglish: {
     fontFamily: SERIF,
     fontWeight: 500,
     fontSize: '10px',
-    color: '#915838',
+    color: '#8A7568',
     letterSpacing: '0.3px',
   },
   geoBtn: {
@@ -207,20 +210,20 @@ const styles = {
     width: '100%',
     margin: '12px 0 4px',
     padding: '10px',
-    background: 'rgba(58,21,10,0.06)',
-    border: '1.5px dashed rgba(58,21,10,0.2)',
-    borderRadius: '8px',
+    background: 'rgba(196,155,42,0.04)',
+    border: '1.5px dashed rgba(196,155,42,0.25)',
+    borderRadius: '10px',
     cursor: 'pointer',
     fontFamily: TELUGU,
     fontWeight: 700,
     fontSize: '13px',
-    color: '#3a150a',
+    color: '#2D1810',
   },
   geoSub: {
     fontFamily: SERIF,
     fontWeight: 500,
     fontSize: '9px',
-    color: '#915838',
+    color: '#8A7568',
     letterSpacing: '0.5px',
   },
   customInfo: {

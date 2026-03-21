@@ -3,18 +3,44 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+Telugu:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&family=Abril+Fatface&display=swap');
 
 :root {
-  --paper-base: #f0c230;
-  --paper-light: #f5d050;
-  --paper-dark: #d6a820;
-  --paper-edge: #c49818;
-  --paper-back: #dbb428;
+  /* Paper (calendar pad) — soft modern gold */
+  --paper-base: #F5E4A8;
+  --paper-light: #FBF0CA;
+  --paper-dark: #E8D080;
+  --paper-edge: #D8C068;
+  --paper-back: #E5CC78;
 
+  /* Ink on paper — unchanged */
   --ink-primary: #3a150a;
   --ink-secondary: #6b2d15;
   --ink-light: #915838;
   --ink-faint: #b88050;
 
-  --wall-bg: #1a120e;
+  /* Light theme shell */
+  --wall-bg: #F5F2ED;
+  --card-bg: #FFFFFF;
+  --card-shadow: 0 2px 12px rgba(45,24,16,0.06), 0 1px 3px rgba(45,24,16,0.04);
+  --card-radius: 16px;
+
+  /* Accent colors */
+  --accent-saffron: #C49B2A;
+  --accent-maroon: #8B1A1A;
+  --accent-gold-light: #EDD9A3;
+  --accent-cream: #FDF8EF;
+
+  /* Text on light background */
+  --text-primary: #2D1810;
+  --text-secondary: #5C3D2E;
+  --text-tertiary: #8A7568;
+  --text-faint: #B5A899;
+
+  /* Icons */
+  --icon-active: #C49B2A;
+  --icon-inactive: #A09486;
+
+  /* Borders & dividers */
+  --border-subtle: rgba(45,24,16,0.06);
+  --divider: rgba(45,24,16,0.06);
 }
 
 * {
@@ -26,7 +52,6 @@
 html, body, #root {
   height: 100%;
   width: 100%;
-  overflow: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -34,28 +59,36 @@ html, body, #root {
 body {
   font-family: 'Inter', system-ui, sans-serif;
   background: var(--wall-bg);
-  color: var(--ink-primary);
+  color: var(--text-primary);
   user-select: none;
   -webkit-user-select: none;
   touch-action: pinch-zoom;
 }
 
-/* Paper grain texture — warm golden with subtle fibre noise */
+/* Paper grain texture — soft modern gold with subtle glossy sheen */
 .paper-texture {
   position: relative;
   background:
+    /* Glossy sheen — subtle top-to-bottom highlight */
+    linear-gradient(
+      175deg,
+      rgba(255,255,255,0.18) 0%,
+      rgba(255,255,255,0.04) 30%,
+      rgba(255,255,255,0) 50%,
+      rgba(0,0,0,0.02) 100%
+    ),
     /* Subtle grain overlay */
-    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E"),
-    /* Vignette — golden center fading to deeper gold at edges */
-    radial-gradient(ellipse at 50% 45%, #f5d050 0%, #f0c230 50%, #dbb428 100%);
-  background-size: 200px 200px, 100% 100%;
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E"),
+    /* Vignette — soft gold center fading to slightly deeper at edges */
+    radial-gradient(ellipse at 50% 40%, #FBF0CA 0%, #F5E4A8 55%, #E8D080 100%);
+  background-size: 100% 100%, 200px 200px, 100% 100%;
 }
 
 /* Page shadow and depth */
 .page-paper {
   box-shadow:
-    0 2px 8px rgba(60, 30, 10, 0.18),
-    -1px 0 4px rgba(60, 30, 10, 0.08),
-    1px 0 3px rgba(60, 30, 10, 0.06),
-    inset 0 0 80px rgba(245, 210, 80, 0.25);
+    0 2px 12px rgba(60, 30, 10, 0.12),
+    -1px 0 4px rgba(60, 30, 10, 0.05),
+    1px 0 3px rgba(60, 30, 10, 0.04),
+    inset 0 0 60px rgba(255, 248, 220, 0.3);
 }

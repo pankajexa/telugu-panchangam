@@ -7,11 +7,11 @@ import TeluguMonthView from './TeluguMonthView';
 import EnglishMonthStrip from './EnglishMonthStrip';
 import ShareButton from './ShareButton';
 import FestivalWishes from './FestivalWishes';
-import AddToHomeScreen from './AddToHomeScreen';
 import { computeClipPath, drawFlip } from '../physics/drawFlip';
 import { getPanchangamForDate, getTodayIndex, generateAllDates } from '../data/panchangam';
 // teluguMonths come from LocationContext
 import { useLocation } from '../context/LocationContext';
+import { useLanguage } from '../context/LanguageContext';
 
 const allDatesArray = generateAllDates();
 const TOTAL_DAYS = allDatesArray.length;
@@ -28,15 +28,16 @@ function getData(index, location) {
   return getPanchangamForDate(allDatesArray[index], location);
 }
 
-export default function CalendarPad({ onDateChange }) {
+export default function CalendarPad() {
   const { location, teluguMonths } = useLocation();
+  const { t, font } = useLanguage();
 
   // === React state ===
   const [currentIndex, setCurrentIndex] = useState(() => getTodayIndex());
   const [hasInteracted, setHasInteracted] = useState(false);
   const [showMonthStrip, setShowMonthStrip] = useState(false);
   const [showEngMonthStrip, setShowEngMonthStrip] = useState(false);
-  const [viewMode, setViewMode] = useState('day'); // 'day' | 'month' | 'telugu-month'
+  const [viewMode, setViewMode] = useState('month'); // 'day' | 'month' | 'telugu-month'
 
   // For conditional DOM rendering (under-page, canvas)
   const [flipping, setFlipping] = useState(false);
@@ -423,24 +424,28 @@ export default function CalendarPad({ onDateChange }) {
   const nextData = useMemo(() => getData(currentIndex + 1, location), [currentIndex, location]);
   const prevData = useMemo(() => getData(currentIndex - 1, location), [currentIndex, location]);
 
-  // Report current festival to parent
-  useEffect(() => {
-    if (onDateChange) onDateChange(currentData?.festival);
-  }, [currentIndex, location, onDateChange, currentData]);
-
-  // Global touch listeners — swipe works anywhere on the screen (day view only)
+  // Touch listeners on the calendar container only (not document)
+  // Uses passive: false so we can preventDefault to stop page scroll during flip
   useEffect(() => {
     if (viewMode !== 'day') return;
+    const el = containerRef.current;
+    if (!el) return;
     const down = (e) => onPointerDown(e);
-    const move = (e) => onPointerMove(e);
+    const move = (e) => {
+      // If we're dragging a flip, prevent the page from scrolling
+      if (phaseRef.current === 'dragging') {
+        e.preventDefault();
+      }
+      onPointerMove(e);
+    };
     const up = (e) => onPointerUp(e);
-    document.addEventListener('touchstart', down, { passive: true });
-    document.addEventListener('touchmove', move, { passive: true });
-    document.addEventListener('touchend', up, { passive: true });
+    el.addEventListener('touchstart', down, { passive: true });
+    el.addEventListener('touchmove', move, { passive: false });
+    el.addEventListener('touchend', up, { passive: true });
     return () => {
-      document.removeEventListener('touchstart', down);
-      document.removeEventListener('touchmove', move);
-      document.removeEventListener('touchend', up);
+      el.removeEventListener('touchstart', down);
+      el.removeEventListener('touchmove', move);
+      el.removeEventListener('touchend', up);
     };
   }, [viewMode, onPointerDown, onPointerMove, onPointerUp]);
 
@@ -586,15 +591,15 @@ export default function CalendarPad({ onDateChange }) {
                   <div className="page-lift-hint" style={styles.pageLiftHint}>
                     <svg width="70" height="70" viewBox="0 0 70 70" style={{ display: 'block' }}>
                       <path d="M70,70 L70,18 Q55,32 18,70 Z"
-                        fill="rgba(20,12,5,0.4)" />
+                        fill="rgba(45,24,16,0.12)" />
                       <path d="M70,70 L70,20 Q56,34 20,70 Z"
-                        fill="#1a120e" />
+                        fill="#E8E2DA" />
                       <path d="M70,70 L70,24 Q58,36 24,70 Z"
-                        fill="#c49818" opacity="0.5" />
+                        fill="#D8C068" opacity="0.5" />
                       <path d="M70,70 L70,28 Q60,38 28,70 Z"
-                        fill="#e8c030" opacity="0.8" />
+                        fill="#E8D080" opacity="0.8" />
                       <path d="M70,22 Q56,36 22,70"
-                        fill="none" stroke="#f5d855" strokeWidth="1.5" opacity="0.7" />
+                        fill="none" stroke="#FBF0CA" strokeWidth="1.5" opacity="0.7" />
                     </svg>
                   </div>
                 )}
@@ -630,16 +635,16 @@ export default function CalendarPad({ onDateChange }) {
           {viewMode === 'day' ? (
             <>
               <button style={styles.viewToggle} onClick={switchToTeluguMonth}>
-                <span style={styles.toggleText}>తెలుగు నెల</span>
+                <span style={{ ...styles.toggleText, fontFamily: font }}>{t('cal.teluguMonth')}</span>
               </button>
               <button style={styles.viewToggle} onClick={switchToEnglishMonth}>
-                <span style={styles.toggleText}>ఇంగ్లీష్ నెల</span>
+                <span style={{ ...styles.toggleText, fontFamily: font }}>{t('cal.englishMonth')}</span>
               </button>
             </>
           ) : (
             <button style={styles.viewToggle} onClick={switchToDay}>
               <span style={styles.toggleIcon}>◉</span>
-              <span style={styles.toggleText}>రోజు</span>
+              <span style={{ ...styles.toggleText, fontFamily: font }}>{t('cal.day')}</span>
             </button>
           )}
         </div>
@@ -651,7 +656,6 @@ export default function CalendarPad({ onDateChange }) {
           </div>
         )}
         {/* Row 3: PWA install */}
-        {viewMode === 'day' && <AddToHomeScreen />}
         {viewMode === 'month' && <MonthNavHint />}
       </div>
 
@@ -671,10 +675,11 @@ export default function CalendarPad({ onDateChange }) {
 }
 
 function MonthNavHint() {
+  const { t, font } = useLanguage();
   return (
     <div style={monthHintStyles.container}>
       <span style={monthHintStyles.arrow}>←</span>
-      <span style={monthHintStyles.label}>నెల మార్చండి</span>
+      <span style={{ ...monthHintStyles.label, fontFamily: font }}>{t('cal.changeMonth')}</span>
       <span style={monthHintStyles.arrow}>→</span>
     </div>
   );
@@ -690,15 +695,15 @@ const monthHintStyles = {
   },
   arrow: {
     fontSize: '20px',
-    color: '#d6a820',
-    opacity: 0.35,
+    color: '#C49B2A',
+    opacity: 0.5,
   },
   label: {
     fontFamily: "'Noto Serif Telugu', serif",
     fontSize: '11px',
     fontWeight: 500,
-    color: '#d6a820',
-    opacity: 0.35,
+    color: '#C49B2A',
+    opacity: 0.5,
   },
 };
 
@@ -709,6 +714,7 @@ const styles = {
     margin: '0 auto',
     position: 'relative',
     outline: 'none',
+    boxSizing: 'border-box',
   },
   pad: {
     position: 'relative',
@@ -774,24 +780,25 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     gap: '6px',
-    background: 'rgba(214,168,32,0.08)',
-    border: '1.5px solid rgba(214,168,32,0.3)',
+    background: '#FFFFFF',
+    border: '1.5px solid rgba(196,155,42,0.25)',
     borderRadius: '24px',
     padding: '8px 16px',
     cursor: 'pointer',
     transition: 'border-color 200ms, background 200ms',
     whiteSpace: 'nowrap',
+    boxShadow: '0 1px 4px rgba(45,24,16,0.06)',
   },
   toggleIcon: {
     fontSize: '18px',
-    color: '#d6a820',
+    color: '#C49B2A',
     opacity: 0.85,
   },
   toggleText: {
     fontFamily: "'Noto Serif Telugu', serif",
     fontWeight: 700,
     fontSize: '14px',
-    color: '#d6a820',
+    color: '#C49B2A',
     letterSpacing: '0.3px',
     whiteSpace: 'nowrap',
   },

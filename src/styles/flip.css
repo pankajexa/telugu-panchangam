@@ -22,3 +22,53 @@
   animation: pageLift 3.5s ease-in-out infinite;
   transform-origin: bottom right;
 }
+
+/* ═══ Today pulse glow ═══ */
+
+@keyframes todayPulse {
+  0%, 100% {
+    box-shadow: 0 0 6px 2px rgba(160,48,32,0.12);
+    background: rgba(160,48,32,0.10);
+  }
+  50% {
+    box-shadow: 0 0 14px 5px rgba(160,48,32,0.22);
+    background: rgba(160,48,32,0.16);
+  }
+}
+
+@keyframes sparkleRotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes sparklePulse1 {
+  0%, 100% { opacity: 0; transform: scale(0.3); }
+  15% { opacity: 1; transform: scale(1); }
+  40% { opacity: 0; transform: scale(0.3); }
+}
+
+@keyframes sparklePulse2 {
+  0%, 100% { opacity: 0; transform: scale(0.3); }
+  25% { opacity: 0; transform: scale(0.3); }
+  40% { opacity: 1; transform: scale(1); }
+  65% { opacity: 0; transform: scale(0.3); }
+}
+
+@keyframes sparklePulse3 {
+  0%, 100% { opacity: 0; transform: scale(0.3); }
+  50% { opacity: 0; transform: scale(0.3); }
+  65% { opacity: 1; transform: scale(1); }
+  90% { opacity: 0; transform: scale(0.3); }
+}
+
+.today-glow {
+  animation: todayGlow 2.5s ease-in-out infinite;
+}
+
+.sparkle-ring {
+  animation: sparkleRotate 12s linear infinite;
+}
+
+.sparkle-1 { animation: sparklePulse1 3s ease-in-out infinite; }
+.sparkle-2 { animation: sparklePulse2 3s ease-in-out infinite; }
+.sparkle-3 { animation: sparklePulse3 3s ease-in-out infinite; }

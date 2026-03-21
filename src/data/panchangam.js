@@ -6,7 +6,7 @@ import {
   Observer,
   findSankrantisInRange,
 } from '@ishubhamx/panchangam-js';
-import { TITHIS, NAKSHATRAS, YOGAMS, TELUGU_DAYS, ENGLISH_DAYS, ENGLISH_MONTHS } from './constants.js';
+import { TITHIS, TITHIS_EN, NAKSHATRAS, NAKSHATRAS_EN, YOGAMS, YOGAMS_EN, PAKSHAS_EN, TELUGU_DAYS, ENGLISH_DAYS, ENGLISH_MONTHS } from './constants.js';
 import { getTimezoneOffsetMinutes } from './locations.js';
 import { getFestival as getHardcodedFestival } from './festivals.js';
 
@@ -60,6 +60,22 @@ const FIXED_FESTIVALS = {
   '10-02': { telugu: 'గాంధీ జయంతి', english: 'Gandhi Jayanti', major: false },
 };
 
+// Sankranti names for all 12 solar months
+const SANKRANTI_NAMES = {
+  'Mesha Sankranti': { telugu: 'మేష సంక్రాంతి', english: 'Mesha Sankranti', major: false },
+  'Vrishabha Sankranti': { telugu: 'వృషభ సంక్రాంతి', english: 'Vrishabha Sankranti', major: false },
+  'Mithuna Sankranti': { telugu: 'మిథున సంక్రాంతి', english: 'Mithuna Sankranti', major: false },
+  'Karka Sankranti': { telugu: 'కర్కాటక సంక్రాంతి (దక్షిణాయనం)', english: 'Karka Sankranti (Dakshinayana)', major: true },
+  'Simha Sankranti': { telugu: 'సింహ సంక్రాంతి', english: 'Simha Sankranti', major: false },
+  'Kanya Sankranti': { telugu: 'కన్యా సంక్రాంతి', english: 'Kanya Sankranti', major: false },
+  'Tula Sankranti': { telugu: 'తులా సంక్రాంతి', english: 'Tula Sankranti', major: false },
+  'Vrishchika Sankranti': { telugu: 'వృశ్చిక సంక్రాంతి', english: 'Vrishchika Sankranti', major: false },
+  'Dhanu Sankranti': { telugu: 'ధనుర్ సంక్రాంతి', english: 'Dhanu Sankranti', major: false },
+  'Makar Sankranti': { telugu: 'మకర సంక్రాంతి', english: 'Makara Sankranti', major: true },
+  'Kumbha Sankranti': { telugu: 'కుంభ సంక్రాంతి', english: 'Kumbha Sankranti', major: false },
+  'Meena Sankranti': { telugu: 'మీన సంక్రాంతి', english: 'Meena Sankranti', major: false },
+};
+
 // Sankranti dates (computed once per location, cached)
 let _sankrantiCache = { locationId: null, dates: {} };
 
@@ -73,25 +89,128 @@ function getSankrantiDates(location) {
   try {
     const sankrantis = findSankrantisInRange(start, end, obs, tzOffset);
     for (const s of sankrantis) {
+      const exact = new Date(s.exactTime);
+      const localDate = new Date(exact.toLocaleString('en-US', { timeZone: location.tz }));
+      const sd = formatDateStr(localDate);
+
       if (s.name === 'Makar Sankranti') {
-        // Sankranti spans: Bhogi (day before), Sankranti, Kanuma (day after)
-        const exact = new Date(s.exactTime);
-        const sankrantiDate = new Date(exact.toLocaleString('en-US', { timeZone: location.tz }));
-        const sd = formatDateStr(sankrantiDate);
         dates[sd] = { telugu: 'మకర సంక్రాంతి', english: 'Makara Sankranti', major: true };
-        // Bhogi (day before)
-        const bhogi = new Date(sankrantiDate);
-        bhogi.setDate(bhogi.getDate() - 1);
+        const bhogi = new Date(localDate); bhogi.setDate(bhogi.getDate() - 1);
         dates[formatDateStr(bhogi)] = { telugu: 'భోగి', english: 'Bhogi', major: true };
-        // Kanuma (day after)
-        const kanuma = new Date(sankrantiDate);
-        kanuma.setDate(kanuma.getDate() + 1);
+        const kanuma = new Date(localDate); kanuma.setDate(kanuma.getDate() + 1);
         dates[formatDateStr(kanuma)] = { telugu: 'కనుమ', english: 'Kanuma', major: true };
+      } else if (SANKRANTI_NAMES[s.name]) {
+        dates[sd] = { ...SANKRANTI_NAMES[s.name] };
       }
     }
   } catch (e) { /* ignore */ }
   _sankrantiCache = { locationId: location.id, dates };
   return dates;
+}
+
+// ══════════════════════════════════════════════════════════════
+// Vratham / recurring observance resolution
+// ══════════════════════════════════════════════════════════════
+
+// Named Ekadashi map — library name → Telugu
+const EKADASHI_TELUGU = {
+  'Kamada Ekadashi': 'కామద ఏకాదశి',
+  'Varuthini Ekadashi': 'వరూధిని ఏకాదశి',
+  'Mohini Ekadashi': 'మోహిని ఏకాదశి',
+  'Apara Ekadashi': 'అపర ఏకాదశి',
+  'Nirjala Ekadashi': 'నిర్జల ఏకాదశి',
+  'Yogini Ekadashi': 'యోగిని ఏకాదశి',
+  'Devshayani Ekadashi': 'దేవశయని ఏకాదశి',
+  'Kamika Ekadashi': 'కామికా ఏకాదశి',
+  'Shravana Putrada Ekadashi': 'శ్రావణ పుత్రద ఏకాదశి',
+  'Aja Ekadashi': 'అజ ఏకాదశి',
+  'Parsva Ekadashi': 'పరివర్తిని ఏకాదశి',
+  'Indira Ekadashi': 'ఇందిర ఏకాదశి',
+  'Papankusha Ekadashi': 'పాపాంకుశ ఏకాదశి',
+  'Rama Ekadashi': 'రామ ఏకాదశి',
+  'Devutthana Ekadashi': 'దేవోత్థాన ఏకాదశి',
+  'Utpanna Ekadashi': 'ఉత్పన్న ఏకాదశి',
+  'Mokshada Ekadashi': 'వైకుంఠ ఏకాదశి',
+  'Saphala Ekadashi': 'సఫల ఏకాదశి',
+  'Pausha Putrada Ekadashi': 'పౌష్య పుత్రద ఏకాదశి',
+  'Shattila Ekadashi': 'షట్తిల ఏకాదశి',
+  'Jaya Ekadashi': 'జయ ఏకాదశి',
+  'Vijaya Ekadashi': 'విజయ ఏకాదశి',
+  'Amalaki Ekadashi': 'ఆమలకి ఏకాదశి',
+  'Papmochani Ekadashi': 'పాపమోచని ఏకాదశి',
+};
+
+function resolveVrathams(libraryFestivals, tithiIndex, masaIndex, vara) {
+  const vrathams = [];
+
+  // 1. Collect library-detected recurring events
+  if (libraryFestivals) {
+    for (const f of libraryFestivals) {
+      // Named Ekadashis
+      if (f.name.endsWith('Ekadashi')) {
+        const te = EKADASHI_TELUGU[f.name] || f.name;
+        vrathams.push({ telugu: te, english: f.name, type: 'ekadashi' });
+      }
+      // Pradosham
+      if (f.name.startsWith('Pradosham')) {
+        let te = 'ప్రదోషం';
+        let en = 'Pradosham';
+        if (vara === 1) { te = 'సోమ ప్రదోషం'; en = 'Soma Pradosham'; }
+        else if (vara === 6) { te = 'శని ప్రదోషం'; en = 'Shani Pradosham'; }
+        else if (vara === 2) { te = 'భౌమ ప్రదోషం'; en = 'Bhauma Pradosham'; }
+        vrathams.push({ telugu: te, english: en, type: 'pradosham' });
+      }
+      // Sankashti Chaturthi
+      if (f.name === 'Sankashti Chaturthi') {
+        if (vara === 2) {
+          vrathams.push({ telugu: 'అంగారక చతుర్థి', english: 'Angaraki Chaturthi', type: 'chaturthi' });
+        } else {
+          vrathams.push({ telugu: 'సంకష్టహర చతుర్థి', english: 'Sankashti Chaturthi', type: 'chaturthi' });
+        }
+      }
+      // Vinayaka Chaturthi (monthly Shukla)
+      if (f.name === 'Vinayaka Chaturthi' && f.category !== 'major') {
+        vrathams.push({ telugu: 'వినాయక చతుర్థి', english: 'Vinayaka Chaturthi', type: 'chaturthi' });
+      }
+      // Masik Shivaratri
+      if (f.name === 'Masik Shivaratri') {
+        vrathams.push({ telugu: 'మాస శివరాత్రి', english: 'Masik Shivaratri', type: 'shivaratri' });
+      }
+      // Purnima (monthly)
+      if (f.name === 'Purnima') {
+        vrathams.push({ telugu: 'పూర్ణిమ', english: 'Purnima', type: 'purnima' });
+      }
+      // Amavasya (monthly)
+      if (f.name === 'Amavasya') {
+        if (vara === 1) {
+          vrathams.push({ telugu: 'సోమవతి అమావాస్య', english: 'Somavati Amavasya', type: 'amavasya' });
+        } else {
+          vrathams.push({ telugu: 'అమావాస్య', english: 'Amavasya', type: 'amavasya' });
+        }
+      }
+    }
+  }
+
+  // 2. Custom tithi+masa+vara combinations not detected by library
+
+  // Shukla Shashthi — monthly Skanda Shashthi
+  if (tithiIndex === 5) {
+    vrathams.push({ telugu: 'స్కంద షష్ఠి', english: 'Skanda Shashthi', type: 'shashthi' });
+  }
+
+  // Shravana month special days (masa index 4 = Shravana)
+  if (masaIndex === 4) {
+    if (vara === 1) vrathams.push({ telugu: 'శ్రావణ సోమవారం', english: 'Shravana Somavaram', type: 'masa-vrata' });
+    if (vara === 2) vrathams.push({ telugu: 'మంగళ గౌరీ వ్రతం', english: 'Mangala Gauri Vratham', type: 'masa-vrata' });
+    if (vara === 5 && tithiIndex < 15) vrathams.push({ telugu: 'శ్రావణ శుక్రవారం', english: 'Shravana Shukravaram', type: 'masa-vrata' });
+  }
+
+  // Kartika month Mondays (masa index 7 = Kartika)
+  if (masaIndex === 7 && vara === 1) {
+    vrathams.push({ telugu: 'కార్తీక సోమవారం', english: 'Kartika Somavaram', type: 'masa-vrata' });
+  }
+
+  return vrathams;
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -250,10 +369,15 @@ export function getPanchangamForDate(date, location) {
 
   // Telugu name mappings
   const tithiName = TITHIS[p.tithi];
+  const tithiNameEn = TITHIS_EN[p.tithi] || p.tithi?.toString();
   const paksha = p.tithi < 15 ? 'శుక్ల' : 'కృష్ణ';
+  const pakshaEn = p.tithi < 15 ? PAKSHAS_EN[0] : PAKSHAS_EN[1];
   const nakshatraName = NAKSHATRAS[p.nakshatra];
+  const nakshatraNameEn = NAKSHATRAS_EN[p.nakshatra] || p.nakshatra?.toString();
   const yogamName = YOGAMS[p.yoga];
+  const yogamNameEn = YOGAMS_EN[p.yoga] || p.yoga?.toString();
   const karanaName = TELUGU_KARANA[p.karana] || p.karana;
+  const karanaNameEn = p.karana || '';
   const masaTelugu = TELUGU_MASA[p.masa?.name] || p.masa?.name || '';
   const masaEnglish = p.masa?.name || '';
 
@@ -297,6 +421,10 @@ export function getPanchangamForDate(date, location) {
   // Festival
   const festival = resolveFestival(p.festivals, date, location);
 
+  // Vrathams / recurring observances
+  const masaIndex = p.masa?.index ?? -1;
+  const vrathams = resolveVrathams(p.festivals, p.tithi, masaIndex, date.getDay());
+
   const result = {
     date: dateStr,
     dayOfWeek: date.getDay(),
@@ -307,10 +435,11 @@ export function getPanchangamForDate(date, location) {
     year: date.getFullYear(),
     masam: { telugu: masaPrefix + masaTelugu, english: masaEnglish },
     paksha,
-    tithi: { name: tithiName, start: tithiStart, end: tithiEnd },
-    nakshatra: { name: nakshatraName, start: nakshatraStart, end: nakshatraEnd },
-    yogam: { name: yogamName, end: yogamEnd },
-    karanam: { name: karanaName },
+    pakshaEn,
+    tithi: { name: tithiName, nameEn: tithiNameEn, start: tithiStart, end: tithiEnd },
+    nakshatra: { name: nakshatraName, nameEn: nakshatraNameEn, start: nakshatraStart, end: nakshatraEnd },
+    yogam: { name: yogamName, nameEn: yogamNameEn, end: yogamEnd },
+    karanam: { name: karanaName, nameEn: karanaNameEn },
     sunrise,
     sunset,
     rahuKalam,
@@ -318,6 +447,7 @@ export function getPanchangamForDate(date, location) {
     varjyam,
     durmuhurtham,
     festival,
+    vrathams,
     isSunday: date.getDay() === 0,
   };
 

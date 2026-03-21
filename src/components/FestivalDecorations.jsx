@@ -2,14 +2,14 @@ import React from 'react';
 import { getMotif, DefaultTop, DefaultBottom } from './festivalMotifs/motifs';
 
 // Auspicious motif for non-festival days — Swastik with small diyas
-const G = '#d6a820';
-const G2 = '#b88050';
+const G = '#C49B2A';
+const G2 = '#9A7A5C';
 
 function AuspiciousTop() {
   return (
     <svg viewBox="0 0 360 65" style={{ width: '100%', height: '100%', display: 'block' }}>
       {/* Hindu Swastik — each arm tip hooks outward */}
-      <g transform="translate(180,32)" opacity="0.5"
+      <g transform="translate(180,32)" opacity="0.6"
          fill="none" stroke={G} strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
         {/* Top arm: up, bends right, tip hooks UP */}
         <path d="M0,0 V-14 H14 V-18" />
@@ -34,16 +34,16 @@ function AuspiciousTop() {
         <g key={x} transform={`translate(${x},38)`} opacity="0.35">
           {/* Lamp bowl — filled yellow */}
           <path d="M-7,6 Q-9,2 -6,-1 Q0,-3 6,-1 Q9,2 7,6"
-            stroke={G} strokeWidth="1" fill="#f5d050" fillOpacity="0.5" />
+            stroke={G} strokeWidth="1" fill="#F5E4A8" fillOpacity="0.5" />
           <line x1="-8" y1="6" x2="8" y2="6" stroke={G} strokeWidth="0.8" />
           {/* Stand */}
           <line x1="0" y1="6" x2="0" y2="10" stroke={G2} strokeWidth="0.6" />
           <line x1="-4" y1="10" x2="4" y2="10" stroke={G2} strokeWidth="0.6" />
           {/* Flame — filled yellow */}
           <path d="M0,-1 Q-2.5,-7 0,-12 Q2.5,-7 0,-1"
-            stroke={G} strokeWidth="0.8" fill="#f5d050" fillOpacity="0.6" />
+            stroke={G} strokeWidth="0.8" fill="#F5E4A8" fillOpacity="0.6" />
           {/* Glow at tip */}
-          <circle cx="0" cy="-10" r="3" fill="#f5d050" opacity="0.25" />
+          <circle cx="0" cy="-10" r="3" fill="#F5E4A8" opacity="0.25" />
           <circle cx="0" cy="-11" r="1.5" fill="#fff8e0" opacity="0.4" />
         </g>
       ))}
@@ -64,13 +64,13 @@ function Diya({ x, y, scale = 1, opacity = 0.35 }) {
   return (
     <g transform={`translate(${x},${y}) scale(${scale})`} opacity={opacity}>
       <path d="M-7,6 Q-9,2 -6,-1 Q0,-3 6,-1 Q9,2 7,6"
-        stroke={G} strokeWidth="1" fill="#f5d050" fillOpacity="0.5" />
+        stroke={G} strokeWidth="1" fill="#F5E4A8" fillOpacity="0.5" />
       <line x1="-8" y1="6" x2="8" y2="6" stroke={G} strokeWidth="0.8" />
       <line x1="0" y1="6" x2="0" y2="10" stroke={G2} strokeWidth="0.6" />
       <line x1="-4" y1="10" x2="4" y2="10" stroke={G2} strokeWidth="0.6" />
       <path d="M0,-1 Q-2.5,-7 0,-12 Q2.5,-7 0,-1"
-        stroke={G} strokeWidth="0.8" fill="#f5d050" fillOpacity="0.6" />
-      <circle cx="0" cy="-10" r="3" fill="#f5d050" opacity="0.25" />
+        stroke={G} strokeWidth="0.8" fill="#F5E4A8" fillOpacity="0.6" />
+      <circle cx="0" cy="-10" r="3" fill="#F5E4A8" opacity="0.25" />
       <circle cx="0" cy="-11" r="1.5" fill="#fff8e0" opacity="0.4" />
     </g>
   );

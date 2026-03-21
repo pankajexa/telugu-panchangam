@@ -5,8 +5,8 @@
 
 import React from 'react';
 
-const G = '#d6a820';
-const G2 = '#b88050';
+const G = '#C49B2A';
+const G2 = '#9A7A5C';
 const sw = (w = 1) => ({ stroke: G, strokeWidth: w, fill: 'none' });
 const sw2 = (w = 0.7) => ({ stroke: G2, strokeWidth: w, fill: 'none' });
 
@@ -25,7 +25,7 @@ export function UgadiTop() {
           stroke={G} strokeWidth="1.4" fill="#d6a820" fillOpacity="0.15" />
         {/* Inner glow on pot belly */}
         <path d="M-20,60 Q-26,46 -20,34 Q-10,26 0,24 Q10,26 20,34 Q26,46 20,60"
-          fill="#f5d050" fillOpacity="0.1" stroke="none" />
+          fill="#F5E4A8" fillOpacity="0.1" stroke="none" />
         {/* Flat base */}
         <path d="M-18,70 Q-10,74 0,75 Q10,74 18,70" {...sw(1.2)} />
         <line x1="-14" y1="75" x2="14" y2="75" {...sw(1)} />

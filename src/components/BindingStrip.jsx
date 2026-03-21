@@ -33,8 +33,8 @@ const styles = {
     width: '11px',
     height: '11px',
     borderRadius: '50%',
-    background: 'radial-gradient(circle at 40% 35%, #2a1a10, #1a120e)',
-    boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.5), 0 0 0 1.5px rgba(196,152,24,0.25)',
+    background: 'radial-gradient(circle at 40% 35%, #D6D0C8, #E8E2DA)',
+    boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.12), 0 0 0 1.5px rgba(216,192,104,0.25)',
   },
   tearLine: {
     width: '82%',

@@ -14,13 +14,18 @@ export default defineConfig({
         description: 'శ్రీ పరాభవ నామ సంవత్సరం తెలుగు పంచాంగం 2026-27',
         start_url: '/',
         display: 'standalone',
-        background_color: '#1a120e',
-        theme_color: '#d6a820',
+        background_color: '#F5F2ED',
+        theme_color: '#C49B2A',
         icons: [
           { src: '/icon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' },
           { src: '/icon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'maskable' },
+          { src: '/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
         ],
       },
     }),
   ],
+  build: {
+    // Ensure assets use relative paths for Capacitor file:// protocol
+    assetsDir: 'assets',
+  },
 })

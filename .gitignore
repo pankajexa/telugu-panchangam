@@ -27,3 +27,17 @@ dist-ssr
 *.sln
 *.sw?
 dev-dist/
+
+# Capacitor Android build artifacts
+android/app/build/
+android/.gradle/
+android/build/
+android/local.properties
+android/app/src/main/assets/public/
+android/app/src/main/assets/capacitor.config.json
+
+# Capacitor iOS build artifacts
+ios/App/App/public/
+ios/App/App/capacitor.config.json
+ios/App/Pods/
+ios/App/DerivedData/

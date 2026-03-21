@@ -1,7 +1,7 @@
 import React, { memo } from 'react';
 import BindingStrip from './BindingStrip';
-import { SAMVATSARAM } from '../data/constants';
 import { useLocation } from '../context/LocationContext';
+import { useLanguage } from '../context/LanguageContext';
 
 function to12Hr(time24) {
   const [hh, mm] = time24.split(':').map(Number);
@@ -45,6 +45,7 @@ function SunsetIcon() {
 
 const Page = memo(function Page({ data, dayIndex, totalDays }) {
   const { location } = useLocation();
+  const { t, pick, font } = useLanguage();
   if (!data) return null;
 
   const isSunday = data.isSunday;
@@ -55,19 +56,29 @@ const Page = memo(function Page({ data, dayIndex, totalDays }) {
   const rise = to12Hr(data.sunrise);
   const set = to12Hr(data.sunset);
 
+  // Language-aware values
+  const dayName = pick(data.vaaram, data.englishDay);
+  const monthName = pick(data.masam.telugu, data.masam.english);
+  const pakshaName = pick(data.paksha, data.pakshaEn);
+  const tithiName = pick(data.tithi.name, data.tithi.nameEn);
+  const nakshatraName = pick(data.nakshatra.name, data.nakshatra.nameEn);
+  const yogamName = pick(data.yogam.name, data.yogam.nameEn);
+  const karanamName = pick(data.karanam.name, data.karanam.nameEn);
+  const festivalName = hasFestival ? pick(data.festival.telugu, data.festival.english) : '';
+
   return (
     <div className="paper-texture page-paper" style={styles.page}>
       <BindingStrip />
 
       <div style={styles.content}>
 
-        {/* ── Header: Telugu day + month ── */}
+        {/* ── Header: day + month ── */}
         <div style={styles.headerRow}>
-          <span style={styles.teluguDay}>{data.vaaram}</span>
-          <span style={styles.teluguMonth}>{data.masam.telugu}</span>
+          <span style={{ ...styles.teluguDay, fontFamily: font }}>{dayName}</span>
+          <span style={{ ...styles.teluguMonth, fontFamily: font }}>{monthName}</span>
         </div>
 
-        {/* ── Sub-header: English ── */}
+        {/* ── Sub-header: English date + masa ── */}
         <div style={styles.subHeaderRow}>
           <span style={styles.subText}>{data.englishDay}</span>
           <span style={styles.subTextCenter}>{data.englishMonth} {data.year}</span>
@@ -98,19 +109,18 @@ const Page = memo(function Page({ data, dayIndex, totalDays }) {
           </div>
         </div>
 
-        {/* ── Festival name — woven into the date identity, not a separate block ── */}
+        {/* ── Festival name ── */}
         {hasFestival ? (
           <div style={styles.festivalZone}>
             {isMajor && <div style={styles.festivalOrnament}>✦&ensp;✦&ensp;✦</div>}
-            <div style={isMajor ? styles.festivalNameMajor : styles.festivalName}>
-              {data.festival.telugu}
+            <div style={{ ...(isMajor ? styles.festivalNameMajor : styles.festivalName), fontFamily: font }}>
+              {festivalName}
             </div>
             {data.festival.description && (
-              <div style={styles.festivalDesc}>{data.festival.description}</div>
+              <div style={{ ...styles.festivalDesc, fontFamily: font }}>{data.festival.description}</div>
             )}
           </div>
         ) : (
-          /* Non-festival days: just a small flourish */
           <div style={styles.flourish}>
             <svg width="50" height="6" viewBox="0 0 50 6">
               <path d="M5,3 Q12,0 18,3 T32,3 T45,3"
@@ -119,19 +129,31 @@ const Page = memo(function Page({ data, dayIndex, totalDays }) {
           </div>
         )}
 
+        {/* ── Vrathams / observances ── */}
+        {data.vrathams && data.vrathams.length > 0 && (
+          <div style={styles.vrathamLine}>
+            {data.vrathams.map((v, i) => (
+              <span key={i} style={{ ...styles.vrathamText, fontFamily: font }}>
+                {i > 0 && <span style={styles.vrathamDot}> · </span>}
+                {pick(v.telugu, v.english)}
+              </span>
+            ))}
+          </div>
+        )}
+
         {/* ── Paksha · Tithi with start/end times ── */}
         <div style={styles.tithiLine}>
           <TithiDT dt={data.tithi.start} />
           <span style={styles.tithiDash}>──</span>
-          <span style={styles.tithiText}>{data.paksha} {data.tithi.name}</span>
+          <span style={{ ...styles.tithiText, fontFamily: font }}>{pakshaName} {tithiName}</span>
           <span style={styles.tithiDash}>──</span>
           <TithiDT dt={data.tithi.end} />
         </div>
 
         {/* ── Nakshatra ── */}
         <div style={styles.nakshatraBlock}>
-          <div style={styles.nakshatraLabel}>నక్షత్రం</div>
-          <div style={styles.nakshatraName}>{data.nakshatra.name}</div>
+          <div style={{ ...styles.nakshatraLabel, fontFamily: font }}>{t('page.nakshatra')}</div>
+          <div style={{ ...styles.nakshatraName, fontFamily: font }}>{nakshatraName}</div>
           <div style={styles.nakshatraTimes}>
             <NakshatraDT dt={data.nakshatra.start} />
             <span style={styles.nakshatraSep}> ─ </span>
@@ -142,13 +164,13 @@ const Page = memo(function Page({ data, dayIndex, totalDays }) {
         {/* ── Yogam · Karanam ── */}
         <div style={styles.panchRow}>
           <div style={styles.panchItem}>
-            <span style={styles.panchLabel}>యోగం</span>
-            <span style={styles.panchValue}>{data.yogam.name}</span>
+            <span style={{ ...styles.panchLabel, fontFamily: font }}>{t('page.yogam')}</span>
+            <span style={{ ...styles.panchValue, fontFamily: font }}>{yogamName}</span>
           </div>
           <div style={styles.panchDot}>·</div>
           <div style={styles.panchItem}>
-            <span style={styles.panchLabel}>కరణం</span>
-            <span style={styles.panchValue}>{data.karanam.name}</span>
+            <span style={{ ...styles.panchLabel, fontFamily: font }}>{t('page.karanam')}</span>
+            <span style={{ ...styles.panchValue, fontFamily: font }}>{karanamName}</span>
           </div>
         </div>
 
@@ -158,15 +180,15 @@ const Page = memo(function Page({ data, dayIndex, totalDays }) {
         {/* ── Inauspicious timings ── */}
         <div style={styles.timingsBlock}>
           <div style={styles.timingsRow}>
-            <Timing label="రాహు" value={data.rahuKalam} />
-            <Timing label="వర్జ్యం" value={data.varjyam} />
-            <Timing label="దుర్ము." value={data.durmuhurtham} />
+            <Timing label={t('page.rahu')} value={data.rahuKalam} font={font} />
+            <Timing label={t('page.varjyam')} value={data.varjyam} font={font} />
+            <Timing label={t('page.durmuhurtham')} value={data.durmuhurtham} font={font} />
           </div>
         </div>
 
         {/* ── Footer ── */}
-        <div style={styles.footer}>
-          {SAMVATSARAM} · {location.label}
+        <div style={{ ...styles.footer, fontFamily: font }}>
+          {t('page.samvatsaram')} · {pick(location.label, location.labelEn)}
         </div>
       </div>
     </div>
@@ -195,15 +217,89 @@ function NakshatraDT({ dt }) {
   );
 }
 
-function Timing({ label, value }) {
+function Timing({ label, value, font }) {
   const values = Array.isArray(value) ? value : [value];
   return (
     <div style={styles.timingItem}>
-      <div style={styles.timingLabel}>{label}</div>
+      <div style={{ ...styles.timingLabel, fontFamily: font }}>{label}</div>
       {values.map((v, i) => (
         <div key={i} style={styles.timingValue}>{v}</div>
       ))}
     </div>
+  );
+}
+
+// Hindu lotus blossom watermark — pointed overlapping petals like temple art
+function LotusWatermark() {
+  const C = '#9A7A3A';
+
+  // Outer petal: pointed tip, concave sides curving to base
+  // Each petal is a path that starts at center-base, curves out to a pointed tip, curves back
+  function petalPath(angle, r1, r2, spread) {
+    const rad = (a) => (a * Math.PI) / 180;
+    const cx = 150, cy = 150;
+    // Tip point
+    const tx = cx + r2 * Math.sin(rad(angle));
+    const ty = cy - r2 * Math.cos(rad(angle));
+    // Base left
+    const blx = cx + r1 * Math.sin(rad(angle - spread));
+    const bly = cy - r1 * Math.cos(rad(angle - spread));
+    // Base right
+    const brx = cx + r1 * Math.sin(rad(angle + spread));
+    const bry = cy - r1 * Math.cos(rad(angle + spread));
+    // Control points for concave sides (pull inward)
+    const cl1x = cx + (r2 * 0.55) * Math.sin(rad(angle - spread * 0.35));
+    const cl1y = cy - (r2 * 0.55) * Math.cos(rad(angle - spread * 0.35));
+    const cl2x = cx + (r2 * 0.55) * Math.sin(rad(angle + spread * 0.35));
+    const cl2y = cy - (r2 * 0.55) * Math.cos(rad(angle + spread * 0.35));
+
+    return `M${blx},${bly} Q${cl1x},${cl1y} ${tx},${ty} Q${cl2x},${cl2y} ${brx},${bry} Z`;
+  }
+
+  const outerAngles = Array.from({ length: 8 }, (_, i) => i * 45);
+  const innerAngles = Array.from({ length: 8 }, (_, i) => i * 45 + 22.5);
+
+  return (
+    <svg
+      viewBox="0 0 300 300"
+      style={{
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: '80%',
+        height: '80%',
+        pointerEvents: 'none',
+        zIndex: 0,
+        opacity: 0.025,
+      }}
+    >
+      {/* Outer layer — 8 large pointed petals */}
+      {outerAngles.map((angle) => (
+        <path
+          key={`o-${angle}`}
+          d={petalPath(angle, 42, 130, 18)}
+          fill="none"
+          stroke={C}
+          strokeWidth="2.2"
+          strokeLinejoin="round"
+        />
+      ))}
+      {/* Inner layer — 8 petals rotated 22.5°, slightly smaller */}
+      {innerAngles.map((angle) => (
+        <path
+          key={`i-${angle}`}
+          d={petalPath(angle, 38, 100, 16)}
+          fill="none"
+          stroke={C}
+          strokeWidth="1.8"
+          strokeLinejoin="round"
+        />
+      ))}
+      {/* Center circle */}
+      <circle cx="150" cy="150" r="40" fill="none" stroke={C} strokeWidth="2.2" />
+      <circle cx="150" cy="150" r="34" fill="none" stroke={C} strokeWidth="1" />
+    </svg>
   );
 }
 
@@ -235,6 +331,8 @@ const styles = {
     flexDirection: 'column',
     padding: '3px 16px 8px',
     overflow: 'hidden',
+    position: 'relative',
+    zIndex: 1,
   },
 
   // Header
@@ -280,7 +378,7 @@ const styles = {
   festivalDate: {},
   star: { fontSize: '14px', verticalAlign: 'super', color: INK2, marginRight: '2px' },
 
-  // Festival zone — sits in the same space as the flourish, no extra height
+  // Festival zone
   festivalZone: {
     textAlign: 'center',
     margin: '0 0 1px',
@@ -320,6 +418,28 @@ const styles = {
     textAlign: 'center',
     margin: '0 0 1px',
     lineHeight: 0,
+  },
+
+  // Vrathams
+  vrathamLine: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '0',
+    margin: '2px 0',
+  },
+  vrathamText: {
+    fontFamily: TELUGU,
+    fontWeight: 600,
+    fontSize: '9px',
+    color: '#8B6914',
+    letterSpacing: '0.2px',
+  },
+  vrathamDot: {
+    color: INK4,
+    fontSize: '8px',
+    opacity: 0.5,
   },
 
   // Tithi

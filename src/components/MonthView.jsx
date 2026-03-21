@@ -1,8 +1,7 @@
 import React, { memo, useMemo, useCallback, useRef } from 'react';
 import { getPanchangamForDate } from '../data/panchangam';
 import { useLocation } from '../context/LocationContext';
-
-const TELUGU_DAY_SHORT = ['ఆది', 'సోమ', 'మంగళ', 'బుధ', 'గురు', 'శుక్ర', 'శని'];
+import { useLanguage } from '../context/LanguageContext';
 const MONTH_NAMES = [
   'January', 'February', 'March', 'April', 'May', 'June',
   'July', 'August', 'September', 'October', 'November', 'December',
@@ -59,6 +58,8 @@ function buildMonthGrid(year, month) {
 
 const MonthView = memo(function MonthView({ year, month, onSelectDate, onPrevMonth, onNextMonth }) {
   const { location } = useLocation();
+  const { t, pick, font } = useLanguage();
+  const dayNames = t('month.days');
   const { grid, numWeeks } = useMemo(() => buildMonthGrid(year, month), [year, month]);
 
   const today = useMemo(() => {
@@ -94,8 +95,10 @@ const MonthView = memo(function MonthView({ year, month, onSelectDate, onPrevMon
     }
   }, [onNextMonth, onPrevMonth]);
 
-  const colWidth = `${(100 / (numWeeks + 1)).toFixed(2)}%`;
-  const dayColWidth = `${(100 / (numWeeks + 1) * 1.2).toFixed(2)}%`;
+  // Day name column is slightly wider; remaining space split equally among week columns
+  const dayColPct = 12; // fixed 12% for day name
+  const colWidth = `${((100 - dayColPct) / numWeeks).toFixed(2)}%`;
+  const dayColWidth = `${dayColPct}%`;
 
   return (
     <div
@@ -116,7 +119,7 @@ const MonthView = memo(function MonthView({ year, month, onSelectDate, onPrevMon
 
       {/* Grid */}
       <div style={styles.grid}>
-        {TELUGU_DAY_SHORT.map((dayName, row) => (
+        {dayNames.map((dayName, row) => (
           <div key={row} style={{
             ...styles.row,
             ...(row === 0 ? styles.sundayRow : {}),
@@ -125,6 +128,7 @@ const MonthView = memo(function MonthView({ year, month, onSelectDate, onPrevMon
             <div style={{
               ...styles.dayNameCell,
               ...(row === 0 ? styles.sundayDayName : {}),
+              fontFamily: font,
               width: dayColWidth,
             }}>
               {dayName}
@@ -158,11 +162,14 @@ const MonthView = memo(function MonthView({ year, month, onSelectDate, onPrevMon
 });
 
 const DayCell = memo(function DayCell({ day, data, isSunday, isToday }) {
+  const { t, pick, font } = useLanguage();
   const hasFestival = !!data?.festival;
   const isMajor = hasFestival && data.festival.major;
-  const tithiName = data?.tithi?.name || '';
-  const isAmavasya = tithiName === 'అమావాస్య';
-  const isPurnima = tithiName === 'పూర్ణిమ';
+  const hasVratham = !hasFestival && data?.vrathams?.length > 0;
+  const tithiName = pick(data?.tithi?.name, data?.tithi?.nameEn) || '';
+  const tithiNameTe = data?.tithi?.name || '';
+  const isAmavasya = tithiNameTe === 'అమావాస్య';
+  const isPurnima = tithiNameTe === 'పూర్ణిమ';
 
   return (
     <div style={{
@@ -180,16 +187,11 @@ const DayCell = memo(function DayCell({ day, data, isSunday, isToday }) {
       {/* Festival star marker — top left */}
       {isMajor && <div style={styles.festivalStar}>✦</div>}
 
-      {/* Date number + today circle */}
-      <div style={styles.dateWrap}>
-        {isToday && (
-          <svg viewBox="0 0 44 44" style={styles.todayCircle}>
-            <path
-              d="M22,3 Q38,2 40,14 Q43,26 34,36 Q24,44 12,40 Q2,34 2,22 Q1,10 12,4 Q18,2 22,3"
-              fill="none" stroke="#a03020" strokeWidth="1.6" strokeLinecap="round" opacity="0.7"
-            />
-          </svg>
-        )}
+      {/* Date number + today highlight */}
+      <div style={{
+        ...styles.dateWrap,
+        ...(isToday ? styles.todayWrap : {}),
+      }}>
         <div style={{
           ...styles.cellDate,
           ...(isSunday ? styles.sundayDate : {}),
@@ -203,13 +205,17 @@ const DayCell = memo(function DayCell({ day, data, isSunday, isToday }) {
       {/* Info below date */}
       <div style={styles.cellInfo}>
         {hasFestival ? (
-          <div style={isMajor ? styles.festivalNameMajor : styles.festivalNameMinor}>
-            {data.festival.telugu}
+          <div style={{ ...(isMajor ? styles.festivalNameMajor : styles.festivalNameMinor), fontFamily: font }}>
+            {pick(data.festival.telugu, data.festival.english)}
+          </div>
+        ) : hasVratham ? (
+          <div style={{ ...styles.vrathamName, fontFamily: font }}>
+            {pick(data.vrathams[0].telugu, data.vrathams[0].english)}
           </div>
         ) : (isAmavasya || isPurnima) ? (
-          <div style={styles.moonLabel}>{isAmavasya ? 'అమావాస్య' : 'పూర్ణిమ'}</div>
+          <div style={{ ...styles.moonLabel, fontFamily: font }}>{isAmavasya ? t('month.amavasya') : t('month.purnima')}</div>
         ) : data ? (
-          <div style={styles.cellTithi}>{tithiName}</div>
+          <div style={{ ...styles.cellTithi, fontFamily: font }}>{tithiName}</div>
         ) : null}
       </div>
     </div>
@@ -225,6 +231,7 @@ const styles = {
     overflow: 'hidden',
     padding: '6px 0 4px',
     touchAction: 'pan-y',
+    boxSizing: 'border-box',
   },
   header: {
     display: 'flex',
@@ -312,12 +319,15 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
+    overflow: 'visible',
   },
-  todayCircle: {
-    position: 'absolute',
+  todayWrap: {
+    background: 'rgba(160,48,32,0.12)',
+    borderRadius: '50%',
     width: '36px',
     height: '36px',
-    pointerEvents: 'none',
+    boxShadow: '0 0 8px 3px rgba(160,48,32,0.15)',
+    animation: 'todayPulse 2.5s ease-in-out infinite',
   },
   cellDate: {
     fontFamily: DATE_FONT,
@@ -328,6 +338,7 @@ const styles = {
   },
   todayDate: {
     color: '#a03020',
+    fontWeight: 700,
   },
   sundayDate: {
     textShadow: `0.5px 0 0 ${INK}`,
@@ -405,6 +416,21 @@ const styles = {
     color: INK2,
     lineHeight: 1,
     textAlign: 'center',
+  },
+
+  // Vratham name
+  vrathamName: {
+    fontFamily: TELUGU,
+    fontWeight: 600,
+    fontSize: '6.5px',
+    color: '#8B6914',
+    lineHeight: 1.15,
+    textAlign: 'center',
+    maxWidth: '100%',
+    overflow: 'hidden',
+    display: '-webkit-box',
+    WebkitLineClamp: 2,
+    WebkitBoxOrient: 'vertical',
   },
 
   // Regular tithi

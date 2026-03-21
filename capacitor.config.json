@@ -1,0 +1,21 @@
+{
+  "appId": "com.manacalendar.app",
+  "appName": "మనCalendar",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 1500,
+      "backgroundColor": "#F5F2ED",
+      "showSpinner": false,
+      "launchAutoHide": true,
+      "launchFadeOutDuration": 300
+    },
+    "StatusBar": {
+      "style": "LIGHT",
+      "backgroundColor": "#F5F2ED"
+    }
+  }
+}
