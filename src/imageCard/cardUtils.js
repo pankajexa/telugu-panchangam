@@ -427,16 +427,30 @@ export function drawGlowText(ctx, text, x, y, font, color, glowColor, glowSize) 
   ctx.restore();
 }
 
-/** Draw branding footer */
+/** Draw branding footer — properly measured to avoid overlap */
 export function drawBranding(ctx, w, y) {
   ctx.save();
-  ctx.textAlign = 'center';
-  ctx.globalAlpha = 0.6;
-  ctx.font = `800 28px ${F.telugu}`;
+  ctx.globalAlpha = 0.55;
+  ctx.textBaseline = 'alphabetic';
+
+  const gap = 4;
+  ctx.font = `800 32px ${F.telugu}`;
   ctx.fillStyle = C.ink3;
-  ctx.fillText('మన', w / 2 - 50, y);
-  ctx.font = `700 26px ${F.english}`;
-  ctx.fillText('Calendar.com', w / 2 + 30, y);
+  const manaW = ctx.measureText('మన').width;
+
+  ctx.font = `700 30px ${F.english}`;
+  const calW = ctx.measureText('Calendar.com').width;
+
+  const totalW = manaW + gap + calW;
+  const startX = (w - totalW) / 2;
+
+  ctx.textAlign = 'left';
+  ctx.font = `800 32px ${F.telugu}`;
+  ctx.fillText('మన', startX, y);
+
+  ctx.font = `700 30px ${F.english}`;
+  ctx.fillText('Calendar.com', startX + manaW + gap, y);
+
   ctx.restore();
 }
 

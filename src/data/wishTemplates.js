@@ -1,7 +1,8 @@
 // Festival wish templates — curated Telugu + English messages
 // Each template has a theme name and the full message text
+// Festival-specific templates keyed by festival English name
 
-export const WISH_TEMPLATES = [
+const UGADI_TEMPLATES = [
   {
     theme: 'సంప్రదాయం',
     themeEn: 'Traditional',
@@ -103,3 +104,185 @@ May your life be as sweet as jaggery and as tangy as a fresh mango.`,
 Wishing you a year of vibrant health and boundless energy. Happy Ugadi!`,
   },
 ];
+
+const RAMA_NAVAMI_TEMPLATES = [
+  {
+    theme: 'భక్తి',
+    themeEn: 'Devotion',
+    message: `శ్రీరామచంద్రుని దివ్య జన్మదినం సందర్భంగా,
+ఆయన ఆశీర్వాదాలు మీపై సదా వర్షించాలని,
+ధర్మ మార్గంలో మీరు నడవాలని కోరుకుంటున్నాను.
+శ్రీ రామ నవమి శుభాకాంక్షలు!
+
+May Lord Rama's divine blessings guide you on the path of righteousness.`,
+  },
+  {
+    theme: 'ధర్మం',
+    themeEn: 'Dharma',
+    message: `రామో విగ్రహవాన్ ధర్మః — ధర్మమే రాముడు, రాముడే ధర్మం.
+ఈ శుభదినాన శ్రీరాముడి ధర్మబోధన మన జీవితాల్లో వెలుగులు నింపాలి.
+సత్యం, ధర్మం, ప్రేమల మార్గంలో నడుద్దాం.
+శ్రీ సీతారామ కల్యాణం శుభాకాంక్షలు!
+
+Dharma is the essence of Rama — may His teachings illuminate our lives.`,
+  },
+  {
+    theme: 'పట్టాభిషేకం',
+    themeEn: 'Coronation',
+    message: `అయోధ్యాపతి శ్రీరామచంద్రుని పట్టాభిషేకం నాటి ఆనందం
+మీ ఇంట కూడా వెల్లివిరియాలని ఆశిస్తున్నాను.
+రామరాజ్యంలో వలె మీ జీవితం సుఖసంతోషాలతో నిండాలి.
+శ్రీ రామ నవమి శుభాకాంక్షలు!
+
+Like the joy of Rama's coronation in Ayodhya, may happiness reign in your home.`,
+  },
+  {
+    theme: 'సీతారామ',
+    themeEn: 'Sita-Rama',
+    message: `సీతారాముల అనురాగం, అన్యోన్యత
+మన దాంపత్య జీవితాలకు ఆదర్శం కావాలి.
+ఆ దివ్య దంపతుల ఆశీస్సులు మనందరిపై ఉండాలి.
+జై శ్రీ రామ! శ్రీ రామ నవమి శుభాకాంక్షలు!
+
+May the divine love of Sita and Rama bless every home with harmony.`,
+  },
+  {
+    theme: 'హనుమంతుడు',
+    themeEn: 'Hanuman',
+    message: `హనుమంతుడి భక్తి, విశ్వాసం, సేవాభావం
+మనకు ఎల్లప్పుడూ స్ఫూర్తి కావాలి.
+రామభక్తి ఉన్న చోట భయమే లేదు!
+జై శ్రీ రామ! జై హనుమాన్! శ్రీ రామ నవమి శుభాకాంక్షలు!
+
+Like Hanuman's unwavering devotion, may faith guide our every step. Jai Sri Ram!`,
+  },
+  {
+    theme: 'కుటుంబం',
+    themeEn: 'Family',
+    message: `తల్లిదండ్రుల పట్ల రాముడి భక్తి, సోదరుల పట్ల ప్రేమ
+ఆదర్శ కుటుంబానికి మార్గదర్శనం.
+మీ కుటుంబం శ్రీరాముడి కుటుంబంలా అనుబంధంతో వెలగాలి.
+మీ అందరికీ శ్రీ రామ నవమి శుభాకాంక్షలు!
+
+Rama's love for family inspires us all. May your family be blessed with unity and joy.`,
+  },
+  {
+    theme: 'విజయం',
+    themeEn: 'Victory',
+    message: `అసత్యంపై సత్యం, అధర్మంపై ధర్మం విజయం సాధించిన రోజు ఇది.
+శ్రీరాముడి ధైర్యం, శౌర్యం మీకు ఎల్లప్పుడూ తోడుండాలి.
+మీ జీవితంలో ప్రతి సవాలుపై విజయం సాధించాలని కోరుకుంటున్నాను.
+శ్రీ రామ నవమి శుభాకాంక్షలు!
+
+May Rama's courage inspire you to triumph over every challenge in life.`,
+  },
+  {
+    theme: 'రామరాజ్యం',
+    themeEn: 'Ram Rajya',
+    message: `రామరాజ్యంలో ఉన్నట్లు ప్రతి ఇంట్లో సుఖశాంతులు నెలకొనాలి.
+న్యాయం, సమానత్వం, ప్రేమతో నిండిన సమాజం మనది కావాలి.
+శ్రీరాముడి పాలన మనకు ఆదర్శం.
+శ్రీ రామ నవమి శుభాకాంక్షలు!
+
+May Ram Rajya's ideals of justice and peace bless our homes and society.`,
+  },
+  {
+    theme: 'మోడ్రన్',
+    themeEn: 'Modern',
+    message: `రాముడి స్టోరీ నేటికీ రిలేట్ అవుతుంది — ఎంత కష్టమైనా ధర్మాన్ని వదలకపోవడం.
+ఈ రామనవమి మీలో కొత్త స్ట్రెంగ్త్‌ని, పాజిటివిటీని నింపాలి.
+లెట్స్ బి ద బెస్ట్ వర్షన్ ఆఫ్ అవర్‌సెల్వ్స్!
+జై శ్రీ రామ! 🙏
+
+Rama's story is timeless — stand for what's right, no matter what. Happy Rama Navami!`,
+  },
+  {
+    theme: 'శాంతి',
+    themeEn: 'Peace',
+    message: `శ్రీరాముడి కరుణ, సహనం, క్షమాగుణం
+ఈ ప్రపంచానికి ఎంతో అవసరం.
+ఈ పవిత్ర దినాన మన హృదయాల్లో శాంతి నెలకొనాలి.
+సర్వే జనాః సుఖినో భవంతు.
+శ్రీ రామ నవమి శుభాకాంక్షలు!
+
+May Lord Rama's compassion fill our hearts with peace and goodwill.`,
+  },
+];
+
+// Map of festival names to their specific templates
+const FESTIVAL_TEMPLATES = {
+  'Rama Navami': RAMA_NAVAMI_TEMPLATES,
+  'Sri Rama Navami': RAMA_NAVAMI_TEMPLATES,
+  'Ugadi': UGADI_TEMPLATES,
+};
+
+// Default templates (generic, works for any festival)
+const DEFAULT_TEMPLATES = [
+  {
+    theme: 'సంప్రదాయం',
+    themeEn: 'Traditional',
+    message: `ఈ పవిత్ర పండుగ సందర్భంగా,
+మీకు మరియు మీ కుటుంబ సభ్యులకు శుభాకాంక్షలు!
+ఆయురారోగ్య ఐశ్వర్యాలతో మీరు వర్ధిల్లాలని కోరుకుంటున్నాను.
+
+Wishing you and your family a blessed and joyful celebration.`,
+  },
+  {
+    theme: 'భక్తి',
+    themeEn: 'Devotion',
+    message: `దైవ కృప మీపై సదా ఉండాలని,
+మీ జీవితంలో సుఖసంతోషాలు వెల్లివిరియాలని
+మనస్ఫూర్తిగా కోరుకుంటున్నాను.
+ఈ పండుగ మీకు మంగళకరమవ్వాలి!
+
+May divine grace shower upon you and fill your life with happiness.`,
+  },
+  {
+    theme: 'కుటుంబం',
+    themeEn: 'Family',
+    message: `ఈ పండుగ వేళ కుటుంబమంతా కలిసి,
+సంతోషంగా, ఆనందంగా గడపాలని ఆశిస్తున్నాను.
+పెద్దల ఆశీస్సులు, పిల్లల నవ్వులతో మీ ఇల్లు కళకళలాడాలి!
+
+May your home be filled with laughter and love this festive season.`,
+  },
+  {
+    theme: 'శాంతి',
+    themeEn: 'Peace',
+    message: `ఈ పవిత్ర సందర్భంలో మీ హృదయంలో శాంతి,
+మీ ఇంట సంతోషం, మీ జీవితంలో సమృద్ధి నెలకొనాలి.
+అందరికీ హృదయపూర్వక శుభాకాంక్షలు!
+
+Wishing you peace, happiness, and abundance on this auspicious day.`,
+  },
+  {
+    theme: 'విజయం',
+    themeEn: 'Success',
+    message: `ఈ పండుగ మీ జీవితంలో కొత్త విజయాలకు నాంది కావాలి.
+మీ ప్రతి ప్రయత్నం ఫలించాలని ఆకాంక్షిస్తున్నాను.
+మీకు మరియు మీ కుటుంబానికి పండుగ శుభాకాంక్షలు!
+
+May this festival mark the beginning of new achievements in your life.`,
+  },
+  {
+    theme: 'సంపద',
+    themeEn: 'Prosperity',
+    message: `ఈ శుభ సందర్భంలో మీ ఇంట్లో సిరిసంపదలు,
+ఆరోగ్యం, ఆనందం నిండి ఉండాలని కోరుకుంటున్నాను.
+దైవ ఆశీర్వాదం మీ కుటుంబంపై సదా ఉండాలి!
+
+Wishing you prosperity, health, and blessings on this festive occasion.`,
+  },
+];
+
+/** Get wish templates for a specific festival, with fallback to defaults */
+export function getWishTemplates(festivalEnglish) {
+  if (!festivalEnglish) return DEFAULT_TEMPLATES;
+  for (const [key, templates] of Object.entries(FESTIVAL_TEMPLATES)) {
+    if (festivalEnglish.toLowerCase().includes(key.toLowerCase())) return templates;
+  }
+  return DEFAULT_TEMPLATES;
+}
+
+// Legacy export for backward compatibility
+export const WISH_TEMPLATES = UGADI_TEMPLATES;

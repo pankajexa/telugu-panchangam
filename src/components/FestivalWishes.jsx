@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { track } from '@vercel/analytics';
-import { WISH_TEMPLATES } from '../data/wishTemplates';
+import { getWishTemplates } from '../data/wishTemplates';
 import { useLanguage } from '../context/LanguageContext';
 import { generateWishCard } from '../imageCard/generateWishCard';
 import { shareImageWithFallback } from '../imageCard/cardUtils';
@@ -49,6 +49,8 @@ export default function FestivalWishes({ festival }) {
 
   if (!festival || !festival.major) return null;
 
+  const templates = getWishTemplates(festival.english);
+
   return (
     <>
       <button style={{ ...styles.btn, opacity: generating ? 0.6 : 1 }} onClick={handleOpen} disabled={generating}>
@@ -70,10 +72,10 @@ export default function FestivalWishes({ festival }) {
           <div style={styles.overlay} onClick={(e) => e.stopPropagation()}>
             <div style={styles.strip}>
             <div style={styles.grid}>
-              {WISH_TEMPLATES.map((t, i) => (
-                <button key={i} style={styles.templateBtn} onClick={() => handleSelect(t)}>
-                  <span style={styles.themeName}>{t.theme}</span>
-                  <span style={styles.themeEn}>{t.themeEn}</span>
+              {templates.map((tmpl, i) => (
+                <button key={i} style={styles.templateBtn} onClick={() => handleSelect(tmpl)}>
+                  <span style={styles.themeName}>{tmpl.theme}</span>
+                  <span style={styles.themeEn}>{tmpl.themeEn}</span>
                 </button>
               ))}
             </div>

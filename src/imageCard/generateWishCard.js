@@ -1,41 +1,42 @@
 /**
  * Generates a beautiful festival wishes image card with
- * mandala frame, lotus accents, and warm golden aesthetic.
+ * mandala frame, festival-specific artwork, and warm golden aesthetic.
  * Returns a PNG Blob ready for WhatsApp sharing.
  */
 
-import { SAMVATSARAM } from '../data/constants';
 import {
   C, F, ensureFonts, createCanvas, drawBackground,
   drawOrnateBorder, drawCornerOrnaments, drawMandala,
   drawDivider, drawLotus, drawDiya, drawGlowText,
   drawBranding, wrapText, canvasToBlob,
 } from './cardUtils';
+import { getFestivalArt } from './festivalArt';
 
 const W = 1080;
-const H = 1080;
+const H = 1350;
 const CX = W / 2;
 const INSET = 32;
 
-// Festival accent colors (subtle tint on the fest color)
+// Festival accent colors
 const FESTIVAL_ACCENTS = {
-  'Ugadi': '#B8860B',
-  'Diwali': '#D84315',
-  'Deepavali': '#D84315',
-  'Ganesh Chaturthi': '#C62828',
-  'Vinayaka Chavithi': '#C62828',
-  'Dussehra': '#AD1457',
-  'Vijayadashami': '#AD1457',
-  'Rama Navami': '#1565C0',
-  'Krishna Janmashtami': '#283593',
-  'Sankranti': '#E65100',
-  'Makar Sankranti': '#E65100',
+  'ugadi': '#B8860B',
+  'diwali': '#D84315',
+  'deepavali': '#D84315',
+  'ganesh chaturthi': '#C62828',
+  'vinayaka chavithi': '#C62828',
+  'dussehra': '#AD1457',
+  'vijayadashami': '#AD1457',
+  'rama navami': '#1565C0',
+  'krishna janmashtami': '#283593',
+  'sankranti': '#E65100',
+  'makar sankranti': '#E65100',
 };
 
 function getAccent(festivalEnglish) {
   if (!festivalEnglish) return C.fest;
+  const lower = festivalEnglish.toLowerCase();
   for (const [key, color] of Object.entries(FESTIVAL_ACCENTS)) {
-    if (festivalEnglish.toLowerCase().includes(key.toLowerCase())) return color;
+    if (lower.includes(key)) return color;
   }
   return C.fest;
 }
@@ -50,8 +51,14 @@ export async function generateWishCard(festival, template) {
   // ── Background ──
   drawBackground(ctx, W, H);
 
-  // Large mandala watermark (center, very faint)
-  drawMandala(ctx, CX, H * 0.45, 350, C.goldDark, 0.04);
+  // Check for festival-specific artwork
+  const artFn = getFestivalArt(festival.english);
+  const hasArt = !!artFn;
+
+  // Mandala watermark — position depends on whether we have art
+  if (!hasArt) {
+    drawMandala(ctx, CX, H * 0.38, 350, C.goldDark, 0.04);
+  }
 
   // ── Border + corners ──
   drawOrnateBorder(ctx, W, H, INSET);
@@ -61,28 +68,21 @@ export async function generateWishCard(festival, template) {
   drawDiya(ctx, INSET + 55, INSET + 55, 18);
   drawDiya(ctx, W - INSET - 55, INSET + 55, 18);
 
-  let y = 110;
-
-  // ── Top ornamental motif ──
-  drawLotus(ctx, CX, y, 22, C.gold, 0.3);
-  y += 40;
+  let y = 108;
 
   // ── Samvatsaram header ──
   ctx.textAlign = 'center';
-  ctx.font = `500 26px ${F.telugu}`;
+  ctx.font = `500 30px ${F.telugu}`;
   ctx.fillStyle = C.ink3;
   ctx.fillText('శ్రీ పరాభవ నామ సంవత్సర', CX, y);
-  y += 52;
+  y += 56;
 
   // ── Festival name (huge, with glow) ──
   const festName = `${festival.telugu} శుభాకాంక్షలు`;
-  // Check if name is long, reduce font size
-  ctx.font = `900 56px ${F.telugu}`;
+  ctx.font = `900 62px ${F.telugu}`;
   let nameW = ctx.measureText(festName).width;
-  let fontSize = 56;
-  if (nameW > W - 120) {
-    fontSize = 46;
-  }
+  let fontSize = 62;
+  if (nameW > W - 120) fontSize = 50;
 
   drawGlowText(
     ctx, festName, CX, y,
@@ -90,47 +90,57 @@ export async function generateWishCard(festival, template) {
     accent, accent + '30', 24
   );
 
-  // English festival name below
+  // English festival name
   if (festival.english) {
-    y += 38;
-    ctx.font = `600 22px ${F.english}`;
+    y += 42;
+    ctx.font = `600 26px ${F.english}`;
     ctx.fillStyle = C.ink4;
+    ctx.textAlign = 'center';
     ctx.fillText(festival.english.toUpperCase(), CX, y);
   }
 
-  y += 20;
-
-  // ── Ornamental divider ──
+  y += 24;
   drawDivider(ctx, CX, y, (W - 160) / 2);
 
-  // Lotus accents on divider sides
+  // Lotus accents beside divider
   drawLotus(ctx, 90, y, 12, C.gold, 0.15);
   drawLotus(ctx, W - 90, y, 12, C.gold, 0.15);
 
-  y += 42;
+  y += 36;
+
+  // ── Festival artwork (if available) ──
+  if (hasArt) {
+    const artCenterY = y + 175;
+    artFn(ctx, CX, artCenterY, 0.85, C.gold, 0.55);
+    y = artCenterY + 195;
+
+    drawDivider(ctx, CX, y, (W - 160) / 2);
+    y += 36;
+  }
 
   // ── Wish message text ──
-  ctx.font = `500 34px ${F.telugu}`;
+  ctx.font = `500 38px ${F.telugu}`;
   ctx.fillStyle = C.ink;
   ctx.textAlign = 'center';
   const maxTextWidth = W - 160;
   const messageLines = template.message.split('\n');
+  const maxY = H - 120;
 
   for (const paragraph of messageLines) {
     if (paragraph.trim() === '') {
-      y += 18;
+      y += 20;
       continue;
     }
     const wrapped = wrapText(ctx, paragraph.trim(), maxTextWidth);
     for (const line of wrapped) {
-      if (y > H - 130) break; // Don't overflow into footer
+      if (y > maxY) break;
       ctx.fillText(line, CX, y);
-      y += 46;
+      y += 50;
     }
   }
 
   // ── Bottom ornament ──
-  const bottomY = H - 105;
+  const bottomY = H - 100;
   drawDivider(ctx, CX, bottomY, (W - 160) / 2);
 
   // Bottom diyas
@@ -138,7 +148,7 @@ export async function generateWishCard(festival, template) {
   drawDiya(ctx, W - INSET - 55, H - INSET - 50, 16);
 
   // ── Branding ──
-  drawBranding(ctx, W, H - 48);
+  drawBranding(ctx, W, H - 46);
 
   return canvasToBlob(canvas);
 }

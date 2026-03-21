@@ -25,167 +25,172 @@ export async function generatePanchangamCard(data, cityLabel) {
 
   // ── Background ──
   drawBackground(ctx, W, H);
-
-  // Mandala watermark (very faint, behind everything)
-  drawMandala(ctx, CX, H * 0.42, 320, C.goldDark, 0.045);
+  drawMandala(ctx, CX, H * 0.45, 320, C.goldDark, 0.045);
 
   // ── Ornate border + corner ornaments ──
   drawOrnateBorder(ctx, W, H, INSET);
   drawCornerOrnaments(ctx, W, H, INSET, C.gold, 0.22);
-
-  // Small diyas at top-left and top-right inside border
   drawDiya(ctx, INSET + 55, INSET + 50, 16);
   drawDiya(ctx, W - INSET - 55, INSET + 50, 16);
 
-  let y = 100;
+  let y = 105;
 
   // ── Header: Telugu day + month ──
   ctx.textAlign = 'left';
-  ctx.font = `700 48px ${F.telugu}`;
+  ctx.font = `700 58px ${F.telugu}`;
   ctx.fillStyle = C.ink;
   ctx.fillText(data.vaaram, 70, y);
 
   ctx.textAlign = 'right';
-  ctx.font = `600 40px ${F.telugu}`;
+  ctx.font = `600 50px ${F.telugu}`;
   ctx.fillStyle = C.ink2;
   ctx.fillText(data.masam.telugu, W - 70, y);
 
-  y += 44;
+  y += 48;
 
   // ── Sub-header: English date ──
   ctx.textAlign = 'left';
-  ctx.font = `500 26px ${F.english}`;
+  ctx.font = `500 30px ${F.english}`;
   ctx.fillStyle = C.ink3;
   ctx.fillText(data.englishDay, 70, y);
 
   ctx.textAlign = 'center';
-  ctx.font = `700 28px ${F.english}`;
+  ctx.font = `700 32px ${F.english}`;
   ctx.fillStyle = C.ink2;
   ctx.fillText(`${data.englishMonth.toUpperCase()} ${data.year}`, CX, y);
 
   ctx.textAlign = 'right';
-  ctx.font = `500 24px ${F.english}`;
+  ctx.font = `500 28px ${F.english}`;
   ctx.fillStyle = C.ink3;
   ctx.fillText(data.masam.english, W - 70, y);
 
-  y += 28;
-
-  // Decorative divider
+  y += 32;
   drawDivider(ctx, CX, y, (W - 140) / 2);
-  y += 18;
+  y += 24;
 
   // ── Sunrise + Date Number + Sunset ──
-  const sunY = y + 80;
+  const sunY = y + 90;
 
   // Sunrise (left)
   ctx.textAlign = 'center';
-  ctx.font = `700 34px ${F.english}`;
+  ctx.font = `700 42px ${F.english}`;
   ctx.fillStyle = C.ink;
   ctx.fillText(to12Hr(data.sunrise), 175, sunY);
-  ctx.font = `500 20px ${F.english}`;
+  ctx.font = `500 24px ${F.english}`;
   ctx.fillStyle = C.ink4;
-  ctx.fillText('sunrise', 175, sunY + 26);
+  ctx.fillText('sunrise', 175, sunY + 30);
 
-  // Sun icon hint (small circle)
+  // Sun icon
   ctx.globalAlpha = 0.15;
   ctx.beginPath();
-  ctx.arc(175, sunY - 34, 12, 0, Math.PI * 2);
+  ctx.arc(175, sunY - 38, 14, 0, Math.PI * 2);
   ctx.fillStyle = C.fest;
   ctx.fill();
   ctx.globalAlpha = 1;
 
-  // Date number (center, huge)
+  // Date number (huge)
   drawGlowText(
-    ctx, String(data.dateNum), CX, sunY + 30,
-    `400 200px ${F.date}`, C.fest, 'rgba(212,85,0,0.15)', 30
+    ctx, String(data.dateNum), CX, sunY + 38,
+    `400 220px ${F.date}`, C.fest, 'rgba(212,85,0,0.15)', 30
   );
 
   // Sunset (right)
   ctx.textAlign = 'center';
-  ctx.font = `700 34px ${F.english}`;
+  ctx.font = `700 42px ${F.english}`;
   ctx.fillStyle = C.ink;
   ctx.fillText(to12Hr(data.sunset), W - 175, sunY);
-  ctx.font = `500 20px ${F.english}`;
+  ctx.font = `500 24px ${F.english}`;
   ctx.fillStyle = C.ink4;
-  ctx.fillText('sunset', W - 175, sunY + 26);
+  ctx.fillText('sunset', W - 175, sunY + 30);
 
-  // Moon icon hint
+  // Moon icon
   ctx.globalAlpha = 0.12;
   ctx.beginPath();
-  ctx.arc(W - 175, sunY - 34, 10, 0, Math.PI * 2);
+  ctx.arc(W - 175, sunY - 38, 12, 0, Math.PI * 2);
   ctx.fillStyle = C.ink3;
   ctx.fill();
   ctx.globalAlpha = 1;
 
-  y = sunY + 70;
+  y = sunY + 80;
 
-  // ── Festival name (if applicable) ──
+  // ── Festival name ──
   if (data.festival) {
-    y += 15;
-    // Festival name with glow
+    y += 16;
     drawGlowText(
       ctx, data.festival.telugu, CX, y,
-      `800 52px ${F.telugu}`, C.fest, 'rgba(212,85,0,0.2)', 20
+      `800 58px ${F.telugu}`, C.fest, 'rgba(212,85,0,0.2)', 20
     );
-
     if (data.festival.english) {
-      y += 36;
+      y += 40;
       ctx.textAlign = 'center';
-      ctx.font = `600 24px ${F.english}`;
+      ctx.font = `600 28px ${F.english}`;
       ctx.fillStyle = C.ink3;
       ctx.fillText(data.festival.english, CX, y);
     }
-
     if (data.festival.description) {
-      y += 34;
+      y += 38;
       ctx.textAlign = 'center';
-      ctx.font = `400 26px ${F.telugu}`;
+      ctx.font = `400 30px ${F.telugu}`;
       ctx.fillStyle = C.ink3;
       ctx.fillText(data.festival.description, CX, y);
     }
-    y += 15;
-
-    // Small lotus accents beside festival
+    y += 16;
     drawLotus(ctx, 100, y - 45, 14, C.gold, 0.18);
     drawLotus(ctx, W - 100, y - 45, 14, C.gold, 0.18);
   }
 
-  y += 22;
+  y += 28;
   drawDivider(ctx, CX, y, (W - 140) / 2);
-  y += 32;
+  y += 40;
 
   // ── Paksha + Tithi ──
   ctx.textAlign = 'center';
-  ctx.font = `500 22px ${F.telugu}`;
+  ctx.font = `500 28px ${F.telugu}`;
   ctx.fillStyle = C.ink4;
   ctx.fillText(`${data.paksha} పక్షం`, CX, y);
-  y += 42;
-
-  drawTithiLine(ctx, data.tithi.name, CX, y);
   y += 50;
 
+  // Tithi (bigger)
+  ctx.font = `700 46px ${F.telugu}`;
+  ctx.fillStyle = C.ink;
+  const tithiText = data.tithi.name;
+  const tithiW = ctx.measureText(tithiText).width;
+  ctx.fillText(tithiText, CX, y);
+  // Ornamental dashes
+  ctx.strokeStyle = C.ink4;
+  ctx.lineWidth = 1.2;
+  ctx.globalAlpha = 0.5;
+  ctx.beginPath();
+  ctx.moveTo(CX - tithiW / 2 - 60, y - 8);
+  ctx.lineTo(CX - tithiW / 2 - 16, y - 8);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(CX + tithiW / 2 + 16, y - 8);
+  ctx.lineTo(CX + tithiW / 2 + 60, y - 8);
+  ctx.stroke();
+  ctx.globalAlpha = 1;
+  y += 55;
+
   // ── Nakshatra ──
-  ctx.textAlign = 'center';
-  ctx.font = `500 22px ${F.telugu}`;
+  ctx.font = `500 28px ${F.telugu}`;
   ctx.fillStyle = C.ink4;
   ctx.fillText('నక్షత్రం', CX, y);
-  y += 40;
-  ctx.font = `800 44px ${F.telugu}`;
+  y += 48;
+  ctx.font = `800 54px ${F.telugu}`;
   ctx.fillStyle = C.ink;
   ctx.fillText(data.nakshatra.name, CX, y);
-  y += 48;
+  y += 55;
 
   // ── Yogam + Karanam ──
-  ctx.font = `500 26px ${F.telugu}`;
+  ctx.font = `500 32px ${F.telugu}`;
   ctx.fillStyle = C.ink3;
   ctx.fillText(`యోగం  ${data.yogam.name}   ·   కరణం  ${data.karanam.name}`, CX, y);
-  y += 36;
+  y += 42;
 
   drawDivider(ctx, CX, y, (W - 140) / 2);
-  y += 38;
+  y += 44;
 
-  // ── Inauspicious timings (3 columns) ──
-  ctx.font = `500 24px ${F.telugu}`;
+  // ── Inauspicious timings ──
   const timings = [
     { label: 'రాహు కాలం', value: data.rahuKalam },
     { label: 'వర్జ్యం', value: data.varjyam },
@@ -196,24 +201,24 @@ export async function generatePanchangamCard(data, cityLabel) {
     const tx = 70 + colW * i + colW / 2;
     ctx.textAlign = 'center';
     ctx.fillStyle = C.ink4;
-    ctx.font = `500 21px ${F.telugu}`;
+    ctx.font = `500 26px ${F.telugu}`;
     ctx.fillText(t.label, tx, y);
     ctx.fillStyle = C.ink2;
-    ctx.font = `600 24px ${F.english}`;
-    ctx.fillText(t.value, tx, y + 32);
+    ctx.font = `600 28px ${F.english}`;
+    ctx.fillText(t.value, tx, y + 36);
   });
 
-  y += 72;
+  y += 84;
   drawDivider(ctx, CX, y, (W - 140) / 2);
-  y += 36;
+  y += 42;
 
   // ── Samvatsaram + City ──
   ctx.textAlign = 'center';
-  ctx.font = `400 24px ${F.telugu}`;
+  ctx.font = `400 28px ${F.telugu}`;
   ctx.fillStyle = C.ink4;
   ctx.fillText(SAMVATSARAM, CX, y);
-  y += 30;
-  ctx.font = `600 26px ${F.telugu}`;
+  y += 36;
+  ctx.font = `600 32px ${F.telugu}`;
   ctx.fillStyle = C.ink3;
   ctx.fillText(cityLabel || 'హైదరాబాద్', CX, y);
 
@@ -222,7 +227,7 @@ export async function generatePanchangamCard(data, cityLabel) {
   drawDiya(ctx, W - INSET - 55, H - INSET - 50, 16);
 
   // ── Branding ──
-  drawBranding(ctx, W, H - 48);
+  drawBranding(ctx, W, H - 46);
 
   return canvasToBlob(canvas);
 }
