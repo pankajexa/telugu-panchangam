@@ -39,6 +39,11 @@ function buildShareText(data, cityLabel, language) {
   lines.push(`${isTe ? 'నక్షత్రం' : 'Nakshatra'} *${isTe ? data.nakshatra.name : data.nakshatra.nameEn}*`);
   lines.push(`${isTe ? 'యోగం' : 'Yogam'} ${isTe ? data.yogam.name : data.yogam.nameEn}`);
   lines.push('');
+  lines.push(isTe ? `*✦ శుభ ముహూర్తం*` : `*Auspicious Timings*`);
+  lines.push(`${isTe ? 'అభిజిత్' : 'Abhijit'} ${data.abhijitMuhurta || '--'}`);
+  lines.push(`${isTe ? 'అమృతకాలం' : 'Amrit Kalam'} ${data.amritKalam || '--'}`);
+  lines.push(`${isTe ? 'బ్రహ్మ ము.' : 'Brahma Mu.'} ${data.brahmaMuhurta || '--'}`);
+  lines.push('');
   lines.push(`${isTe ? 'రాహు' : 'Rahu'} ${data.rahuKalam}`);
   lines.push(`${isTe ? 'వర్జ్యం' : 'Varjyam'} ${data.varjyam}`);
   const durText = Array.isArray(data.durmuhurtham) ? data.durmuhurtham.join(', ') : data.durmuhurtham;
