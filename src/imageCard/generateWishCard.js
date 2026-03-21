@@ -10,7 +10,7 @@ import {
   drawDivider, drawLotus, drawDiya, drawGlowText,
   drawBranding, wrapText, canvasToBlob,
 } from './cardUtils';
-import { getFestivalArt } from './festivalArt';
+import { getFestivalImagePath, drawFestivalImage } from './festivalArt';
 
 const W = 1080;
 const H = 1350;
@@ -51,11 +51,10 @@ export async function generateWishCard(festival, template) {
   // ── Background ──
   drawBackground(ctx, W, H);
 
-  // Check for festival-specific artwork
-  const artFn = getFestivalArt(festival.english);
-  const hasArt = !!artFn;
+  // Check for festival-specific artwork image
+  const hasArt = !!getFestivalImagePath(festival.english);
 
-  // Mandala watermark — position depends on whether we have art
+  // Mandala watermark — only when no artwork image
   if (!hasArt) {
     drawMandala(ctx, CX, H * 0.38, 350, C.goldDark, 0.04);
   }
@@ -108,11 +107,12 @@ export async function generateWishCard(festival, template) {
 
   y += 36;
 
-  // ── Festival artwork (if available) ──
+  // ── Festival artwork image (if available) ──
   if (hasArt) {
-    const artCenterY = y + 175;
-    artFn(ctx, CX, artCenterY, 0.85, C.gold, 0.55);
-    y = artCenterY + 195;
+    const artH = 420;
+    const artCenterY = y + artH / 2 + 10;
+    await drawFestivalImage(ctx, CX, artCenterY, W - 200, artH, festival.english);
+    y = artCenterY + artH / 2 + 20;
 
     drawDivider(ctx, CX, y, (W - 160) / 2);
     y += 36;
