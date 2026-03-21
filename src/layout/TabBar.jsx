@@ -15,34 +15,15 @@ const tabs = [
       </svg>
     ),
   },
-  {
-    path: '/puja',
-    labelKey: 'tab.puja',
-    icon: (active) => (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-        <path d="M12 2C12 2 10 6 10 8C10 9.1 10.9 10 12 10C13.1 10 14 9.1 14 8C14 6 12 2 12 2Z" fill={active ? '#C49B2A' : '#A09486'} />
-        <rect x="11" y="10" width="2" height="6" rx="1" fill={active ? '#C49B2A' : '#A09486'} />
-        <path d="M7 22H17L16 18C16 16.9 15.1 16 14 16H10C8.9 16 8 16.9 8 18L7 22Z" stroke={active ? '#C49B2A' : '#A09486'} strokeWidth="1.5" strokeLinejoin="round" />
-        <line x1="7" y1="22" x2="17" y2="22" stroke={active ? '#C49B2A' : '#A09486'} strokeWidth="1.5" strokeLinecap="round" />
-      </svg>
-    ),
-  },
-  {
-    path: '/jyotish',
-    labelKey: 'tab.jyotish',
-    icon: (active) => (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-        <circle cx="12" cy="12" r="9.5" stroke={active ? '#C49B2A' : '#A09486'} strokeWidth="1.5" />
-        <circle cx="12" cy="12" r="4" stroke={active ? '#C49B2A' : '#A09486'} strokeWidth="1" />
-        <line x1="12" y1="2.5" x2="12" y2="6" stroke={active ? '#C49B2A' : '#A09486'} strokeWidth="1" />
-        <line x1="12" y1="18" x2="12" y2="21.5" stroke={active ? '#C49B2A' : '#A09486'} strokeWidth="1" />
-        <line x1="2.5" y1="12" x2="6" y2="12" stroke={active ? '#C49B2A' : '#A09486'} strokeWidth="1" />
-        <line x1="18" y1="12" x2="21.5" y2="12" stroke={active ? '#C49B2A' : '#A09486'} strokeWidth="1" />
-        <circle cx="12" cy="8" r="1" fill={active ? '#C49B2A' : '#A09486'} />
-        <circle cx="15" cy="14" r="1" fill={active ? '#C49B2A' : '#A09486'} />
-      </svg>
-    ),
-  },
+  // Puja and Jyotish tabs hidden until further developed
+  // {
+  //   path: '/puja',
+  //   labelKey: 'tab.puja',
+  // },
+  // {
+  //   path: '/jyotish',
+  //   labelKey: 'tab.jyotish',
+  // },
   {
     path: '/settings',
     labelKey: 'tab.settings',
