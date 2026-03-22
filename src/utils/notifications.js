@@ -16,6 +16,18 @@ const ALARM_IDS = {
 };
 
 let LocalNotifications = null;
+let channelCreated = false;
+
+// Alarm notification channel for Android (HIGH importance = heads-up + sound)
+const ALARM_CHANNEL = {
+  id: 'sandhya-alarms',
+  name: 'Sandhya Alarms',
+  description: 'Smart alarms for Brahma Muhurta and Sandhya times',
+  importance: 4, // HIGH — heads-up notification with sound
+  visibility: 1, // PUBLIC — show on lock screen
+  vibration: true,
+  sound: 'temple_bell', // references android/app/src/main/res/raw/temple_bell.wav
+};
 
 async function getPlugin() {
   if (LocalNotifications) return LocalNotifications;
@@ -27,6 +39,17 @@ async function getPlugin() {
   } catch {
     return null;
   }
+}
+
+/** Create the Android notification channel (no-op on iOS, idempotent) */
+async function ensureAlarmChannel() {
+  if (channelCreated) return;
+  const plugin = await getPlugin();
+  if (!plugin) return;
+  try {
+    await plugin.createChannel(ALARM_CHANNEL);
+    channelCreated = true;
+  } catch {}
 }
 
 /**
@@ -85,9 +108,15 @@ export async function setupNotificationListener() {
   plugin.addListener('localNotificationActionPerformed', (event) => {
     const extra = event.notification?.extra;
     if (extra?.action === 'share_panchangam') {
-      // Give the app a moment to fully render after opening
       setTimeout(() => {
         window.dispatchEvent(new CustomEvent('share-panchangam'));
+      }, 500);
+    }
+    if (extra?.action === 'sandhya_alarm') {
+      // Open the app — the alarm sound already played via notification
+      // Future: could navigate to a sadhana screen
+      setTimeout(() => {
+        window.dispatchEvent(new CustomEvent('sandhya-alarm', { detail: { type: extra.type } }));
       }, 500);
     }
   });
@@ -161,6 +190,8 @@ export async function scheduleSmartAlarm(alarmKey, time, lang = 'te') {
   const config = ALARM_CONFIG[alarmKey];
   if (!config) return;
 
+  await ensureAlarmChannel();
+
   const isTe = lang === 'te';
 
   // Schedule for today if the time hasn't passed yet, otherwise tomorrow
@@ -183,9 +214,10 @@ export async function scheduleSmartAlarm(alarmKey, time, lang = 'te') {
       title: isTe ? config.title : config.titleEn,
       body: isTe ? config.body : config.bodyEn,
       schedule: { at: alarmDate },
+      channelId: ALARM_CHANNEL.id,  // Android: uses high-importance channel
       smallIcon: 'ic_stat_calendar',
       iconColor: '#C49B2A',
-      sound: 'default',
+      sound: 'temple_bell.wav',     // Custom sound (android: res/raw/temple_bell, ios: sounds/temple_bell.wav)
       extra: { action: 'sandhya_alarm', type: alarmKey },
     }],
   });
