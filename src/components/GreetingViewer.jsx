@@ -86,7 +86,7 @@ export default function GreetingViewer({ template, mode, festival, greetingConfi
     await saveToGallery(blobRef.current, fileName).catch(() => {});
   }, [template]);
 
-  const hasQuotes = mode === 'festival' && greetingConfig?.quotes?.length > 1;
+  const hasQuotes = mode === 'festival' && !template.preRendered && greetingConfig?.quotes?.length > 1;
 
   // Cleanup
   useEffect(() => () => { if (imageUrl) URL.revokeObjectURL(imageUrl); }, []);

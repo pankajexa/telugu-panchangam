@@ -110,13 +110,10 @@ export const FESTIVAL_TEMPLATES = {
       name: 'ఆలయ దర్శనం',
       nameEn: 'Temple View',
       image: `${B}/rama-navami-card-2.jpg`,
-      // Rama with bow facing temple at bottom. Text area at top.
+      // Background already has "Happy Ram Navami" text — only add name + branding
+      preRendered: true,
       textColor: '#3a150a',
       textColorSecondary: '#6b2d15',
-      accentColor: '#FF6B00',
-      greetingY: 0.08,
-      secondaryY: 0.15,
-      quoteY: 0.22,
       nameY: 0.88,
       maxWidth: 0.8,
     },
@@ -125,13 +122,10 @@ export const FESTIVAL_TEMPLATES = {
       name: 'శ్రీరాముడు',
       nameEn: 'Sri Rama',
       image: `${B}/rama-navami-card-3.jpg`,
-      // Rama face with garlands. Text below center.
+      // Background already has "Happy Ram Navami" text — only add name + branding
+      preRendered: true,
       textColor: '#333333',
       textColorSecondary: '#666666',
-      accentColor: '#C41E3A',
-      greetingY: 0.58,
-      secondaryY: 0.65,
-      quoteY: 0.72,
       nameY: 0.88,
       maxWidth: 0.8,
     },
@@ -140,13 +134,10 @@ export const FESTIVAL_TEMPLATES = {
       name: 'పట్టాభిషేకం',
       nameEn: 'Pattabhishekam',
       image: `${B}/rama-navami-card.jpg`,
-      // Rama Sita in circle, mandalas at corners. Text below center.
+      // Background already has "Happy Rama Navami" text — only add name + branding
+      preRendered: true,
       textColor: '#333333',
       textColorSecondary: '#666666',
-      accentColor: '#2E7D32',
-      greetingY: 0.62,
-      secondaryY: 0.70,
-      quoteY: 0.78,
       nameY: 0.90,
       maxWidth: 0.8,
     },

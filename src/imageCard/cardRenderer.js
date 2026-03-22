@@ -302,54 +302,56 @@ export async function renderFestivalCard(template, festival, greetingConfig, quo
   c.textAlign = 'center';
   c.textBaseline = 'top';
 
-  // ── Greeting text ──
-  let greetingText;
-  if (lang === 'en') {
-    greetingText = `Happy ${festival?.english || 'Festival'}!`;
-  } else {
-    greetingText = greetingConfig?.greetingText || `${festival?.telugu || ''} శుభాకాంక్షలు`;
-  }
-
-  c.fillStyle = template.textColor;
-  c.font = `bold 46px "Mandali", sans-serif`;
-  const greetingLines = wrapText(c, greetingText, contentW);
-  let gy = height * template.greetingY;
-  for (const line of greetingLines) {
-    c.fillText(line, cx, gy);
-    gy += 56;
-  }
-
-  // ── Secondary text ──
-  let secondaryText;
-  if (lang === 'en') {
-    // Use English meaning from quotes or festival name
-    secondaryText = greetingConfig?.quotes?.[quoteIndex]?.meaning || '';
-  } else {
-    secondaryText = greetingConfig?.secondaryText || '';
-  }
-  if (secondaryText) {
-    c.fillStyle = template.textColorSecondary;
-    c.font = `bold 30px "Noto Sans Telugu", sans-serif`;
-    const secLines = wrapText(c, secondaryText, contentW);
-    let sy = height * template.secondaryY;
-    for (const line of secLines) {
-      c.fillText(line, cx, sy);
-      sy += 38;
+  // Skip text overlay for pre-rendered templates (background already has text)
+  if (!template.preRendered) {
+    // ── Greeting text ──
+    let greetingText;
+    if (lang === 'en') {
+      greetingText = `Happy ${festival?.english || 'Festival'}!`;
+    } else {
+      greetingText = greetingConfig?.greetingText || `${festival?.telugu || ''} శుభాకాంక్షలు`;
     }
-  }
 
-  // ── Quote ──
-  if (greetingConfig?.quotes?.length > 0) {
-    const quote = greetingConfig.quotes[quoteIndex % greetingConfig.quotes.length];
-    const quoteText = lang === 'en' ? quote.meaning : quote.telugu;
-    if (quoteText) {
+    c.fillStyle = template.textColor;
+    c.font = `bold 46px "Mandali", sans-serif`;
+    const greetingLines = wrapText(c, greetingText, contentW);
+    let gy = height * template.greetingY;
+    for (const line of greetingLines) {
+      c.fillText(line, cx, gy);
+      gy += 56;
+    }
+
+    // ── Secondary text ──
+    let secondaryText;
+    if (lang === 'en') {
+      secondaryText = greetingConfig?.quotes?.[quoteIndex]?.meaning || '';
+    } else {
+      secondaryText = greetingConfig?.secondaryText || '';
+    }
+    if (secondaryText) {
       c.fillStyle = template.textColorSecondary;
-      c.font = `24px "Noto Sans Telugu", sans-serif`;
-      const quoteLines = wrapText(c, `"${quoteText}"`, contentW * 0.85);
-      let qy = height * template.quoteY;
-      for (const line of quoteLines) {
-        c.fillText(line, cx, qy);
-        qy += 32;
+      c.font = `bold 30px "Noto Sans Telugu", sans-serif`;
+      const secLines = wrapText(c, secondaryText, contentW);
+      let sy = height * template.secondaryY;
+      for (const line of secLines) {
+        c.fillText(line, cx, sy);
+        sy += 38;
+      }
+    }
+
+    // ── Quote ──
+    if (greetingConfig?.quotes?.length > 0) {
+      const quote = greetingConfig.quotes[quoteIndex % greetingConfig.quotes.length];
+      const quoteText = lang === 'en' ? quote.meaning : quote.telugu;
+      if (quoteText) {
+        c.fillStyle = template.textColorSecondary;
+        c.font = `24px "Noto Sans Telugu", sans-serif`;
+        const quoteLines = wrapText(c, `"${quoteText}"`, contentW * 0.85);
+        let qy = height * template.quoteY;
+        for (const line of quoteLines) {
+          c.fillText(line, cx, qy);
+          qy += 32;
+        }
       }
     }
   }
