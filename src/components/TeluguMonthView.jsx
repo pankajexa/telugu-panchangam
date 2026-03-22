@@ -127,7 +127,7 @@ const MiniMonth = memo(function MiniMonth({ year, month, startStr, endStr, onSel
   );
 });
 
-const TeluguMonthView = memo(function TeluguMonthView({ teluguMonthIndex, onPrev, onNext, onSelectDate }) {
+const TeluguMonthView = memo(function TeluguMonthView({ teluguMonthIndex, onPrev, onNext, onSelectDate, onZoomOut }) {
   const { location, teluguMonths } = useLocation();
   const tm = teluguMonths[teluguMonthIndex];
   if (!tm) return null;
@@ -152,7 +152,10 @@ const TeluguMonthView = memo(function TeluguMonthView({ teluguMonthIndex, onPrev
       {/* Telugu month header */}
       <div style={styles.header}>
         <button style={styles.navBtn} onClick={onPrev}>‹</button>
-        <div style={styles.titleBlock}>
+        <div
+          style={{ ...styles.titleBlock, cursor: onZoomOut ? 'pointer' : 'default' }}
+          onClick={onZoomOut ? onZoomOut : undefined}
+        >
           <div style={styles.teluguName}>{tm.telugu}</div>
           <div style={styles.englishName}>{tm.english}</div>
           <div style={styles.dateRange}>

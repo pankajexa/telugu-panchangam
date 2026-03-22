@@ -19,6 +19,8 @@ import { getAlarmTimes } from '../utils/sandhyaTimes';
 const allDatesArray = generateAllDates();
 const TOTAL_DAYS = allDatesArray.length;
 
+const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
 // Easing functions
 function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
 function easeOutBack(t) {
@@ -40,7 +42,8 @@ export default function CalendarPad() {
   // === React state ===
   const [currentIndex, setCurrentIndex] = useState(() => getTodayIndex());
   const [hasInteracted, setHasInteracted] = useState(false);
-  const [viewMode, setViewMode] = useState('month'); // 'day' | 'month' | 'telugu-month' | 'year'
+  const [viewMode, setViewMode] = useState('month'); // 'day' | 'month' | 'year'
+  const [monthStyle, setMonthStyle] = useState('english'); // 'english' | 'telugu'
 
   // Zoom transition state
   const [zoomPhase, setZoomPhase] = useState('none'); // 'none' | 'prepare' | 'animate'
@@ -491,39 +494,17 @@ export default function CalendarPad() {
     return idx >= 0 ? idx : 0;
   });
 
-  // Navigation: switch to year view (zoom out from day or month)
-  const switchToYearView = useCallback(() => {
-    transitionTo('year', 'out');
-  }, [transitionTo]);
-
-  // Navigation: switch to telugu month view (crossfade)
-  const switchToTeluguMonth = useCallback(() => {
-    // Determine the Telugu month for current date
-    const d = allDatesArray[currentIndex] || new Date(2026, 2, 19);
-    const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-    const idx = teluguMonths.findIndex(m => dateStr >= m.start && dateStr <= m.end);
-    if (idx >= 0) setTeluguMonthIdx(idx);
-    transitionTo('telugu-month', 'out');
-  }, [transitionTo, currentIndex, teluguMonths]);
-
-  // Navigation: switch to day view (zoom in)
-  const switchToDay = useCallback(() => {
-    transitionTo('day', 'in');
-  }, [transitionTo]);
-
-  // Navigation: switch to month view from year (zoom in)
-  const switchToMonthFromYear = useCallback(() => {
-    transitionTo('month', 'in');
-  }, [transitionTo]);
-
-  // Navigation: switch to english month view from day (zoom out)
-  const switchToEnglishMonth = useCallback(() => {
-    // Sync month view to current day's month
+  // Navigation: tap day header to zoom out from day to month
+  const handleDayHeaderTap = useCallback(() => {
     const d = allDatesArray[currentIndex] || new Date(2026, 2, 19);
     setMonthViewYear(d.getFullYear());
     setMonthViewMonth(d.getMonth());
-    transitionTo('year', 'out');
-  }, [transitionTo, currentIndex]);
+    // Also sync Telugu month index
+    const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    const idx = teluguMonths.findIndex(m => dateStr >= m.start && dateStr <= m.end);
+    if (idx >= 0) setTeluguMonthIdx(idx);
+    transitionTo('month', 'out');
+  }, [transitionTo, currentIndex, teluguMonths]);
 
   const handleMonthSelectDate = useCallback((day) => {
     // Find the index in allData for this date
@@ -621,6 +602,13 @@ export default function CalendarPad() {
       <div style={styles.pad}>
         {viewMode === 'day' ? (
           <>
+            {/* Tappable month/year header — tap to zoom out to month view */}
+            <div style={styles.dayHeader} onClick={handleDayHeaderTap}>
+              <span style={{ ...styles.dayHeaderMonth, fontFamily: font }}>
+                {MONTH_NAMES[allDatesArray[currentIndex]?.getMonth()] || ''} {allDatesArray[currentIndex]?.getFullYear()}
+              </span>
+              <span style={styles.dayHeaderChevron}>{'\u25B4'}</span>
+            </div>
             <div
               ref={flipSceneRef}
               style={styles.flipScene}
@@ -676,14 +664,39 @@ export default function CalendarPad() {
           </>
         ) : viewMode === 'month' ? (
           <div style={{ ...styles.zoomContainer, ...zoomStyle }}>
-            <MonthView
-              year={monthViewYear}
-              month={monthViewMonth}
-              onSelectDate={handleMonthSelectDate}
-              onPrevMonth={handlePrevMonth}
-              onNextMonth={handleNextMonth}
-              onZoomOut={handleMonthZoomOut}
-            />
+            {/* English / Telugu toggle */}
+            <div style={styles.calToggleRow}>
+              <button
+                style={{ ...(monthStyle === 'english' ? styles.calToggleActive : styles.calToggle), borderRadius: '12px 0 0 12px' }}
+                onClick={() => setMonthStyle('english')}
+              >
+                English
+              </button>
+              <button
+                style={{ ...(monthStyle === 'telugu' ? styles.calToggleActive : styles.calToggle), borderRadius: '0 12px 12px 0' }}
+                onClick={() => setMonthStyle('telugu')}
+              >
+                {'\u0C24\u0C46\u0C32\u0C41\u0C17\u0C41'}
+              </button>
+            </div>
+            {monthStyle === 'english' ? (
+              <MonthView
+                year={monthViewYear}
+                month={monthViewMonth}
+                onSelectDate={handleMonthSelectDate}
+                onPrevMonth={handlePrevMonth}
+                onNextMonth={handleNextMonth}
+                onZoomOut={handleMonthZoomOut}
+              />
+            ) : (
+              <TeluguMonthView
+                teluguMonthIndex={teluguMonthIdx}
+                onPrev={handlePrevTeluguMonth}
+                onNext={handleNextTeluguMonth}
+                onSelectDate={handleTeluguMonthSelectDate}
+                onZoomOut={handleMonthZoomOut}
+              />
+            )}
           </div>
         ) : viewMode === 'year' ? (
           <div style={{ ...styles.zoomContainer, ...zoomStyle }}>
@@ -694,112 +707,25 @@ export default function CalendarPad() {
               currentMonth={monthViewMonth}
             />
           </div>
-        ) : (
-          <div style={{ ...styles.zoomContainer, ...zoomStyle }}>
-            <TeluguMonthView
-              teluguMonthIndex={teluguMonthIdx}
-              onPrev={handlePrevTeluguMonth}
-              onNext={handleNextTeluguMonth}
-              onSelectDate={handleTeluguMonthSelectDate}
-            />
-          </div>
-        )}
+        ) : null}
       </div>
 
-      {/* Controls below the calendar */}
+      {/* Below the calendar — share buttons and detailed panchangam (day view only) */}
       <div style={styles.belowPad}>
-        <div style={styles.buttonRow}>
-          {viewMode === 'day' ? (
-            <>
-              <button style={styles.viewToggle} onClick={switchToTeluguMonth}>
-                <span style={{ ...styles.toggleText, fontFamily: font }}>{t('cal.teluguMonth')}</span>
-              </button>
-              <button style={styles.viewToggle} onClick={switchToEnglishMonth}>
-                <span style={{ ...styles.toggleText, fontFamily: font }}>{t('cal.englishMonth')}</span>
-              </button>
-            </>
-          ) : viewMode === 'month' ? (
-            <>
-              <button style={styles.viewToggle} onClick={switchToYearView}>
-                <span style={{ ...styles.toggleText, fontFamily: font }}>{t('cal.year')}</span>
-              </button>
-              <button style={styles.viewToggle} onClick={switchToDay}>
-                <span style={styles.toggleIcon}>◉</span>
-                <span style={{ ...styles.toggleText, fontFamily: font }}>{t('cal.day')}</span>
-              </button>
-            </>
-          ) : viewMode === 'year' ? (
-            <>
-              <button style={styles.viewToggle} onClick={switchToDay}>
-                <span style={styles.toggleIcon}>◉</span>
-                <span style={{ ...styles.toggleText, fontFamily: font }}>{t('cal.day')}</span>
-              </button>
-              <button style={styles.viewToggle} onClick={switchToTeluguMonth}>
-                <span style={{ ...styles.toggleText, fontFamily: font }}>{t('cal.teluguMonth')}</span>
-              </button>
-            </>
-          ) : (
-            <>
-              <button style={styles.viewToggle} onClick={switchToDay}>
-                <span style={styles.toggleIcon}>◉</span>
-                <span style={{ ...styles.toggleText, fontFamily: font }}>{t('cal.day')}</span>
-              </button>
-              <button style={styles.viewToggle} onClick={switchToEnglishMonth}>
-                <span style={{ ...styles.toggleText, fontFamily: font }}>{t('cal.englishMonth')}</span>
-              </button>
-            </>
-          )}
-        </div>
-        {/* Row 2: Share buttons */}
         {viewMode === 'day' && (
           <div style={styles.shareRow}>
             <ShareButton data={currentData} />
             <FestivalWishes festival={currentData?.festival} />
           </div>
         )}
-        {/* Row 3: Detailed Panchangam */}
         {viewMode === 'day' && detailedData && (
           <DetailedPanchangam detailedData={detailedData} />
         )}
-        {/* Month nav hint */}
-        {viewMode === 'month' && <MonthNavHint />}
       </div>
     </div>
   );
 }
 
-function MonthNavHint() {
-  const { t, font } = useLanguage();
-  return (
-    <div style={monthHintStyles.container}>
-      <span style={monthHintStyles.arrow}>←</span>
-      <span style={{ ...monthHintStyles.label, fontFamily: font }}>{t('cal.changeMonth')}</span>
-      <span style={monthHintStyles.arrow}>→</span>
-    </div>
-  );
-}
-
-const monthHintStyles = {
-  container: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    paddingTop: '6px',
-    pointerEvents: 'none',
-  },
-  arrow: {
-    fontSize: '20px',
-    color: '#C49B2A',
-    opacity: 0.5,
-  },
-  label: {
-    fontFamily: "'Noto Serif Telugu', serif",
-    fontSize: '11px',
-    fontWeight: 500,
-    color: '#C49B2A',
-    opacity: 0.5,
-  },
-};
 
 const styles = {
   padOuter: {
@@ -868,35 +794,51 @@ const styles = {
     justifyContent: 'center',
     gap: '10px',
   },
-  buttonRow: {
+
+  // Day view tappable header
+  dayHeader: {
     display: 'flex',
     alignItems: 'center',
-    gap: '10px',
-  },
-  viewToggle: {
-    display: 'flex',
-    alignItems: 'center',
+    justifyContent: 'center',
     gap: '6px',
-    background: '#FFFFFF',
-    border: '1.5px solid rgba(196,155,42,0.25)',
-    borderRadius: '24px',
-    padding: '8px 16px',
+    padding: '6px 0',
     cursor: 'pointer',
-    transition: 'border-color 200ms, background 200ms',
-    whiteSpace: 'nowrap',
-    boxShadow: '0 1px 4px rgba(45,24,16,0.06)',
   },
-  toggleIcon: {
-    fontSize: '18px',
+  dayHeaderMonth: {
+    fontSize: '15px',
+    fontWeight: 600,
     color: '#C49B2A',
-    opacity: 0.85,
+    letterSpacing: '0.5px',
   },
-  toggleText: {
-    fontFamily: "'Noto Serif Telugu', serif",
+  dayHeaderChevron: {
+    fontSize: '10px',
+    color: '#C49B2A',
+    opacity: 0.6,
+  },
+
+  // Month view English/Telugu toggle
+  calToggleRow: {
+    display: 'flex',
+    justifyContent: 'center',
+    gap: '0',
+    marginBottom: '8px',
+  },
+  calToggle: {
+    padding: '4px 14px',
+    fontSize: '12px',
+    fontWeight: 500,
+    color: '#8A7568',
+    background: 'transparent',
+    border: '1px solid rgba(196,155,42,0.2)',
+    cursor: 'pointer',
+  },
+  calToggleActive: {
+    padding: '4px 14px',
+    fontSize: '12px',
     fontWeight: 700,
-    fontSize: '14px',
     color: '#C49B2A',
-    letterSpacing: '0.3px',
-    whiteSpace: 'nowrap',
+    background: 'rgba(196,155,42,0.08)',
+    border: '1px solid rgba(196,155,42,0.4)',
+    cursor: 'pointer',
   },
 };
