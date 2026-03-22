@@ -412,6 +412,41 @@ export default function SettingsPage() {
         </div>
       </div>
 
+      {/* ═══ Smart Sandhya Alarms ═══ */}
+      <div style={styles.section}>
+        <div style={styles.sectionTitleRow}>
+          <span style={{ fontSize: '16px', color: '#C49B2A' }}>🙏</span>
+          <span style={{ ...styles.sectionTitle, fontFamily: font }}>{pick('సాధన అలారాలు', 'Practice Alarms')}</span>
+        </div>
+        <div style={{ ...styles.subLabel, fontSize: '11px', color: '#B5A899', padding: '0 4px 8px' }}>
+          {pick(
+            'సూర్యోదయం / సూర్యాస్తమయం ఆధారంగా ప్రతిరోజూ మారుతుంది',
+            'Changes daily based on sunrise/sunset at your location'
+          )}
+        </div>
+        <div style={styles.card}>
+          {[
+            { key: 'alarmBrahmaMuhurta', te: 'బ్రహ్మ ముహూర్తం', en: 'Brahma Muhurta', desc: pick('సూర్యోదయానికి 96-48 ని. ముందు', '96-48 min before sunrise') },
+            { key: 'alarmPratahSandhya', te: 'ప్రాతః సంధ్య', en: 'Pratah Sandhya', desc: pick('సూర్యోదయ సమయంలో', 'Around sunrise') },
+            { key: 'alarmMadhyahnaSandhya', te: 'మధ్యాహ్న సంధ్య', en: 'Madhyahna Sandhya', desc: pick('మధ్యాహ్నం', 'Around solar noon') },
+            { key: 'alarmSayamSandhya', te: 'సాయం సంధ్య', en: 'Sayam Sandhya', desc: pick('సూర్యాస్తమయ సమయంలో', 'Around sunset') },
+          ].map((alarm, i) => (
+            <div key={alarm.key} style={{ ...styles.alarmRow, borderTop: i > 0 ? '1px solid rgba(45,24,16,0.05)' : 'none' }}>
+              <div style={styles.alarmInfo}>
+                <div style={{ ...styles.reminderTitle, fontFamily: font, fontSize: '13px' }}>
+                  {pick(alarm.te, alarm.en)}
+                </div>
+                <div style={{ ...styles.reminderSub, fontSize: '10px' }}>{alarm.desc}</div>
+              </div>
+              <Toggle on={prefs[alarm.key]} onToggle={() => {
+                updatePref(alarm.key, !prefs[alarm.key]);
+                if (!prefs[alarm.key] && !prefs.permissionGranted) requestPermission().catch(() => {});
+              }} />
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* ═══ Panchangam Details ═══ */}
       <div style={styles.section}>
         <div style={styles.sectionTitleRow}>
@@ -616,6 +651,13 @@ const styles = {
     padding: '8px 0 4px', gap: '8px',
   },
   subLabel: { fontFamily: SERIF, fontSize: '12px', color: '#5C3D2E', flex: 1 },
+
+  // Smart alarm rows
+  alarmRow: {
+    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+    padding: '12px 16px',
+  },
+  alarmInfo: { flex: 1 },
 
   // About
   divider: { height: '1px', background: 'rgba(45,24,16,0.06)', margin: '0 16px' },

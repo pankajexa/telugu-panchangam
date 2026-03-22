@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import { scheduleDailyShare, cancelDailyShare, setupNotificationListener } from '../utils/notifications';
+import { scheduleDailyShare, cancelDailyShare, setupNotificationListener, scheduleAllSmartAlarms, cancelAllSmartAlarms } from '../utils/notifications';
 
 const ReminderContext = createContext(null);
 const STORAGE_KEY = 'manacalendar-reminders';
@@ -36,6 +36,12 @@ const DEFAULT_PREFS = {
   sunriseOffset: 0,
   sunset: false,
   sunsetOffset: 0,
+
+  // Smart Sandhya Alarms
+  alarmBrahmaMuhurta: false,
+  alarmPratahSandhya: false,
+  alarmMadhyahnaSandhya: false,
+  alarmSayamSandhya: false,
 };
 
 function loadPrefs() {
@@ -101,8 +107,25 @@ export function ReminderProvider({ children }) {
     }
   }, [prefs.dailyShare, prefs.dailyShareTime, prefs.permissionGranted]);
 
+  // Schedule smart alarms — call from CalendarPad when sunrise/sunset data is available
+  const scheduleAlarms = useCallback(async (alarmTimes, lang = 'te') => {
+    if (!prefs.permissionGranted) return;
+    const alarmPrefs = {
+      brahmaMuhurta: prefs.alarmBrahmaMuhurta,
+      pratahSandhya: prefs.alarmPratahSandhya,
+      madhyahnaSandhya: prefs.alarmMadhyahnaSandhya,
+      sayamSandhya: prefs.alarmSayamSandhya,
+    };
+    const anyEnabled = Object.values(alarmPrefs).some(Boolean);
+    if (anyEnabled) {
+      await scheduleAllSmartAlarms(alarmPrefs, alarmTimes, lang);
+    } else {
+      await cancelAllSmartAlarms();
+    }
+  }, [prefs.permissionGranted, prefs.alarmBrahmaMuhurta, prefs.alarmPratahSandhya, prefs.alarmMadhyahnaSandhya, prefs.alarmSayamSandhya]);
+
   return (
-    <ReminderContext.Provider value={{ prefs, updatePref, requestPermission }}>
+    <ReminderContext.Provider value={{ prefs, updatePref, requestPermission, scheduleAlarms }}>
       {children}
     </ReminderContext.Provider>
   );

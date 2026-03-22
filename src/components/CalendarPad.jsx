@@ -11,9 +11,11 @@ import DetailedPanchangam from './DetailedPanchangam';
 import { computeClipPath, drawFlip } from '../physics/drawFlip';
 import { getPanchangamForDate, getDetailedPanchangam, getTodayIndex, generateAllDates } from '../data/panchangam';
 import { usePanchangamPrefs } from '../context/PanchangamPrefsContext';
+import { useReminders } from '../context/ReminderContext';
 // teluguMonths come from LocationContext
 import { useLocation } from '../context/LocationContext';
 import { useLanguage } from '../context/LanguageContext';
+import { getAlarmTimes } from '../utils/sandhyaTimes';
 
 const allDatesArray = generateAllDates();
 const TOTAL_DAYS = allDatesArray.length;
@@ -32,8 +34,9 @@ function getData(index, location) {
 
 export default function CalendarPad() {
   const { location, teluguMonths } = useLocation();
-  const { t, font } = useLanguage();
+  const { t, font, language } = useLanguage();
   const { prefs: panchangamPrefs, isAnyGroupEnabled } = usePanchangamPrefs();
+  const { scheduleAlarms } = useReminders();
 
   // === React state ===
   const [currentIndex, setCurrentIndex] = useState(() => getTodayIndex());
@@ -433,6 +436,15 @@ export default function CalendarPad() {
     if (!isAnyGroupEnabled) return null;
     return getDetailedPanchangam(allDatesArray[currentIndex], location, panchangamPrefs);
   }, [currentIndex, location, panchangamPrefs, isAnyGroupEnabled]);
+
+  // Schedule smart sandhya alarms based on today's sunrise/sunset
+  useEffect(() => {
+    const todayData = getData(getTodayIndex(), location);
+    if (todayData?.sunrise && todayData?.sunset) {
+      const times = getAlarmTimes(todayData.sunrise, todayData.sunset);
+      scheduleAlarms(times, language);
+    }
+  }, [location, language, scheduleAlarms]);
 
   // Touch listeners on the flip scene only (not the whole container)
   // This prevents scroll gestures below the page from triggering flips
