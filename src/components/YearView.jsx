@@ -1,5 +1,6 @@
 import React, { memo, useMemo } from 'react';
 import FESTIVALS from '../data/festivals.js';
+import { useLocation } from '../context/LocationContext';
 
 const SERIF = "'Inter', system-ui, sans-serif";
 const TELUGU = "'Noto Serif Telugu', serif";
@@ -16,6 +17,39 @@ const MONTH_NAMES = [
 
 const DAY_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
+const TELUGU_MONTH_COLORS = [
+  'rgba(255, 152, 0, 0.18)',   // warm saffron
+  'rgba(76, 175, 80, 0.18)',   // soft green
+  'rgba(33, 150, 243, 0.18)',  // calm blue
+  'rgba(156, 39, 176, 0.18)',  // gentle purple
+  'rgba(0, 150, 136, 0.18)',   // teal
+  'rgba(233, 30, 99, 0.18)',   // soft rose
+  'rgba(121, 85, 72, 0.18)',   // warm brown
+  'rgba(63, 81, 181, 0.18)',   // indigo
+  'rgba(255, 87, 34, 0.18)',   // deep orange
+  'rgba(0, 188, 212, 0.18)',   // cyan
+  'rgba(139, 195, 74, 0.18)',  // light green
+  'rgba(255, 193, 7, 0.18)',   // amber
+  'rgba(103, 58, 183, 0.18)',  // deep purple
+];
+
+// Stronger opacity version for legend dots
+const TELUGU_MONTH_DOT_COLORS = [
+  'rgba(255, 152, 0, 0.6)',
+  'rgba(76, 175, 80, 0.6)',
+  'rgba(33, 150, 243, 0.6)',
+  'rgba(156, 39, 176, 0.6)',
+  'rgba(0, 150, 136, 0.6)',
+  'rgba(233, 30, 99, 0.6)',
+  'rgba(121, 85, 72, 0.6)',
+  'rgba(63, 81, 181, 0.6)',
+  'rgba(255, 87, 34, 0.6)',
+  'rgba(0, 188, 212, 0.6)',
+  'rgba(139, 195, 74, 0.6)',
+  'rgba(255, 193, 7, 0.6)',
+  'rgba(103, 58, 183, 0.6)',
+];
+
 // Precompute major festival date keys for fast lookup
 const majorFestivalKeys = new Set(
   Object.entries(FESTIVALS)
@@ -28,7 +62,21 @@ function isMajorFestival(year, month, day) {
   return majorFestivalKeys.has(key);
 }
 
-function MiniMonth({ year, month, isCurrentMonth, onSelectMonth, onSelectDate }) {
+// Returns the index of the Telugu month for a given date, or -1 if not found
+function getTeluguMonthIndex(year, month, day, teluguMonths) {
+  if (!teluguMonths || teluguMonths.length === 0) return -1;
+  const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+  for (let i = 0; i < teluguMonths.length; i++) {
+    if (dateStr >= teluguMonths[i].start && dateStr <= teluguMonths[i].end) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+function MiniMonth({ year, month, isCurrentMonth, onSelectMonth, onSelectDate, monthStyle, teluguMonths }) {
+  const isTelugu = monthStyle === 'telugu';
+
   const today = useMemo(() => {
     const now = new Date();
     if (now.getFullYear() === year && now.getMonth() === month) return now.getDate();
@@ -89,10 +137,17 @@ function MiniMonth({ year, month, isCurrentMonth, onSelectMonth, onSelectDate })
         {days.map((d) => {
           const isToday = d === today;
           const hasMajorFestival = isMajorFestival(year, month, d);
+          const teluguIdx = isTelugu ? getTeluguMonthIndex(year, month, d, teluguMonths) : -1;
+          const teluguBg = teluguIdx >= 0
+            ? TELUGU_MONTH_COLORS[teluguIdx % TELUGU_MONTH_COLORS.length]
+            : undefined;
           return (
             <div
               key={d}
-              style={miniStyles.dateCell}
+              style={{
+                ...miniStyles.dateCell,
+                ...(teluguBg ? { background: teluguBg, borderRadius: '2px' } : {}),
+              }}
               onClick={(e) => {
                 e.stopPropagation();
                 onSelectDate(year, month, d);
@@ -117,9 +172,30 @@ function MiniMonth({ year, month, isCurrentMonth, onSelectMonth, onSelectDate })
 
 const MiniMonthMemo = memo(MiniMonth);
 
-const YearView = memo(function YearView({ onSelectMonth, onSelectDate, currentYear, currentMonth }) {
+// Legend showing Telugu month names with color dots
+const TeluguMonthLegend = memo(function TeluguMonthLegend({ teluguMonths }) {
+  if (!teluguMonths || teluguMonths.length === 0) return null;
+  return (
+    <div style={legendStyles.container}>
+      {teluguMonths.map((tm, i) => (
+        <span key={i} style={legendStyles.item}>
+          <span style={{
+            ...legendStyles.dot,
+            background: TELUGU_MONTH_DOT_COLORS[i % TELUGU_MONTH_DOT_COLORS.length],
+          }} />
+          <span style={legendStyles.label}>{tm.telugu}</span>
+        </span>
+      ))}
+    </div>
+  );
+});
+
+const YearView = memo(function YearView({ onSelectMonth, onSelectDate, currentYear, currentMonth, monthStyle = 'english' }) {
+  const { teluguMonths } = useLocation();
+  const isTelugu = monthStyle === 'telugu';
+
   // Calendar range: March 2026 - April 2027
-  // Group: 2026 → Mar-Dec, 2027 → Jan-Apr
+  // Group: 2026 -> Mar-Dec, 2027 -> Jan-Apr
   const months2026 = useMemo(() => {
     const arr = [];
     for (let m = 2; m <= 11; m++) { // Mar=2 to Dec=11
@@ -138,6 +214,9 @@ const YearView = memo(function YearView({ onSelectMonth, onSelectDate, currentYe
 
   return (
     <div className="paper-texture page-paper" style={yearStyles.container}>
+      {/* Telugu month legend */}
+      {isTelugu && <TeluguMonthLegend teluguMonths={teluguMonths} />}
+
       {/* 2026 section */}
       <div style={yearStyles.yearHeader}>2026</div>
       <div style={yearStyles.monthsGrid}>
@@ -149,6 +228,8 @@ const YearView = memo(function YearView({ onSelectMonth, onSelectDate, currentYe
             isCurrentMonth={year === currentYear && month === currentMonth}
             onSelectMonth={onSelectMonth}
             onSelectDate={onSelectDate}
+            monthStyle={monthStyle}
+            teluguMonths={isTelugu ? teluguMonths : undefined}
           />
         ))}
       </div>
@@ -164,6 +245,8 @@ const YearView = memo(function YearView({ onSelectMonth, onSelectDate, currentYe
             isCurrentMonth={year === currentYear && month === currentMonth}
             onSelectMonth={onSelectMonth}
             onSelectDate={onSelectDate}
+            monthStyle={monthStyle}
+            teluguMonths={isTelugu ? teluguMonths : undefined}
           />
         ))}
       </div>
@@ -172,6 +255,35 @@ const YearView = memo(function YearView({ onSelectMonth, onSelectDate, currentYe
 });
 
 export default YearView;
+
+const legendStyles = {
+  container: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: '4px 8px',
+    marginBottom: '10px',
+    padding: '0 4px',
+  },
+  item: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '3px',
+  },
+  dot: {
+    display: 'inline-block',
+    width: '7px',
+    height: '7px',
+    borderRadius: '50%',
+    flexShrink: 0,
+  },
+  label: {
+    fontFamily: TELUGU,
+    fontSize: '10px',
+    color: INK2,
+    lineHeight: 1.2,
+  },
+};
 
 const yearStyles = {
   container: {

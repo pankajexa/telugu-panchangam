@@ -700,11 +700,27 @@ export default function CalendarPad() {
           </div>
         ) : viewMode === 'year' ? (
           <div style={{ ...styles.zoomContainer, ...zoomStyle }}>
+            {/* Calendar mode toggle */}
+            <div style={styles.calToggleRow}>
+              <button
+                style={{ ...styles.calToggle, ...(monthStyle === 'english' ? styles.calToggleActive : {}), borderRadius: '12px 0 0 12px' }}
+                onClick={() => setMonthStyle('english')}
+              >
+                English
+              </button>
+              <button
+                style={{ ...styles.calToggle, ...(monthStyle === 'telugu' ? styles.calToggleActive : {}), borderRadius: '0 12px 12px 0' }}
+                onClick={() => setMonthStyle('telugu')}
+              >
+                తెలుగు
+              </button>
+            </div>
             <YearView
               onSelectMonth={handleYearSelectMonth}
               onSelectDate={handleYearSelectDate}
               currentYear={monthViewYear}
               currentMonth={monthViewMonth}
+              monthStyle={monthStyle}
             />
           </div>
         ) : null}
