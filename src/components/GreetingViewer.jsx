@@ -15,7 +15,7 @@ import { shareImage, saveToGallery } from '../utils/sharingService';
  *   onClose — callback
  */
 export default function GreetingViewer({ template, mode, festival, greetingConfig, panchangamData, onClose }) {
-  const { font } = useLanguage();
+  const { font, language } = useLanguage();
   const [imageUrl, setImageUrl] = useState(null);
   const [rendering, setRendering] = useState(true);
   const [sharing, setSharing] = useState(false);
@@ -30,17 +30,18 @@ export default function GreetingViewer({ template, mode, festival, greetingConfi
     setRendering(true);
     try {
       let blob;
+      const lang = language === 'te' ? 'te' : 'en';
       if (mode === 'daily') {
-        blob = await renderDailyCard(template, panchangamData || {}, name);
+        blob = await renderDailyCard(template, panchangamData || {}, name, lang);
       } else {
-        blob = await renderFestivalCard(template, festival, greetingConfig, qi, name);
+        blob = await renderFestivalCard(template, festival, greetingConfig, qi, name, lang);
       }
       blobRef.current = blob;
       if (imageUrl) URL.revokeObjectURL(imageUrl);
       setImageUrl(URL.createObjectURL(blob));
     } catch (_) {}
     setRendering(false);
-  }, [template, mode, panchangamData, festival, greetingConfig]);
+  }, [template, mode, panchangamData, festival, greetingConfig, language]);
 
   // Initial render
   useEffect(() => {
@@ -67,9 +68,10 @@ export default function GreetingViewer({ template, mode, festival, greetingConfi
     if (!blobRef.current) return;
     setSharing(true);
     try {
+      const isEn = language !== 'te';
       const text = mode === 'festival'
-        ? `${greetingConfig?.greetingText || festival?.telugu} 🙏\n\n— shared from manacalendar.com`
-        : `నేటి పంచాంగం 🙏\n\n— shared from manacalendar.com`;
+        ? `${isEn ? `Happy ${festival?.english}` : (greetingConfig?.greetingText || festival?.telugu)} 🙏\n\n— shared from manacalendar.com`
+        : `${isEn ? "Today's Panchangam" : 'నేటి పంచాంగం'} 🙏\n\n— shared from manacalendar.com`;
       const fileName = mode === 'festival'
         ? `${festival?.english || 'festival'}-greeting.jpg`
         : `panchangam-${new Date().toISOString().split('T')[0]}.jpg`;
@@ -100,50 +102,57 @@ export default function GreetingViewer({ template, mode, festival, greetingConfi
             </svg>
           </button>
           <span style={{ ...styles.headerTitle, fontFamily: font }}>
-            {mode === 'festival' ? `${festival?.telugu} శుభాకాంక్షలు` : 'నేటి పంచాంగం'}
+            {mode === 'festival'
+              ? (language === 'te' ? `${festival?.telugu} శుభాకాంక్షలు` : `${festival?.english} Wishes`)
+              : (language === 'te' ? 'నేటి పంచాంగం' : "Today's Panchangam")}
           </span>
         </div>
 
-        {/* Image */}
-        <div style={styles.imageBox}>
-          {rendering && !imageUrl ? (
-            <div style={styles.loadingBox}><div style={styles.spinnerLg} /></div>
-          ) : imageUrl ? (
-            <img src={imageUrl} alt="Card" style={styles.previewImg} />
-          ) : null}
-          {rendering && imageUrl && (
-            <div style={styles.renderingOverlay}><div style={styles.spinnerSm} /></div>
-          )}
-        </div>
-
-        {/* Quote switcher */}
-        {hasQuotes && (
-          <div style={styles.quoteRow}>
-            <span style={{ ...styles.quoteLabel, fontFamily: font }}>శ్లోకం:</span>
-            {greetingConfig.quotes.map((_, i) => (
-              <button
-                key={i}
-                style={{ ...styles.quoteDot, ...(i === quoteIndex ? styles.quoteDotActive : {}) }}
-                onClick={() => setQuoteIndex(i)}
-              >
-                {i + 1}
-              </button>
-            ))}
+        {/* Scrollable content area */}
+        <div style={styles.scrollArea}>
+          {/* Image */}
+          <div style={styles.imageBox}>
+            {rendering && !imageUrl ? (
+              <div style={styles.loadingBox}><div style={styles.spinnerLg} /></div>
+            ) : imageUrl ? (
+              <img src={imageUrl} alt="Card" style={styles.previewImg} />
+            ) : null}
+            {rendering && imageUrl && (
+              <div style={styles.renderingOverlay}><div style={styles.spinnerSm} /></div>
+            )}
           </div>
-        )}
 
-        {/* Name input */}
-        <div style={styles.nameRow}>
-          <input
-            type="text"
-            value={customName}
-            onChange={handleNameChange}
-            placeholder="మీ పేరు / కుటుంబం పేరు (ఐచ్ఛికం)"
-            style={{ ...styles.nameInput, fontFamily: font }}
-          />
+          {/* Quote switcher */}
+          {hasQuotes && (
+            <div style={styles.quoteRow}>
+              <span style={{ ...styles.quoteLabel, fontFamily: font }}>
+                {language === 'te' ? 'శ్లోకం:' : 'Quote:'}
+              </span>
+              {greetingConfig.quotes.map((_, i) => (
+                <button
+                  key={i}
+                  style={{ ...styles.quoteDot, ...(i === quoteIndex ? styles.quoteDotActive : {}) }}
+                  onClick={() => setQuoteIndex(i)}
+                >
+                  {i + 1}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Name input */}
+          <div style={styles.nameRow}>
+            <input
+              type="text"
+              value={customName}
+              onChange={handleNameChange}
+              placeholder={language === 'te' ? 'మీ పేరు / కుటుంబం పేరు (ఐచ్ఛికం)' : 'Your name / Family name (optional)'}
+              style={{ ...styles.nameInput, fontFamily: font }}
+            />
+          </div>
         </div>
 
-        {/* Actions */}
+        {/* Actions — pinned at bottom */}
         <div style={styles.actions}>
           <button
             style={{ ...styles.shareBtn, opacity: sharing ? 0.6 : 1 }}
@@ -154,7 +163,7 @@ export default function GreetingViewer({ template, mode, festival, greetingConfi
               <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
             </svg>
             <span style={{ fontFamily: font, fontWeight: 700 }}>
-              {sharing ? 'Sharing...' : 'Share'}
+              {sharing ? (language === 'te' ? 'షేర్ అవుతోంది...' : 'Sharing...') : 'Share'}
             </span>
           </button>
           <button style={styles.saveBtn} onClick={handleSave} disabled={!blobRef.current}>
@@ -184,8 +193,8 @@ const styles = {
     maxHeight: '95vh',
     background: '#FDF8EF',
     borderRadius: '20px 20px 0 0',
-    overflowY: 'auto',
-    paddingBottom: 'calc(12px + env(safe-area-inset-bottom, 0px))',
+    display: 'flex',
+    flexDirection: 'column',
   },
   header: {
     display: 'flex',
@@ -206,6 +215,11 @@ const styles = {
     fontWeight: 700,
     color: '#2D1810',
     flex: 1,
+  },
+  scrollArea: {
+    flex: 1,
+    overflowY: 'auto',
+    minHeight: 0,
   },
   imageBox: {
     padding: '10px 16px',
@@ -301,7 +315,10 @@ const styles = {
   actions: {
     display: 'flex',
     gap: '8px',
-    padding: '6px 16px',
+    padding: '10px 16px',
+    paddingBottom: 'calc(10px + env(safe-area-inset-bottom, 0px))',
+    borderTop: '1px solid rgba(45,24,16,0.06)',
+    flexShrink: 0,
   },
   shareBtn: {
     flex: 1,

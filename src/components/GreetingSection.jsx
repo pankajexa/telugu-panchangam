@@ -14,7 +14,7 @@ import GreetingViewer from './GreetingViewer';
  *   panchangamData — panchangam data object from the app
  */
 export default function GreetingSection({ festival, panchangamData }) {
-  const { font } = useLanguage();
+  const { font, language } = useLanguage();
   const [thumbnails, setThumbnails] = useState([]);
   const [selected, setSelected] = useState(null); // { template, mode }
   const [loading, setLoading] = useState(true);
@@ -74,7 +74,7 @@ export default function GreetingSection({ festival, panchangamData }) {
         {hasFestival && (
           <>
             <div style={{ ...styles.sectionTitle, fontFamily: font }}>
-              {festival.telugu} శుభాకాంక్షలు
+              {language === 'te' ? `${festival.telugu} శుభాకాంక్షలు` : `${festival.english} Wishes`}
             </div>
             <div style={styles.scrollRow}>
               {loading ? (
@@ -97,7 +97,7 @@ export default function GreetingSection({ festival, panchangamData }) {
 
         {/* Daily panchangam */}
         <div style={{ ...styles.sectionTitle, fontFamily: font, marginTop: hasFestival ? '12px' : 0 }}>
-          నేటి పంచాంగం కార్డ్
+          {language === 'te' ? 'నేటి పంచాంగం కార్డ్' : "Today's Panchangam Card"}
         </div>
         <div style={styles.scrollRow}>
           {loading ? (
