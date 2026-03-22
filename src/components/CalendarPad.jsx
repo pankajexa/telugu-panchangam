@@ -5,7 +5,8 @@ import MonthStrip from './MonthStrip';
 import MonthView from './MonthView';
 import TeluguMonthView from './TeluguMonthView';
 import EnglishMonthStrip from './EnglishMonthStrip';
-import GreetingSection from './GreetingSection';
+import ShareButton from './ShareButton';
+import FestivalWishes from './FestivalWishes';
 import DetailedPanchangam from './DetailedPanchangam';
 import { computeClipPath, drawFlip } from '../physics/drawFlip';
 import { getPanchangamForDate, getDetailedPanchangam, getTodayIndex, generateAllDates } from '../data/panchangam';
@@ -661,12 +662,12 @@ export default function CalendarPad() {
             </button>
           )}
         </div>
-        {/* Row 2: Greeting cards (daily panchangam + festival greetings) */}
+        {/* Row 2: Share buttons */}
         {viewMode === 'day' && (
-          <GreetingSection
-            festival={currentData?.festival}
-            panchangamData={currentData}
-          />
+          <div style={styles.shareRow}>
+            <ShareButton data={currentData} />
+            <FestivalWishes festival={currentData?.festival} />
+          </div>
         )}
         {/* Row 4: Detailed Panchangam */}
         {viewMode === 'day' && detailedData && (

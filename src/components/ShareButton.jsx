@@ -1,9 +1,10 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { track } from '@vercel/analytics';
 import { useLocation } from '../context/LocationContext';
 import { useLanguage } from '../context/LanguageContext';
-import { generatePanchangamCard } from '../imageCard/generatePanchangamCard';
-import { shareImageWithFallback } from '../imageCard/cardUtils';
+import { DAILY_TEMPLATES } from '../data/cardTemplates';
+import { renderDailyCard } from '../imageCard/cardRenderer';
+import { shareImage } from '../utils/sharingService';
 
 const TELUGU_MONTHS_MAP = {
   'January': 'జనవరి', 'February': 'ఫిబ్రవరి', 'March': 'మార్చి',
@@ -13,6 +14,7 @@ const TELUGU_MONTHS_MAP = {
 };
 
 function to12Hr(time24) {
+  if (!time24 || time24 === '--') return '--';
   const [hh, mm] = time24.split(':').map(Number);
   const period = hh >= 12 ? 'PM' : 'AM';
   const h = hh % 12 || 12;
@@ -39,22 +41,19 @@ function buildShareText(data, cityLabel, language) {
   lines.push(`${isTe ? 'నక్షత్రం' : 'Nakshatra'} *${isTe ? data.nakshatra.name : data.nakshatra.nameEn}*`);
   lines.push(`${isTe ? 'యోగం' : 'Yogam'} ${isTe ? data.yogam.name : data.yogam.nameEn}`);
   lines.push('');
-  lines.push(isTe ? `*✦ శుభ ముహూర్తం*` : `*Auspicious Timings*`);
-  lines.push(`${isTe ? 'అభిజిత్' : 'Abhijit'} ${data.abhijitMuhurta || '--'}`);
-  lines.push(`${isTe ? 'అమృతకాలం' : 'Amrit Kalam'} ${data.amritKalam || '--'}`);
-  lines.push(`${isTe ? 'బ్రహ్మ ము.' : 'Brahma Mu.'} ${data.brahmaMuhurta || '--'}`);
-  lines.push('');
   lines.push(`${isTe ? 'రాహు' : 'Rahu'} ${data.rahuKalam}`);
   lines.push(`${isTe ? 'వర్జ్యం' : 'Varjyam'} ${data.varjyam}`);
   const durText = Array.isArray(data.durmuhurtham) ? data.durmuhurtham.join(', ') : data.durmuhurtham;
   lines.push(`${isTe ? 'దుర్ము.' : 'Durmu.'} ${durText}`);
   lines.push('');
-  lines.push(isTe ? `_శ్రీ పరాభవ నామ సంవత్సరం_` : `_Sri Parabhava Nama Samvatsaram_`);
   lines.push(`_${cityLabel} ${isTe ? 'పంచాంగం' : 'Panchangam'}_`);
   lines.push('');
   lines.push(`_shared from manacalendar.com_`);
   return lines.join('\n');
 }
+
+// Track which template index to use next — cycles through on each press
+let templateIndex = Math.floor(Math.random() * DAILY_TEMPLATES.length);
 
 export default function ShareButton({ data }) {
   const { location } = useLocation();
@@ -68,12 +67,19 @@ export default function ShareButton({ data }) {
     const cityLabel = language === 'te' ? location.label : location.labelEn;
     const fallbackText = buildShareText(data, cityLabel, language);
 
+    // Pick next template (cycles through all templates)
+    const template = DAILY_TEMPLATES[templateIndex % DAILY_TEMPLATES.length];
+    templateIndex++;
+
+    const customName = localStorage.getItem('manacalendar-custom-name') || '';
+    const lang = language === 'te' ? 'te' : 'en';
+
     setGenerating(true);
     try {
-      const blob = await generatePanchangamCard(data, cityLabel);
-      await shareImageWithFallback(blob, `panchangam-${data.date}.png`, fallbackText);
+      const blob = await renderDailyCard(template, data, customName, lang);
+      await shareImage(blob, `panchangam-${data.date}.jpg`, fallbackText);
     } catch (_) {
-      // If image generation fails, share text
+      // Fallback to text
       if (navigator.share) {
         navigator.share({ text: fallbackText }).catch(() => {});
       } else {
