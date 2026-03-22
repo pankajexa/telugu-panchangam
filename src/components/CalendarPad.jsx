@@ -1,10 +1,9 @@
 import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import Page from './Page';
 import PageStack from './PageStack';
-import MonthStrip from './MonthStrip';
 import MonthView from './MonthView';
 import TeluguMonthView from './TeluguMonthView';
-import EnglishMonthStrip from './EnglishMonthStrip';
+import YearView from './YearView';
 import ShareButton from './ShareButton';
 import FestivalWishes from './FestivalWishes';
 import DetailedPanchangam from './DetailedPanchangam';
@@ -41,9 +40,11 @@ export default function CalendarPad() {
   // === React state ===
   const [currentIndex, setCurrentIndex] = useState(() => getTodayIndex());
   const [hasInteracted, setHasInteracted] = useState(false);
-  const [showMonthStrip, setShowMonthStrip] = useState(false);
-  const [showEngMonthStrip, setShowEngMonthStrip] = useState(false);
-  const [viewMode, setViewMode] = useState('month'); // 'day' | 'month' | 'telugu-month'
+  const [viewMode, setViewMode] = useState('month'); // 'day' | 'month' | 'telugu-month' | 'year'
+
+  // Zoom transition state
+  const [zoomPhase, setZoomPhase] = useState('none'); // 'none' | 'prepare' | 'animate'
+  const [zoomDirection, setZoomDirection] = useState('in'); // 'in' (zoom closer) | 'out' (zoom farther)
 
   // For conditional DOM rendering (under-page, canvas)
   const [flipping, setFlipping] = useState(false);
@@ -77,9 +78,6 @@ export default function CalendarPad() {
     lastY: 0,
     hasMoved: false,
   });
-
-  // Long press
-  const longPressRef = useRef(null);
 
   // =================================================================
   //  CANVAS MANAGEMENT
@@ -273,13 +271,6 @@ export default function CalendarPad() {
       lastY: y,
       hasMoved: false,
     };
-
-    clearTimeout(longPressRef.current);
-    longPressRef.current = setTimeout(() => {
-      if (touchRef.current.active && !touchRef.current.hasMoved) {
-        setShowMonthStrip(s => !s);
-      }
-    }, 500);
   }, []);
 
   const onPointerMove = useCallback((e) => {
@@ -297,7 +288,6 @@ export default function CalendarPad() {
 
     if (Math.abs(delta) < 10 && phaseRef.current === 'idle') return;
 
-    clearTimeout(longPressRef.current);
     touchRef.current.hasMoved = true;
     touchRef.current.lastY = y;
 
@@ -322,7 +312,6 @@ export default function CalendarPad() {
   }, [beginFlip, renderFrame]);
 
   const onPointerUp = useCallback(() => {
-    clearTimeout(longPressRef.current);
     if (!touchRef.current.active) return;
     touchRef.current.active = false;
 
@@ -345,7 +334,6 @@ export default function CalendarPad() {
   const onClickHandler = useCallback((e) => {
     if (touchRef.current.hasMoved) return;
     if (phaseRef.current !== 'idle') return;
-    if (showMonthStrip) { setShowMonthStrip(false); return; }
 
     const rect = e.currentTarget.getBoundingClientRect();
     const ratio = (e.clientY - rect.top) / rect.height;
@@ -355,7 +343,7 @@ export default function CalendarPad() {
     } else if (ratio > 0.6 && indexRef.current > 0) {
       quickFlip('backward');
     }
-  }, [quickFlip, showMonthStrip]);
+  }, [quickFlip]);
 
   // Keyboard
   useEffect(() => {
@@ -387,21 +375,6 @@ export default function CalendarPad() {
       setCurrentIndex(getTodayIndex());
     }
     lastTapRef.current = now;
-  }, []);
-
-  // Month strip
-  const handleSelectMonth = useCallback((dayIndex, teluguIdx) => {
-    // Dismiss on backdrop click
-    if (dayIndex === -1) { setShowMonthStrip(false); return; }
-    // teluguIdx is the index into teluguMonths array
-    if (teluguIdx !== undefined) {
-      setTeluguMonthIdx(teluguIdx);
-      setShowMonthStrip(false);
-      setViewMode('telugu-month');
-    } else {
-      setCurrentIndex(dayIndex);
-      setShowMonthStrip(false);
-    }
   }, []);
 
   // Clear clip-path AFTER React has rendered the new page content
@@ -475,6 +448,33 @@ export default function CalendarPad() {
   useEffect(() => () => cancelAnimationFrame(rafRef.current), []);
 
   // =================================================================
+  //  ZOOM TRANSITION HELPER
+  // =================================================================
+  const zoomTimerRef = useRef(null);
+  const transitionTo = useCallback((newMode, direction = 'in') => {
+    setZoomDirection(direction);
+    setZoomPhase('prepare');
+    setViewMode(newMode);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setZoomPhase('animate');
+      });
+    });
+    clearTimeout(zoomTimerRef.current);
+    zoomTimerRef.current = setTimeout(() => setZoomPhase('none'), 400);
+  }, []);
+
+  // Compute zoom style for view containers
+  const zoomStyle = zoomPhase === 'prepare' ? {
+    transform: zoomDirection === 'in' ? 'scale(0.85)' : 'scale(1.15)',
+    opacity: 0,
+  } : zoomPhase === 'animate' ? {
+    transform: 'scale(1)',
+    opacity: 1,
+    transition: 'transform 350ms cubic-bezier(0.32, 0.72, 0, 1), opacity 250ms ease',
+  } : {};
+
+  // =================================================================
   //  MONTH VIEW LOGIC
   // =================================================================
   // Derive current month/year from the current day index
@@ -491,26 +491,39 @@ export default function CalendarPad() {
     return idx >= 0 ? idx : 0;
   });
 
-  const switchToEnglishMonth = useCallback(() => {
-    setShowEngMonthStrip(true);
-  }, []);
+  // Navigation: switch to year view (zoom out from day or month)
+  const switchToYearView = useCallback(() => {
+    transitionTo('year', 'out');
+  }, [transitionTo]);
 
-  const handleEngMonthSelect = useCallback((year, month) => {
-    // Dismiss on backdrop click
-    if (year === null) { setShowEngMonthStrip(false); return; }
-    setMonthViewYear(year);
-    setMonthViewMonth(month);
-    setShowEngMonthStrip(false);
-    setViewMode('month');
-  }, []);
-
+  // Navigation: switch to telugu month view (crossfade)
   const switchToTeluguMonth = useCallback(() => {
-    setShowMonthStrip(true);
-  }, []);
+    // Determine the Telugu month for current date
+    const d = allDatesArray[currentIndex] || new Date(2026, 2, 19);
+    const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    const idx = teluguMonths.findIndex(m => dateStr >= m.start && dateStr <= m.end);
+    if (idx >= 0) setTeluguMonthIdx(idx);
+    transitionTo('telugu-month', 'out');
+  }, [transitionTo, currentIndex, teluguMonths]);
 
+  // Navigation: switch to day view (zoom in)
   const switchToDay = useCallback(() => {
-    setViewMode('day');
-  }, []);
+    transitionTo('day', 'in');
+  }, [transitionTo]);
+
+  // Navigation: switch to month view from year (zoom in)
+  const switchToMonthFromYear = useCallback(() => {
+    transitionTo('month', 'in');
+  }, [transitionTo]);
+
+  // Navigation: switch to english month view from day (zoom out)
+  const switchToEnglishMonth = useCallback(() => {
+    // Sync month view to current day's month
+    const d = allDatesArray[currentIndex] || new Date(2026, 2, 19);
+    setMonthViewYear(d.getFullYear());
+    setMonthViewMonth(d.getMonth());
+    transitionTo('year', 'out');
+  }, [transitionTo, currentIndex]);
 
   const handleMonthSelectDate = useCallback((day) => {
     // Find the index in allData for this date
@@ -521,9 +534,9 @@ export default function CalendarPad() {
     const idx = Math.round((target - start) / 86400000);
     if (idx >= 0 && idx < TOTAL_DAYS) {
       setCurrentIndex(idx);
-      setViewMode('day');
+      transitionTo('day', 'in');
     }
-  }, [monthViewYear, monthViewMonth]);
+  }, [monthViewYear, monthViewMonth, transitionTo]);
 
   const handlePrevMonth = useCallback(() => {
     setMonthViewMonth(m => {
@@ -538,6 +551,11 @@ export default function CalendarPad() {
       return m + 1;
     });
   }, []);
+
+  // Month view: zoom out to year
+  const handleMonthZoomOut = useCallback(() => {
+    transitionTo('year', 'out');
+  }, [transitionTo]);
 
   // Telugu month navigation
   const handlePrevTeluguMonth = useCallback(() => {
@@ -554,9 +572,28 @@ export default function CalendarPad() {
     const idx = Math.round((target - start) / 86400000);
     if (idx >= 0 && idx < TOTAL_DAYS) {
       setCurrentIndex(idx);
-      setViewMode('day');
+      transitionTo('day', 'in');
     }
-  }, []);
+  }, [transitionTo]);
+
+  // Year view handlers
+  const handleYearSelectMonth = useCallback((year, month) => {
+    setMonthViewYear(year);
+    setMonthViewMonth(month);
+    transitionTo('month', 'in');
+  }, [transitionTo]);
+
+  const handleYearSelectDate = useCallback((year, month, day) => {
+    const target = new Date(year, month, day);
+    target.setHours(0, 0, 0, 0);
+    const start = new Date(2026, 2, 19);
+    start.setHours(0, 0, 0, 0);
+    const idx = Math.round((target - start) / 86400000);
+    if (idx >= 0 && idx < TOTAL_DAYS) {
+      setCurrentIndex(idx);
+      transitionTo('day', 'in');
+    }
+  }, [transitionTo]);
 
   // Wheel navigation for month view
   const monthWheelCooldown = useRef(false);
@@ -638,20 +675,34 @@ export default function CalendarPad() {
             <PageStack dayIndex={currentIndex} totalDays={TOTAL_DAYS} />
           </>
         ) : viewMode === 'month' ? (
-          <MonthView
-            year={monthViewYear}
-            month={monthViewMonth}
-            onSelectDate={handleMonthSelectDate}
-            onPrevMonth={handlePrevMonth}
-            onNextMonth={handleNextMonth}
-          />
+          <div style={{ ...styles.zoomContainer, ...zoomStyle }}>
+            <MonthView
+              year={monthViewYear}
+              month={monthViewMonth}
+              onSelectDate={handleMonthSelectDate}
+              onPrevMonth={handlePrevMonth}
+              onNextMonth={handleNextMonth}
+              onZoomOut={handleMonthZoomOut}
+            />
+          </div>
+        ) : viewMode === 'year' ? (
+          <div style={{ ...styles.zoomContainer, ...zoomStyle }}>
+            <YearView
+              onSelectMonth={handleYearSelectMonth}
+              onSelectDate={handleYearSelectDate}
+              currentYear={monthViewYear}
+              currentMonth={monthViewMonth}
+            />
+          </div>
         ) : (
-          <TeluguMonthView
-            teluguMonthIndex={teluguMonthIdx}
-            onPrev={handlePrevTeluguMonth}
-            onNext={handleNextTeluguMonth}
-            onSelectDate={handleTeluguMonthSelectDate}
-          />
+          <div style={{ ...styles.zoomContainer, ...zoomStyle }}>
+            <TeluguMonthView
+              teluguMonthIndex={teluguMonthIdx}
+              onPrev={handlePrevTeluguMonth}
+              onNext={handleNextTeluguMonth}
+              onSelectDate={handleTeluguMonthSelectDate}
+            />
+          </div>
         )}
       </div>
 
@@ -667,11 +718,36 @@ export default function CalendarPad() {
                 <span style={{ ...styles.toggleText, fontFamily: font }}>{t('cal.englishMonth')}</span>
               </button>
             </>
+          ) : viewMode === 'month' ? (
+            <>
+              <button style={styles.viewToggle} onClick={switchToYearView}>
+                <span style={{ ...styles.toggleText, fontFamily: font }}>{t('cal.year')}</span>
+              </button>
+              <button style={styles.viewToggle} onClick={switchToDay}>
+                <span style={styles.toggleIcon}>◉</span>
+                <span style={{ ...styles.toggleText, fontFamily: font }}>{t('cal.day')}</span>
+              </button>
+            </>
+          ) : viewMode === 'year' ? (
+            <>
+              <button style={styles.viewToggle} onClick={switchToDay}>
+                <span style={styles.toggleIcon}>◉</span>
+                <span style={{ ...styles.toggleText, fontFamily: font }}>{t('cal.day')}</span>
+              </button>
+              <button style={styles.viewToggle} onClick={switchToTeluguMonth}>
+                <span style={{ ...styles.toggleText, fontFamily: font }}>{t('cal.teluguMonth')}</span>
+              </button>
+            </>
           ) : (
-            <button style={styles.viewToggle} onClick={switchToDay}>
-              <span style={styles.toggleIcon}>◉</span>
-              <span style={{ ...styles.toggleText, fontFamily: font }}>{t('cal.day')}</span>
-            </button>
+            <>
+              <button style={styles.viewToggle} onClick={switchToDay}>
+                <span style={styles.toggleIcon}>◉</span>
+                <span style={{ ...styles.toggleText, fontFamily: font }}>{t('cal.day')}</span>
+              </button>
+              <button style={styles.viewToggle} onClick={switchToEnglishMonth}>
+                <span style={{ ...styles.toggleText, fontFamily: font }}>{t('cal.englishMonth')}</span>
+              </button>
+            </>
           )}
         </div>
         {/* Row 2: Share buttons */}
@@ -681,25 +757,13 @@ export default function CalendarPad() {
             <FestivalWishes festival={currentData?.festival} />
           </div>
         )}
-        {/* Row 4: Detailed Panchangam */}
+        {/* Row 3: Detailed Panchangam */}
         {viewMode === 'day' && detailedData && (
           <DetailedPanchangam detailedData={detailedData} />
         )}
-        {/* Row 4: Month nav hint */}
+        {/* Month nav hint */}
         {viewMode === 'month' && <MonthNavHint />}
       </div>
-
-      <MonthStrip
-        visible={showMonthStrip}
-        onSelectMonth={handleSelectMonth}
-        currentMonthIndex={currentIndex}
-      />
-      <EnglishMonthStrip
-        visible={showEngMonthStrip}
-        onSelectMonth={handleEngMonthSelect}
-        currentYear={monthViewYear}
-        currentMonth={monthViewMonth}
-      />
     </div>
   );
 }
@@ -749,6 +813,9 @@ const styles = {
   pad: {
     position: 'relative',
     width: '100%',
+  },
+  zoomContainer: {
+    willChange: 'transform, opacity',
   },
   flipScene: {
     position: 'relative',

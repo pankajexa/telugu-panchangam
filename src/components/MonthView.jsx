@@ -56,7 +56,7 @@ function buildMonthGrid(year, month) {
   return { grid, daysInMonth, numWeeks };
 }
 
-const MonthView = memo(function MonthView({ year, month, onSelectDate, onPrevMonth, onNextMonth }) {
+const MonthView = memo(function MonthView({ year, month, onSelectDate, onPrevMonth, onNextMonth, onZoomOut }) {
   const { location } = useLocation();
   const { t, pick, font } = useLanguage();
   const dayNames = t('month.days');
@@ -110,7 +110,10 @@ const MonthView = memo(function MonthView({ year, month, onSelectDate, onPrevMon
       {/* Month header */}
       <div style={styles.header}>
         <button style={styles.navBtn} onClick={onPrevMonth}>‹</button>
-        <div style={styles.monthTitle}>
+        <div
+          style={{ ...styles.monthTitle, cursor: onZoomOut ? 'pointer' : 'default' }}
+          onClick={onZoomOut ? onZoomOut : undefined}
+        >
           <span style={styles.monthName}>{MONTH_NAMES[month]}</span>
           <span style={styles.yearText}>{year}</span>
         </div>

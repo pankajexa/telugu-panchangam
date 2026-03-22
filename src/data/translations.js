@@ -22,6 +22,7 @@ const translations = {
     'cal.teluguMonth': 'తెలుగు నెల',
     'cal.englishMonth': 'ఇంగ్లీష్ నెల',
     'cal.day': 'రోజు',
+    'cal.year': 'సంవత్సరం',
     'cal.changeMonth': 'నెల మార్చండి',
 
     // ShareButton
@@ -175,6 +176,7 @@ const translations = {
     'cal.teluguMonth': 'Telugu Month',
     'cal.englishMonth': 'English Month',
     'cal.day': 'Day',
+    'cal.year': 'Year',
     'cal.changeMonth': 'Change month',
 
     // ShareButton
