@@ -66,7 +66,7 @@ export default function FestivalsPage() {
       <div style={styles.content}>
         {/* Header */}
         <h1 style={styles.title}>{t('festivals.title')}</h1>
-        <div style={styles.subtitle}>{t('page.samvatsaram')}</div>
+        <div style={styles.subtitle}>{language === 'te' ? 'పండుగలు & వ్రతాలు' : 'Festivals & Vratas'}</div>
 
         {/* Filter chips */}
         <div style={styles.chipRow}>

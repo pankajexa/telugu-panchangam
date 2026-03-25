@@ -259,7 +259,7 @@ export default function CalendarPage() {
             {calendarMode === 'english' ? (
               <>
                 <h1 style={S.title}>{viewMode === 'month' ? `${MONTH_NAMES_EN[currentMonth]} ${currentYear}` : currentYear}</h1>
-                <div style={S.subtitle}>{viewMode === 'month' ? t('page.samvatsaram') : (language === 'te' ? 'సంవత్సర వీక్షణ' : 'Year View')}</div>
+                {viewMode === 'year' && <div style={S.subtitle}>{language === 'te' ? 'సంవత్సర వీక్షణ' : 'Year View'}</div>}
               </>
             ) : (
               <>

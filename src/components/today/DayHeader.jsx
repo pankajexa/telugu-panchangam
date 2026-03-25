@@ -9,16 +9,13 @@ const DayHeader = memo(function DayHeader({ data, detailed, font, pick, language
   const dayName = pick(TELUGU_DAYS[today.getDay()], ENGLISH_DAYS[today.getDay()]);
   const dateStr = `${data.dateNum} ${data.englishMonth}, ${data.year}`;
   const masaLabel = pick(data.masam?.telugu, data.masam?.english) || '';
-  const samvatsara = t('page.samvatsaram');
 
   return (
     <div style={styles.container}>
       <div style={styles.left}>
-        {/* Hindu month (bigger) + samvatsara (smaller) */}
+        {/* Hindu month name */}
         <div style={styles.masaRow}>
           <span style={{ ...styles.masaName, fontFamily: font }}>{masaLabel}</span>
-          <span style={styles.masaDot}>•</span>
-          <span style={styles.samvatsara}>{samvatsara}</span>
         </div>
         {/* Large date (primary) */}
         <h1 style={styles.dateNum}>{dateStr}</h1>
