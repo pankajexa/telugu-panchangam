@@ -86,7 +86,7 @@ const styles = {
     transition: 'opacity 200ms',
   },
   text: {
-    fontFamily: "'Noto Serif Telugu', serif",
+    fontFamily: "'Noto Sans Telugu', serif",
     fontWeight: 700,
     fontSize: '13px',
     color: '#25D366',

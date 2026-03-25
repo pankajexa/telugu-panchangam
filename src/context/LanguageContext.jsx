@@ -31,8 +31,8 @@ export function LanguageProvider({ children }) {
     return language === 'te' ? teluguVal : englishVal;
   }, [language]);
 
-  // Font helper: returns Telugu font or Inter based on language
-  const font = language === 'te' ? "'Noto Serif Telugu', serif" : "'Inter', system-ui, sans-serif";
+  // Font helper: returns Telugu font or Plus Jakarta Sans based on language
+  const font = language === 'te' ? "'Noto Sans Telugu', sans-serif" : "'Plus Jakarta Sans', system-ui, sans-serif";
 
   return (
     <LanguageContext.Provider value={{ language, setLanguage, t, pick, font }}>

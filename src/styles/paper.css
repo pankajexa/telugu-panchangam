@@ -1,46 +1,71 @@
-/* Paper texture and colors — Golden Yellow Panchangam */
+/* Modern Hindu Calendar — Design Tokens */
 
-@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+Telugu:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&family=Abril+Fatface&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@400;500;600;700;800;900&family=Noto+Sans+Devanagari:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&family=Playfair+Display:wght@400;500;600;700;800;900&display=swap');
 
 :root {
-  /* Paper (calendar pad) — soft modern gold */
-  --paper-base: #F5E4A8;
-  --paper-light: #FBF0CA;
-  --paper-dark: #E8D080;
-  --paper-edge: #D8C068;
-  --paper-back: #E5CC78;
+  /* Background — warm off-white with subtle warmth */
+  --bg: #FAFAF8;
 
-  /* Ink on paper — unchanged */
-  --ink-primary: #3a150a;
-  --ink-secondary: #6b2d15;
-  --ink-light: #915838;
-  --ink-faint: #b88050;
-
-  /* Light theme shell */
-  --wall-bg: #F5F2ED;
+  /* Cards — glossy white with refined shadows */
   --card-bg: #FFFFFF;
-  --card-shadow: 0 2px 12px rgba(45,24,16,0.06), 0 1px 3px rgba(45,24,16,0.04);
-  --card-radius: 16px;
+  --card-shadow: 0 1px 4px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.03);
+  --card-shadow-hover: 0 4px 16px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+  --card-radius: 14px;
+  --card-border: 1px solid rgba(0,0,0,0.05);
 
-  /* Accent colors */
-  --accent-saffron: #C49B2A;
-  --accent-maroon: #8B1A1A;
-  --accent-gold-light: #EDD9A3;
-  --accent-cream: #FDF8EF;
+  /* Primary accent — vermilion red */
+  --primary: #E63B2E;
+  --primary-dark: #C62828;
 
-  /* Text on light background */
-  --text-primary: #2D1810;
-  --text-secondary: #5C3D2E;
-  --text-tertiary: #8A7568;
-  --text-faint: #B5A899;
+  /* Secondary accent — saffron gold */
+  --secondary: #E8A817;
+  --secondary-light: #FFF9E6;
 
-  /* Icons */
-  --icon-active: #C49B2A;
-  --icon-inactive: #A09486;
+  /* Auspicious / Inauspicious */
+  --color-shubh: #2D8A39;
+  --color-shubh-bg: #F0FFF0;
+  --color-shubh-border: #D4F5D4;
+  --color-avoid: #CC3333;
+  --color-avoid-bg: #FFF1F0;
+  --color-avoid-border: #FFD6D6;
+  --color-good: #B8860B;
+  --color-good-bg: #FFF9E6;
+  --color-good-border: #FFF0B3;
+
+  /* Text */
+  --text-primary: #1A1A1A;
+  --text-secondary: #777;
+  --text-muted: #999;
+  --text-faint: #BBB;
+  --text-label: #CCC;
+
+  /* Typography */
+  --font-heading: 'Playfair Display', Georgia, serif;
+  --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-telugu: 'Noto Sans Telugu', sans-serif;
+  --font-devanagari: 'Noto Sans Devanagari', sans-serif;
 
   /* Borders & dividers */
-  --border-subtle: rgba(45,24,16,0.06);
-  --divider: rgba(45,24,16,0.06);
+  --border-subtle: rgba(0,0,0,0.05);
+  --divider: rgba(0,0,0,0.05);
+
+  /* Calendar grid cells */
+  --cell-bg: linear-gradient(145deg, #FFF8E7, #FFF3D6);
+  --cell-border: rgba(200,170,100,0.15);
+  --cell-today-bg: linear-gradient(135deg, #E63B2E, #C62828);
+  --cell-selected-bg: linear-gradient(145deg, #FFF0C2, #FFE6A0);
+  --cell-selected-border: #E8A817;
+
+  /* Panchang card icon backgrounds */
+  --tithi-icon-bg: linear-gradient(135deg, #FFF1F0, #FFE4E1);
+  --nakshatra-icon-bg: linear-gradient(135deg, #FFF9E6, #FFF3CC);
+  --yoga-icon-bg: linear-gradient(135deg, #FFF1F0, #FFDDD6);
+  --karana-icon-bg: linear-gradient(135deg, #FFF6E6, #FFEACC);
+
+  /* Sun/Moon strip backgrounds */
+  --sunrise-bg: linear-gradient(135deg, #FFF9E6, #FFF3D0);
+  --sunset-bg: linear-gradient(135deg, #FFE8E0, #FFD6CC);
+  --moonrise-bg: linear-gradient(135deg, #F0F0FF, #E8E8FF);
 }
 
 * {
@@ -57,38 +82,66 @@ html, body, #root {
 }
 
 body {
-  font-family: 'Inter', system-ui, sans-serif;
-  background: var(--wall-bg);
+  font-family: var(--font-body);
+  background: var(--bg);
   color: var(--text-primary);
   user-select: none;
   -webkit-user-select: none;
   touch-action: pinch-zoom;
+  /* Subtle warm gradient across entire page */
+  background-image: linear-gradient(160deg, #FEFCF8 0%, #FFF8F5 30%, #FFFBF0 70%, #FEFCF8 100%);
+  background-attachment: fixed;
 }
 
-/* Paper grain texture — soft modern gold with subtle glossy sheen */
-.paper-texture {
-  position: relative;
-  background:
-    /* Glossy sheen — subtle top-to-bottom highlight */
-    linear-gradient(
-      175deg,
-      rgba(255,255,255,0.18) 0%,
-      rgba(255,255,255,0.04) 30%,
-      rgba(255,255,255,0) 50%,
-      rgba(0,0,0,0.02) 100%
-    ),
-    /* Subtle grain overlay */
-    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E"),
-    /* Vignette — soft gold center fading to slightly deeper at edges */
-    radial-gradient(ellipse at 50% 40%, #FBF0CA 0%, #F5E4A8 55%, #E8D080 100%);
-  background-size: 100% 100%, 200px 200px, 100% 100%;
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 0;
+  height: 0;
 }
 
-/* Page shadow and depth */
-.page-paper {
-  box-shadow:
-    0 2px 12px rgba(60, 30, 10, 0.12),
-    -1px 0 4px rgba(60, 30, 10, 0.05),
-    1px 0 3px rgba(60, 30, 10, 0.04),
-    inset 0 0 60px rgba(255, 248, 220, 0.3);
+/* ═══ Glossy polish ═══ */
+
+/* Smooth transitions on all interactive elements */
+button, a, [role="button"] {
+  transition: transform 0.1s ease, opacity 0.15s ease;
+}
+button:active, a:active, [role="button"]:active {
+  transform: scale(0.97);
+  opacity: 0.85;
+}
+
+/* Tab bar active press state */
+nav button:active {
+  transform: scale(0.92);
+}
+
+/* ═══ Animations ═══ */
+
+/* Today pulse animation — for today indicator in calendar grid */
+@keyframes todayPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(230, 59, 46, 0.3); }
+  50% { box-shadow: 0 0 0 6px rgba(230, 59, 46, 0); }
+}
+
+/* Card entrance animation */
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Loading spinner */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Gentle shimmer for glass elements */
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+/* Splash screen — floating particles */
+@keyframes splashFloat {
+  0%, 100% { transform: translateY(0) scale(1); opacity: 0.25; }
+  50% { transform: translateY(-18px) scale(1.3); opacity: 0.5; }
 }

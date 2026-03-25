@@ -92,7 +92,7 @@ export default function JyotishPage() {
 const styles = {
   container: { padding: '0 20px', maxWidth: '432px', margin: '0 auto' },
   title: { fontSize: '24px', fontWeight: 800, color: '#2D1810', textAlign: 'center', margin: '0 0 4px' },
-  subtitle: { fontFamily: "'Inter', system-ui, sans-serif", fontSize: '12px', color: '#8A7568', textAlign: 'center', margin: '0 0 20px' },
+  subtitle: { fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: '12px', color: '#8A7568', textAlign: 'center', margin: '0 0 20px' },
   todayCard: {
     background: '#FFFFFF',
     border: '1px solid rgba(45,24,16,0.06)',
@@ -108,7 +108,7 @@ const styles = {
   todayValue: { fontSize: '13px', fontWeight: 700, color: '#2D1810' },
   sectionHeader: { display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '12px' },
   sectionTitle: { fontSize: '16px', fontWeight: 700, color: '#C49B2A' },
-  sectionSubtitle: { fontFamily: "'Inter', system-ui, sans-serif", fontSize: '11px', color: '#B5A899' },
+  sectionSubtitle: { fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: '11px', color: '#B5A899' },
   rashiGrid: { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', marginBottom: '24px' },
   rashiCard: {
     display: 'flex',
@@ -123,7 +123,7 @@ const styles = {
   },
   rashiSymbol: { fontSize: '24px', marginBottom: '2px' },
   rashiPrimary: { fontSize: '12px', fontWeight: 700, color: '#2D1810' },
-  rashiSecondary: { fontFamily: "'Inter', system-ui, sans-serif", fontSize: '9px', color: '#B5A899' },
+  rashiSecondary: { fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: '9px', color: '#B5A899' },
   comingSoon: {
     textAlign: 'center',
     padding: '24px 16px',
@@ -135,5 +135,5 @@ const styles = {
   },
   comingSoonIcon: { fontSize: '32px', marginBottom: '8px' },
   comingSoonText: { fontSize: '14px', fontWeight: 600, color: '#C49B2A', margin: '0 0 4px' },
-  comingSoonSubtext: { fontFamily: "'Inter', system-ui, sans-serif", fontSize: '11px', color: '#B5A899', margin: 0, lineHeight: 1.5 },
+  comingSoonSubtext: { fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: '11px', color: '#B5A899', margin: 0, lineHeight: 1.5 },
 };

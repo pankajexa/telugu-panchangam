@@ -26,7 +26,7 @@ const ALARM_CHANNEL = {
   importance: 4, // HIGH — heads-up notification with sound
   visibility: 1, // PUBLIC — show on lock screen
   vibration: true,
-  sound: 'temple_bell', // references android/app/src/main/res/raw/temple_bell.wav
+  sound: undefined, // Use system default notification sound
 };
 
 async function getPlugin() {
@@ -77,7 +77,7 @@ export async function scheduleDailyShare(time) {
         repeats: true,
         every: 'day',
       },
-      smallIcon: 'ic_stat_calendar',
+      smallIcon: 'ic_launcher', // Uses app launcher icon as notification icon
       iconColor: '#C49B2A',
       extra: { action: 'share_panchangam' },
     }],
@@ -215,9 +215,9 @@ export async function scheduleSmartAlarm(alarmKey, time, lang = 'te') {
       body: isTe ? config.body : config.bodyEn,
       schedule: { at: alarmDate },
       channelId: ALARM_CHANNEL.id,  // Android: uses high-importance channel
-      smallIcon: 'ic_stat_calendar',
+      smallIcon: 'ic_launcher', // Uses app launcher icon as notification icon
       iconColor: '#C49B2A',
-      sound: 'temple_bell.wav',     // Custom sound (android: res/raw/temple_bell, ios: sounds/temple_bell.wav)
+      // Uses system default sound (channel-level)
       extra: { action: 'sandhya_alarm', type: alarmKey },
     }],
   });

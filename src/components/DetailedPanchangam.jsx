@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { usePanchangamPrefs } from '../context/PanchangamPrefsContext';
 
-const SERIF = "'Inter', system-ui, sans-serif";
+const SERIF = "'Plus Jakarta Sans', system-ui, sans-serif";
 
 function to12Hr(time24) {
   if (!time24 || time24 === '--') return time24 || '--';

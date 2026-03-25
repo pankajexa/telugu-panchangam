@@ -3,8 +3,8 @@ import { useLocation } from '../context/LocationContext';
 import { useLanguage } from '../context/LanguageContext';
 import { LOCATIONS, createCustomLocation } from '../data/locations';
 
-const TELUGU = "'Noto Serif Telugu', serif";
-const SERIF = "'Inter', system-ui, sans-serif";
+const TELUGU = "'Noto Sans Telugu', serif";
+const SERIF = "'Plus Jakarta Sans', system-ui, sans-serif";
 
 export default function LocationPicker() {
   const { location, setLocation } = useLocation();
