@@ -7,6 +7,7 @@ const translations = {
     'tab.panchangam': 'పంచాంగం',
     'tab.puja': 'పూజ',
     'tab.jyotish': 'జ్యోతిష్',
+    'tab.shlokas': 'శ్లోకాలు',
     'tab.settings': 'సెట్టింగ్స్',
 
     // Page (daily calendar)
@@ -151,6 +152,70 @@ const translations = {
     'field.gandamool': 'గండమూల',
     'field.anandadiYoga': 'ఆనందాది యోగం',
     'settings.panchangamFields': 'పంచాంగం వివరాలు',
+
+    // New tab labels
+    'tab.today': 'ఈరోజు',
+    'tab.calendar': 'క్యాలెండర్',
+    'tab.festivals': 'పండుగలు',
+    'tab.muhurta': 'ముహూర్తం',
+
+    // Today page
+    'today.observance': 'నేటి ఆచరణ',
+    'today.panchang': 'నేటి పంచాంగం',
+    'today.moreDetails': 'అదనపు సమాచారం',
+    'today.sunrise': 'సూర్యోదయం',
+    'today.sunset': 'సూర్యాస్తమయం',
+    'today.moonrise': 'చంద్రోదయం',
+    'today.tithi': 'తిథి',
+    'today.nakshatra': 'నక్షత్రం',
+    'today.yoga': 'యోగం',
+    'today.karana': 'కరణం',
+    'today.rashi': 'రాశి',
+    'today.chandrabala': 'చంద్రబలం',
+    'today.dishaShool': 'దిశా శూల',
+    'today.ayanamsa': 'అయనాంశ',
+    'today.timings': 'సమయాలు',
+    'today.illuminated': 'ప్రకాశం',
+
+    // Festival page
+    'festivals.title': 'పండుగలు & వ్రతాలు',
+    'festivals.all': 'అన్నీ',
+    'festivals.festivals': 'పండుగలు',
+    'festivals.vrats': 'వ్రతాలు',
+    'festivals.noFestival': 'ప్రత్యేక ఆచరణ లేదు',
+
+    // Muhurta page
+    'muhurta.title': 'ముహూర్తం',
+    'muhurta.subtitle': 'నేటి శుభ & అశుభ సమయాలు',
+    'muhurta.overview': '24-గంటల సమీక్ష',
+    'muhurta.auspicious': 'శుభ సమయాలు',
+    'muhurta.inauspicious': 'అశుభ సమయాలు',
+    'muhurta.shubh': 'శుభం',
+    'muhurta.good': 'మంచిది',
+    'muhurta.avoid': 'వర్జ్యం',
+    'muhurta.abhijit': 'అభిజిత్ ముహూర్తం',
+    'muhurta.amrit': 'అమృతకాలం',
+    'muhurta.brahma': 'బ్రహ్మ ముహూర్తం',
+    'muhurta.rahu': 'రాహు కాలం',
+    'muhurta.yamaganda': 'యమగండం',
+    'muhurta.gulika': 'గుళిక కాలం',
+    'muhurta.varjyam': 'వర్జ్యం',
+    'muhurta.durmuhurtham': 'దుర్ముహూర్తం',
+
+    // Settings back
+    'settings.back': 'వెనుకకు',
+
+    // Share Center
+    'tab.share': 'షేర్',
+    'share.title': 'షేర్ సెంటర్',
+    'share.subtitle': 'పంచాంగం, శ్లోకాలు & శుభాకాంక్షలు పంచుకోండి',
+    'share.todayPanchangam': 'నేటి పంచాంగం',
+    'share.shlokaOfDay': 'నేటి శ్లోకం',
+    'share.browseShlokas': 'శ్లోకాలు చూడండి',
+    'share.festivalWishes': 'పండుగ శుభాకాంక్షలు',
+    'share.tapToShare': 'షేర్ చేయడానికి నొక్కండి',
+    'share.readAndShare': 'చదవండి & షేర్ చేయండి',
+    'share.viewAll': 'అన్నీ చూడండి',
   },
 
   en: {
@@ -161,6 +226,7 @@ const translations = {
     'tab.panchangam': 'Panchangam',
     'tab.puja': 'Puja',
     'tab.jyotish': 'Jyotish',
+    'tab.shlokas': 'Shlokas',
     'tab.settings': 'Settings',
 
     // Page (daily calendar)
@@ -305,6 +371,70 @@ const translations = {
     'field.gandamool': 'Gandamool',
     'field.anandadiYoga': 'Anandadi Yoga',
     'settings.panchangamFields': 'Panchangam Details',
+
+    // New tab labels
+    'tab.today': 'Today',
+    'tab.calendar': 'Calendar',
+    'tab.festivals': 'Festivals',
+    'tab.muhurta': 'Muhurta',
+
+    // Today page
+    'today.observance': "Today's Observance",
+    'today.panchang': 'Daily Panchang',
+    'today.moreDetails': 'More Details',
+    'today.sunrise': 'Sunrise',
+    'today.sunset': 'Sunset',
+    'today.moonrise': 'Moonrise',
+    'today.tithi': 'Tithi',
+    'today.nakshatra': 'Nakshatra',
+    'today.yoga': 'Yoga',
+    'today.karana': 'Karana',
+    'today.rashi': 'Rashi',
+    'today.chandrabala': 'Chandrabala',
+    'today.dishaShool': 'Disha Shool',
+    'today.ayanamsa': 'Ayanamsa',
+    'today.timings': 'Timings',
+    'today.illuminated': 'Illuminated',
+
+    // Festival page
+    'festivals.title': 'Festivals & Vrats',
+    'festivals.all': 'All',
+    'festivals.festivals': 'Festivals',
+    'festivals.vrats': 'Vrats',
+    'festivals.noFestival': 'No special observance',
+
+    // Muhurta page
+    'muhurta.title': 'Muhurta',
+    'muhurta.subtitle': 'Auspicious & inauspicious times today',
+    'muhurta.overview': '24-Hour Overview',
+    'muhurta.auspicious': 'Auspicious Periods',
+    'muhurta.inauspicious': 'Periods to Avoid',
+    'muhurta.shubh': 'Shubh',
+    'muhurta.good': 'Good',
+    'muhurta.avoid': 'Avoid',
+    'muhurta.abhijit': 'Abhijit Muhurta',
+    'muhurta.amrit': 'Amrit Kalam',
+    'muhurta.brahma': 'Brahma Muhurta',
+    'muhurta.rahu': 'Rahu Kalam',
+    'muhurta.yamaganda': 'Yamaganda',
+    'muhurta.gulika': 'Gulika Kalam',
+    'muhurta.varjyam': 'Varjyam',
+    'muhurta.durmuhurtham': 'Durmuhurtham',
+
+    // Settings back
+    'settings.back': 'Back',
+
+    // Share Center
+    'tab.share': 'Share',
+    'share.title': 'Share Center',
+    'share.subtitle': 'Share panchangam, shlokas & festival wishes',
+    'share.todayPanchangam': "Today's Panchangam",
+    'share.shlokaOfDay': 'Shloka of the Day',
+    'share.browseShlokas': 'Browse Shlokas',
+    'share.festivalWishes': 'Festival Wishes',
+    'share.tapToShare': 'Tap to share',
+    'share.readAndShare': 'Read & Share',
+    'share.viewAll': 'View all',
   },
 };
 

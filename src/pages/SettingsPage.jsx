@@ -1,12 +1,22 @@
 import { useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import LocationPicker from '../components/LocationPicker';
 import { useLanguage } from '../context/LanguageContext';
 import { useReminders } from '../context/ReminderContext';
 import { usePanchangamPrefs } from '../context/PanchangamPrefsContext';
-import { GlobeIcon, PinIcon, BellIcon, DiyaIcon, NamasteIcon, TrishulIcon, SunIcon, InfoIcon } from '../components/HinduIcons';
+import { Globe, MapPin, Bell, Sun, Info, ArrowLeft } from 'lucide-react';
+import { DiyaIcon, TrishulIcon, MalaIcon } from '../components/icons/HinduIcons';
 
-const TELUGU = "'Noto Serif Telugu', serif";
-const SERIF = "'Inter', system-ui, sans-serif";
+// Wrapper to match old API: { size, color } props
+const GlobeIcon = ({ size = 18, color }) => <Globe size={size} color={color} strokeWidth={1.8} />;
+const PinIcon = ({ size = 18, color }) => <MapPin size={size} color={color} strokeWidth={1.8} />;
+const BellIcon = ({ size = 18, color }) => <Bell size={size} color={color} strokeWidth={1.8} />;
+const SunIcon = ({ size = 18, color }) => <Sun size={size} color={color} strokeWidth={1.8} />;
+const InfoIcon = ({ size = 18, color }) => <Info size={size} color={color} strokeWidth={1.8} />;
+const NamasteIcon = ({ size = 18, color }) => <MalaIcon size={size} color={color} />;
+
+const TELUGU = "'Noto Sans Telugu', serif";
+const SERIF = "'Plus Jakarta Sans', system-ui, sans-serif";
 
 function Toggle({ on, onToggle }) {
   return (
@@ -19,11 +29,11 @@ function Toggle({ on, onToggle }) {
 const toggleStyles = {
   track: {
     width: '44px', height: '24px', borderRadius: '12px',
-    background: '#E0DAD2', border: 'none', padding: '2px',
+    background: '#DDD', border: 'none', padding: '2px',
     cursor: 'pointer', flexShrink: 0, transition: 'background 200ms',
     display: 'flex', alignItems: 'center',
   },
-  trackOn: { background: '#C49B2A' },
+  trackOn: { background: '#E63B2E' },
   thumb: {
     width: '20px', height: '20px', borderRadius: '50%',
     background: '#FFFFFF', transition: 'transform 200ms',
@@ -55,8 +65,8 @@ function formatTime(t) {
 const timeStyles = {
   select: {
     fontFamily: SERIF, fontSize: '12px', fontWeight: 600,
-    color: '#2D1810', background: '#FDF8EF',
-    border: '1px solid rgba(45,24,16,0.1)', borderRadius: '8px',
+    color: '#1A1A1A', background: '#FFF9F0',
+    border: '1px solid rgba(0,0,0,0.1)', borderRadius: '8px',
     padding: '4px 8px', cursor: 'pointer', outline: 'none',
   },
 };
@@ -119,15 +129,15 @@ const advStyles = {
   row: { display: 'flex', gap: '6px', flexWrap: 'wrap' },
   pill: {
     fontFamily: SERIF, fontSize: '11px', fontWeight: 600,
-    color: '#8A7568', background: '#FDF8EF',
-    border: '1.5px solid rgba(45,24,16,0.08)', borderRadius: '20px',
+    color: '#999', background: '#FFF9F0',
+    border: '1.5px solid rgba(0,0,0,0.08)', borderRadius: '20px',
     padding: '5px 10px', cursor: 'pointer', whiteSpace: 'nowrap',
     display: 'flex', alignItems: 'center', gap: '4px',
     transition: 'all 150ms',
   },
   pillActive: {
-    color: '#C49B2A', background: 'rgba(196,155,42,0.1)',
-    border: '1.5px solid #C49B2A',
+    color: '#E63B2E', background: 'rgba(230,59,46,0.1)',
+    border: '1.5px solid #E63B2E',
   },
   check: {
     fontSize: '10px', fontWeight: 800,
@@ -155,20 +165,25 @@ export default function SettingsPage() {
 
   const pick = (te, en) => language === 'te' ? te : en;
 
+  const navigate = useNavigate();
+
   return (
     <div style={styles.container}>
-      <h1 style={{ ...styles.title, fontFamily: font }}>{t('settings.title')}</h1>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+        <button onClick={() => navigate(-1)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '8px 4px', display: 'flex', alignItems: 'center' }}><ArrowLeft size={20} color="#666" strokeWidth={1.8} /></button>
+        <h1 style={{ ...styles.title, fontFamily: font, margin: 0 }}>{t('settings.title')}</h1>
+      </div>
 
       {/* ═══ Language ═══ */}
       <div style={styles.section}>
-        <div style={styles.sectionTitleRow}><GlobeIcon size={18} color="#C49B2A" /><span style={{ ...styles.sectionTitle, fontFamily: font }}>{t('settings.language')}</span></div>
+        <div style={styles.sectionTitleRow}><GlobeIcon size={18} color="#E63B2E" /><span style={{ ...styles.sectionTitle, fontFamily: font }}>{t('settings.language')}</span></div>
         <div style={styles.card}>
           <div style={styles.langRow}>
             <button
               style={{ ...styles.langBtn, ...(language === 'te' ? styles.langBtnActive : {}) }}
               onClick={() => setLanguage('te')}
             >
-              <span style={{ fontFamily: TELUGU, fontWeight: 700, fontSize: '14px', color: language === 'te' ? '#C49B2A' : '#8A7568' }}>
+              <span style={{ fontFamily: TELUGU, fontWeight: 700, fontSize: '14px', color: language === 'te' ? '#E63B2E' : '#999' }}>
                 తెలుగు
               </span>
               {language === 'te' && <span style={styles.langCheck}>✓</span>}
@@ -177,7 +192,7 @@ export default function SettingsPage() {
               style={{ ...styles.langBtn, ...(language === 'en' ? styles.langBtnActive : {}) }}
               onClick={() => setLanguage('en')}
             >
-              <span style={{ fontFamily: SERIF, fontWeight: 700, fontSize: '14px', color: language === 'en' ? '#C49B2A' : '#8A7568' }}>
+              <span style={{ fontFamily: SERIF, fontWeight: 700, fontSize: '14px', color: language === 'en' ? '#E63B2E' : '#999' }}>
                 English
               </span>
               {language === 'en' && <span style={styles.langCheck}>✓</span>}
@@ -188,14 +203,14 @@ export default function SettingsPage() {
 
       {/* ═══ Location ═══ */}
       <div style={styles.section}>
-        <div style={styles.sectionTitleRow}><PinIcon size={18} color="#C49B2A" /><span style={{ ...styles.sectionTitle, fontFamily: font }}>{t('settings.location')}</span></div>
+        <div style={styles.sectionTitleRow}><PinIcon size={18} color="#E63B2E" /><span style={{ ...styles.sectionTitle, fontFamily: font }}>{t('settings.location')}</span></div>
         <div style={styles.card}><LocationPicker /></div>
       </div>
 
       {/* ═══ Reminders ═══ */}
       <div style={styles.section}>
         <div style={styles.sectionTitleRow}>
-          <BellIcon size={18} color="#C49B2A" />
+          <BellIcon size={18} color="#E63B2E" />
           <span style={{ ...styles.sectionTitle, fontFamily: font }}>{pick('గుర్తుపెట్టుకోండి', 'Reminders')}</span>
         </div>
 
@@ -204,7 +219,7 @@ export default function SettingsPage() {
           <div style={styles.reminderHeader} onClick={() => toggleSection('dailyShare')}>
             <div style={styles.reminderHeaderLeft}>
               <span style={styles.reminderEmoji}>
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" fill="#C49B2A"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.034L.789 23.492a.75.75 0 00.917.918l4.462-1.494A11.94 11.94 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-2.24 0-4.31-.726-5.993-1.957l-.418-.306-2.65.887.886-2.648-.335-.433A9.96 9.96 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z" fill="#C49B2A" opacity="0.7"/></svg>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" fill="#E63B2E"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.034L.789 23.492a.75.75 0 00.917.918l4.462-1.494A11.94 11.94 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-2.24 0-4.31-.726-5.993-1.957l-.418-.306-2.65.887.886-2.648-.335-.433A9.96 9.96 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z" fill="#E63B2E" opacity="0.7"/></svg>
               </span>
               <div>
                 <div style={{ ...styles.reminderTitle, fontFamily: font }}>
@@ -231,7 +246,7 @@ export default function SettingsPage() {
                 <span style={styles.subLabel}>{pick('షేర్ రిమైండర్ సమయం', 'Reminder time')}</span>
                 <TimeSelector value={prefs.dailyShareTime} onChange={(v) => updatePref('dailyShareTime', v)} />
               </div>
-              <div style={{ ...styles.subLabel, fontSize: '10px', color: '#B5A899', paddingTop: '6px' }}>
+              <div style={{ ...styles.subLabel, fontSize: '10px', color: '#BBB', paddingTop: '6px' }}>
                 {pick(
                   'ఈ సమయానికి నోటిఫికేషన్ వస్తుంది. ట్యాప్ చేస్తే పంచాంగం ఇమేజ్ తో షేర్ డైలాగ్ ఓపెన్ అవుతుంది.',
                   'You\'ll get a notification at this time. Tap it to open share with today\'s panchangam image.'
@@ -245,7 +260,7 @@ export default function SettingsPage() {
         <div style={{ ...styles.card, marginTop: '8px' }}>
           <div style={styles.reminderHeader} onClick={() => toggleSection('festivals')}>
             <div style={styles.reminderHeaderLeft}>
-              <span style={styles.reminderEmoji}><DiyaIcon size={22} color="#C49B2A" /></span>
+              <span style={styles.reminderEmoji}><DiyaIcon size={22} color="#E63B2E" /></span>
               <div>
                 <div style={{ ...styles.reminderTitle, fontFamily: font }}>
                   {pick('పండుగ రిమైండర్లు', 'Festival Reminders')}
@@ -281,7 +296,7 @@ export default function SettingsPage() {
         <div style={{ ...styles.card, marginTop: '8px' }}>
           <div style={styles.reminderHeader} onClick={() => toggleSection('vrathams')}>
             <div style={styles.reminderHeaderLeft}>
-              <span style={styles.reminderEmoji}><NamasteIcon size={22} color="#C49B2A" /></span>
+              <span style={styles.reminderEmoji}><NamasteIcon size={22} color="#E63B2E" /></span>
               <div>
                 <div style={{ ...styles.reminderTitle, fontFamily: font }}>
                   {pick('వ్రతం రిమైండర్లు', 'Vratham Reminders')}
@@ -321,7 +336,7 @@ export default function SettingsPage() {
                 <span style={{ ...styles.subLabel, fontFamily: font }}>{pick('అమావాస్య', 'Amavasya')}</span>
                 <Toggle on={prefs.vrathamAmavasya} onToggle={() => updatePref('vrathamAmavasya', !prefs.vrathamAmavasya)} />
               </div>
-              <div style={{ ...styles.subRow, borderTop: '1px solid rgba(45,24,16,0.06)', paddingTop: '8px', marginTop: '4px' }}>
+              <div style={{ ...styles.subRow, borderTop: '1px solid rgba(0,0,0,0.06)', paddingTop: '8px', marginTop: '4px' }}>
                 <span style={styles.subLabel}>{pick('ఎప్పుడు గుర్తు చేయాలి', 'When to remind')}</span>
               </div>
               <AdvanceDaysSelector value={prefs.vrathamDays} onChange={(v) => updatePref('vrathamDays', v)} language={language} />
@@ -337,7 +352,7 @@ export default function SettingsPage() {
         <div style={{ ...styles.card, marginTop: '8px' }}>
           <div style={styles.reminderHeader} onClick={() => toggleSection('puja')}>
             <div style={styles.reminderHeaderLeft}>
-              <span style={styles.reminderEmoji}><TrishulIcon size={22} color="#C49B2A" /></span>
+              <span style={styles.reminderEmoji}><TrishulIcon size={22} color="#E63B2E" /></span>
               <div>
                 <div style={{ ...styles.reminderTitle, fontFamily: font }}>
                   {pick('ఉదయ పూజ గుర్తు', 'Morning Puja Reminder')}
@@ -365,7 +380,7 @@ export default function SettingsPage() {
         <div style={{ ...styles.card, marginTop: '8px' }}>
           <div style={styles.reminderHeader} onClick={() => toggleSection('sun')}>
             <div style={styles.reminderHeaderLeft}>
-              <span style={styles.reminderEmoji}><SunIcon size={22} color="#C49B2A" /></span>
+              <span style={styles.reminderEmoji}><SunIcon size={22} color="#E63B2E" /></span>
               <div>
                 <div style={{ ...styles.reminderTitle, fontFamily: font }}>
                   {pick('సూర్యోదయ / అస్తమయం', 'Sunrise / Sunset')}
@@ -415,10 +430,10 @@ export default function SettingsPage() {
       {/* ═══ Smart Sandhya Alarms ═══ */}
       <div style={styles.section}>
         <div style={styles.sectionTitleRow}>
-          <span style={{ fontSize: '16px', color: '#C49B2A' }}>🙏</span>
+          <span style={{ fontSize: '16px', color: '#E63B2E' }}>🙏</span>
           <span style={{ ...styles.sectionTitle, fontFamily: font }}>{pick('సాధన అలారాలు', 'Practice Alarms')}</span>
         </div>
-        <div style={{ ...styles.subLabel, fontSize: '11px', color: '#B5A899', padding: '0 4px 8px' }}>
+        <div style={{ ...styles.subLabel, fontSize: '11px', color: '#BBB', padding: '0 4px 8px' }}>
           {pick(
             'సూర్యోదయం / సూర్యాస్తమయం ఆధారంగా ప్రతిరోజూ మారుతుంది',
             'Changes daily based on sunrise/sunset at your location'
@@ -431,7 +446,7 @@ export default function SettingsPage() {
             { key: 'alarmMadhyahnaSandhya', te: 'మధ్యాహ్న సంధ్య', en: 'Madhyahna Sandhya', desc: pick('మధ్యాహ్నం', 'Around solar noon') },
             { key: 'alarmSayamSandhya', te: 'సాయం సంధ్య', en: 'Sayam Sandhya', desc: pick('సూర్యాస్తమయ సమయంలో', 'Around sunset') },
           ].map((alarm, i) => (
-            <div key={alarm.key} style={{ ...styles.alarmRow, borderTop: i > 0 ? '1px solid rgba(45,24,16,0.05)' : 'none' }}>
+            <div key={alarm.key} style={{ ...styles.alarmRow, borderTop: i > 0 ? '1px solid rgba(0,0,0,0.05)' : 'none' }}>
               <div style={styles.alarmInfo}>
                 <div style={{ ...styles.reminderTitle, fontFamily: font, fontSize: '13px' }}>
                   {pick(alarm.te, alarm.en)}
@@ -450,7 +465,7 @@ export default function SettingsPage() {
       {/* ═══ Panchangam Details ═══ */}
       <div style={styles.section}>
         <div style={styles.sectionTitleRow}>
-          <span style={{ fontSize: '16px', color: '#C49B2A' }}>☉</span>
+          <span style={{ fontSize: '16px', color: '#E63B2E' }}>☉</span>
           <span style={{ ...styles.sectionTitle, fontFamily: font }}>{t('settings.panchangamFields')}</span>
         </div>
 
@@ -583,7 +598,7 @@ export default function SettingsPage() {
 
       {/* ═══ About ═══ */}
       <div style={styles.section}>
-        <div style={styles.sectionTitleRow}><InfoIcon size={18} color="#C49B2A" /><span style={{ ...styles.sectionTitle, fontFamily: font }}>{t('settings.about')}</span></div>
+        <div style={styles.sectionTitleRow}><InfoIcon size={18} color="#E63B2E" /><span style={{ ...styles.sectionTitle, fontFamily: font }}>{t('settings.about')}</span></div>
         <div style={styles.card}>
           <div style={styles.aboutRow}>
             <span style={styles.aboutLabel}>Version</span>
@@ -599,6 +614,11 @@ export default function SettingsPage() {
             <span style={styles.aboutLabel}>Website</span>
             <span style={styles.aboutValue}>manacalendar.com</span>
           </div>
+          <div style={styles.divider} />
+          <div style={styles.aboutRow} onClick={() => navigate('/privacy')} role="button">
+            <span style={styles.aboutLabel}>{pick('గోప్యతా విధానం', 'Privacy Policy')}</span>
+            <span style={{ ...styles.aboutValue, color: '#E63B2E', cursor: 'pointer' }}>→</span>
+          </div>
         </div>
       </div>
     </div>
@@ -607,16 +627,16 @@ export default function SettingsPage() {
 
 const styles = {
   container: { padding: '0 20px 20px', maxWidth: '432px', margin: '0 auto', overflowY: 'auto', height: '100%' },
-  title: { fontSize: '24px', fontWeight: 800, color: '#2D1810', textAlign: 'center', margin: '0 0 16px' },
+  title: { fontSize: '24px', fontWeight: 800, color: '#1A1A1A', textAlign: 'center', margin: '0 0 16px' },
   section: { marginBottom: '20px' },
   sectionTitleRow: { display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' },
-  sectionTitle: { fontSize: '15px', fontWeight: 700, color: '#C49B2A' },
+  sectionTitle: { fontSize: '15px', fontWeight: 700, color: '#E63B2E' },
   card: {
     background: '#FFFFFF',
-    border: '1px solid rgba(45,24,16,0.06)',
+    border: '1px solid rgba(0,0,0,0.06)',
     borderRadius: '16px',
     padding: '0',
-    boxShadow: '0 2px 12px rgba(45,24,16,0.06), 0 1px 3px rgba(45,24,16,0.04)',
+    boxShadow: '0 2px 12px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04)',
     overflow: 'hidden',
   },
 
@@ -624,11 +644,11 @@ const styles = {
   langRow: { display: 'flex', gap: '8px', padding: '14px 16px' },
   langBtn: {
     flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
-    padding: '12px 10px', background: '#FDF8EF', border: '1.5px solid rgba(45,24,16,0.08)',
+    padding: '12px 10px', background: '#FFF9F0', border: '1.5px solid rgba(0,0,0,0.08)',
     borderRadius: '12px', cursor: 'pointer', transition: 'all 200ms',
   },
-  langBtnActive: { background: 'rgba(196,155,42,0.08)', border: '1.5px solid #C49B2A' },
-  langCheck: { fontSize: '14px', color: '#C49B2A', fontWeight: 700 },
+  langBtnActive: { background: 'rgba(230,59,46,0.08)', border: '1.5px solid #E63B2E' },
+  langCheck: { fontSize: '14px', color: '#E63B2E', fontWeight: 700 },
 
   // Reminder cards
   reminderHeader: {
@@ -637,20 +657,20 @@ const styles = {
   },
   reminderHeaderLeft: { display: 'flex', alignItems: 'center', gap: '12px', flex: 1 },
   reminderEmoji: { fontSize: '22px', flexShrink: 0 },
-  reminderTitle: { fontSize: '13px', fontWeight: 700, color: '#2D1810', lineHeight: 1.3 },
-  reminderSub: { fontFamily: SERIF, fontSize: '10px', color: '#B5A899', marginTop: '1px' },
-  chevron: { fontSize: '14px', color: '#B5A899', flexShrink: 0 },
+  reminderTitle: { fontSize: '13px', fontWeight: 700, color: '#1A1A1A', lineHeight: 1.3 },
+  reminderSub: { fontFamily: SERIF, fontSize: '10px', color: '#BBB', marginTop: '1px' },
+  chevron: { fontSize: '14px', color: '#BBB', flexShrink: 0 },
 
   expandedContent: {
     padding: '0 16px 14px',
-    borderTop: '1px solid rgba(45,24,16,0.05)',
+    borderTop: '1px solid rgba(0,0,0,0.05)',
     marginTop: '-2px',
   },
   subRow: {
     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
     padding: '8px 0 4px', gap: '8px',
   },
-  subLabel: { fontFamily: SERIF, fontSize: '12px', color: '#5C3D2E', flex: 1 },
+  subLabel: { fontFamily: SERIF, fontSize: '12px', color: '#666', flex: 1 },
 
   // Smart alarm rows
   alarmRow: {
@@ -660,8 +680,8 @@ const styles = {
   alarmInfo: { flex: 1 },
 
   // About
-  divider: { height: '1px', background: 'rgba(45,24,16,0.06)', margin: '0 16px' },
+  divider: { height: '1px', background: 'rgba(0,0,0,0.06)', margin: '0 16px' },
   aboutRow: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 16px' },
-  aboutLabel: { fontFamily: SERIF, fontSize: '12px', color: '#8A7568' },
-  aboutValue: { fontSize: '12px', fontWeight: 600, color: '#2D1810' },
+  aboutLabel: { fontFamily: SERIF, fontSize: '12px', color: '#999' },
+  aboutValue: { fontSize: '12px', fontWeight: 600, color: '#1A1A1A' },
 };

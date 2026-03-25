@@ -2,8 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { track } from '@vercel/analytics';
 import { useLanguage } from '../context/LanguageContext';
 
-const TELUGU = "'Noto Serif Telugu', serif";
-const SERIF = "'Inter', system-ui, sans-serif";
+const TELUGU = "'Noto Sans Telugu', serif";
+const SERIF = "'Plus Jakarta Sans', system-ui, sans-serif";
 
 // Stash the install prompt globally
 let deferredPrompt = null;

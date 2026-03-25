@@ -1,23 +1,53 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { HashRouter, Routes, Route } from 'react-router-dom';
 import { LocationProvider } from './context/LocationContext';
 import { LanguageProvider } from './context/LanguageContext';
 import { ReminderProvider } from './context/ReminderContext';
 import { PanchangamPrefsProvider } from './context/PanchangamPrefsContext';
 import TabBar from './layout/TabBar';
+import TopBar from './layout/TopBar';
 import { useLanguage } from './context/LanguageContext';
-import CalendarPage from './pages/CalendarPage';
-import SettingsPage from './pages/SettingsPage';
-import DivinePattern from './components/DivinePattern';
+import TodayPage from './pages/TodayPage';
+import SplashScreen from './components/SplashScreen';
 import './styles/paper.css';
-import './styles/flip.css';
+
+// Lazy load heavier pages so tab switches are instant
+const CalendarPage = lazy(() => import('./pages/CalendarPage'));
+const FestivalsPage = lazy(() => import('./pages/FestivalsPage'));
+const MuhurtaPage = lazy(() => import('./pages/MuhurtaPage'));
+const ShareCenterPage = lazy(() => import('./pages/ShareCenterPage'));
+const SettingsPage = lazy(() => import('./pages/SettingsPage'));
+const PrivacyPolicyPage = lazy(() => import('./pages/PrivacyPolicyPage'));
 
 // Only load Vercel Analytics on the web (not inside Capacitor)
 const isCapacitor = typeof window !== 'undefined' && window.Capacitor?.isNativePlatform?.();
 
+function PageLoader() {
+  return (
+    <div style={styles.pageLoader}>
+      {/* Rotating lotus */}
+      <svg width="56" height="56" viewBox="0 0 200 200" style={styles.loaderLotus}>
+        <defs>
+          <radialGradient id="plGrad" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#FFFFFF" stopOpacity="1" />
+            <stop offset="100%" stopColor="#FFB8B0" stopOpacity="0.6" />
+          </radialGradient>
+        </defs>
+        {[0, 45, 90, 135, 180, 225, 270, 315].map((angle, i) => (
+          <ellipse key={i} cx="100" cy="100" rx="10" ry="38" fill="url(#plGrad)" opacity="0.5"
+            transform={`rotate(${angle} 100 100) translate(0 -18)`} />
+        ))}
+        <circle cx="100" cy="100" r="12" fill="white" opacity="0.9" />
+      </svg>
+      <div style={styles.loaderText}>Loading...</div>
+    </div>
+  );
+}
+
 function AppShell() {
   const { t, font } = useLanguage();
   const [fontsLoaded, setFontsLoaded] = useState(false);
+  const [splashDone, setSplashDone] = useState(false);
 
   useEffect(() => {
     const timeout = setTimeout(() => setFontsLoaded(true), 2000);
@@ -29,25 +59,32 @@ function AppShell() {
 
   return (
     <div style={styles.shell}>
-      <DivinePattern />
+      {/* Main app content — visible once splash finishes */}
       <div style={{
         ...styles.content,
-        opacity: fontsLoaded ? 1 : 0,
-        transition: 'opacity 500ms ease',
+        opacity: splashDone ? 1 : 0,
+        transition: 'opacity 400ms ease',
       }}>
-        <Routes>
-          <Route path="/" element={<CalendarPage />} />
-          <Route path="/settings" element={<SettingsPage />} />
-        </Routes>
+        <TopBar />
+        <div style={styles.scrollArea}>
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
+              <Route path="/" element={<TodayPage />} />
+              <Route path="/calendar" element={<CalendarPage />} />
+              <Route path="/share" element={<ShareCenterPage />} />
+              <Route path="/festivals" element={<FestivalsPage />} />
+              <Route path="/muhurta" element={<MuhurtaPage />} />
+              <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/privacy" element={<PrivacyPolicyPage />} />
+            </Routes>
+          </Suspense>
+        </div>
       </div>
 
-      <TabBar />
+      {splashDone && <TabBar />}
 
-      {!fontsLoaded && (
-        <div style={styles.loading}>
-          <div style={{ ...styles.loadingText, fontFamily: font }}>{t('app.loading')}</div>
-        </div>
-      )}
+      {/* Splash screen — shows on first load */}
+      <SplashScreen visible={!splashDone} onDone={() => setSplashDone(true)} />
     </div>
   );
 }
@@ -85,15 +122,10 @@ function VercelAnalytics() {
 const styles = {
   shell: {
     width: '100%',
-    height: '100vh',
     height: '100dvh',
-    background: '#F5F2ED',
+    background: '#FAFAF8',
     display: 'flex',
     flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    paddingTop: 'calc(env(safe-area-inset-top, 0px) + 32px)',
-    paddingBottom: 'calc(60px + env(safe-area-inset-bottom, 0px) + 4px)',
     overflow: 'hidden',
     position: 'relative',
     boxSizing: 'border-box',
@@ -101,25 +133,35 @@ const styles = {
   content: {
     width: '100%',
     flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
     position: 'relative',
     zIndex: 1,
+    overflow: 'hidden',
+  },
+  scrollArea: {
+    flex: 1,
     overflowY: 'auto',
     overflowX: 'hidden',
+    WebkitOverflowScrolling: 'touch',
+    paddingBottom: 'calc(70px + env(safe-area-inset-bottom, 0px))',
   },
-  loading: {
-    position: 'fixed',
-    inset: 0,
+  pageLoader: {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    background: '#F5F2ED',
-    zIndex: 100,
+    height: '60vh',
+    gap: 16,
   },
-  loadingText: {
-    fontFamily: "'Noto Serif Telugu', serif",
-    fontSize: '28px',
-    color: '#C49B2A',
-    opacity: 0.7,
+  loaderLotus: {
+    animation: 'spin 2.5s ease-in-out infinite',
+    filter: 'drop-shadow(0 2px 8px rgba(230,59,46,0.2))',
+  },
+  loaderText: {
+    fontSize: 13,
+    color: '#BBB',
+    fontFamily: "'Plus Jakarta Sans', sans-serif",
+    letterSpacing: '0.05em',
   },
 };

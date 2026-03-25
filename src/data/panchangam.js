@@ -410,8 +410,8 @@ export function getPanchangamForDate(date, location) {
   const nakshatraStart = formatDT(p.nakshatraStartTime, refDate, tz);
   const nakshatraEnd = formatDT(p.nakshatraEndTime, refDate, tz);
 
-  // Yogam end
-  const yogamEnd = formatTime24(p.yogaEndTime, tz);
+  // Yogam end (library doesn't provide start time, only end)
+  const yogamEnd = formatDT(p.yogaEndTime, refDate, tz);
 
   // Inauspicious timings
   const rahuKalam = formatTimeRange(p.rahuKalamStart, p.rahuKalamEnd, tz);
@@ -435,6 +435,9 @@ export function getPanchangamForDate(date, location) {
   // Vrathams / recurring observances
   const masaIndex = p.masa?.index ?? -1;
   const vrathams = resolveVrathams(p.festivals, p.tithi, masaIndex, date.getDay());
+
+  // Gulika Kalam
+  const gulikaKalam = formatTimeRange(p.gulikaKalam?.start, p.gulikaKalam?.end, tz);
 
   // Shubha muhurtams for main page display
   const abhijitMuhurta = formatTimeRange(p.abhijitMuhurta?.start, p.abhijitMuhurta?.end, tz);
@@ -467,9 +470,11 @@ export function getPanchangamForDate(date, location) {
     yamagandam,
     varjyam,
     durmuhurtham,
+    gulikaKalam,
     abhijitMuhurta,
     amritKalam,
     brahmaMuhurta,
+    tithiIndex: p.tithi,  // 0-29 numeric index for moon phase computation
     festival,
     vrathams,
     isSunday: date.getDay() === 0,

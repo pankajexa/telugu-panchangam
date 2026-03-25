@@ -24,9 +24,9 @@ export const C = {
 
 // Fonts (already loaded via Google Fonts in paper.css)
 export const F = {
-  telugu: "'Noto Serif Telugu', serif",
-  english: "'Inter', system-ui, sans-serif",
-  date: "'Abril Fatface', Georgia, serif",
+  telugu: "'Noto Sans Telugu', sans-serif",
+  english: "'Plus Jakarta Sans', system-ui, sans-serif",
+  date: "'Playfair Display', Georgia, serif",
 };
 
 /** Wait for all fonts to be ready */
