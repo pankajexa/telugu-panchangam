@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { track } from '@vercel/analytics';
+// Safe analytics — may not be loaded on Capacitor
+const track = (...args) => { try { import('@vercel/analytics').then(m => m.track?.(...args)).catch(() => {}); } catch (_) {} };
 import { useLocation } from '../context/LocationContext';
 import { useLanguage } from '../context/LanguageContext';
 import { DAILY_TEMPLATES } from '../data/cardTemplates';
