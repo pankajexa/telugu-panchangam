@@ -35,6 +35,14 @@ export default function FestivalsPage() {
   const [loading, setLoading] = useState(true);
   const [selectedFestival, setSelectedFestival] = useState(null);
 
+  // Lock body scroll when overlay is open (prevents background scroll stealing touch)
+  useEffect(() => {
+    if (selectedFestival?.practices) {
+      document.body.style.overflow = 'hidden';
+      return () => { document.body.style.overflow = ''; };
+    }
+  }, [selectedFestival]);
+
   // Compute festival list after first paint so the tab switches instantly
   useEffect(() => {
     // Use rAF to defer heavy computation past first frame
@@ -324,8 +332,10 @@ const styles = {
   },
   overlayScroll: {
     flex: 1,
-    overflowY: 'auto',
+    overflowY: 'scroll',
     padding: '16px 20px 40px',
     WebkitOverflowScrolling: 'touch',
+    touchAction: 'pan-y',
+    overscrollBehavior: 'contain',
   },
 };
