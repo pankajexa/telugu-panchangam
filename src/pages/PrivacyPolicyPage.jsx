@@ -89,8 +89,8 @@ export default function PrivacyPolicyPage() {
         <Section title={isTe ? 'సంప్రదించండి' : 'Contact'}>
           <P>
             {isTe
-              ? 'ఈ గోప్యతా విధానం గురించి ప్రశ్నలు ఉంటే, దయచేసి manacalendar@gmail.com కు ఇమెయిల్ చేయండి.'
-              : 'If you have questions about this privacy policy, please email manacalendar@gmail.com.'}
+              ? 'ఈ గోప్యతా విధానం గురించి ప్రశ్నలు ఉంటే, దయచేసి pankaj@exargen.com కు ఇమెయిల్ చేయండి.'
+              : 'If you have questions about this privacy policy, please email pankaj@exargen.com.'}
           </P>
         </Section>
 
