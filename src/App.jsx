@@ -9,6 +9,8 @@ import TopBar from './layout/TopBar';
 import { useLanguage } from './context/LanguageContext';
 import TodayPage from './pages/TodayPage';
 import SplashScreen from './components/SplashScreen';
+import { useLocation as useAppLocation } from './context/LocationContext';
+import useFestivalAudio from './hooks/useFestivalAudio';
 import './styles/paper.css';
 
 // Lazy load heavier pages — but preload them after splash so tabs feel instant
@@ -63,6 +65,8 @@ function PageLoader() {
 
 function AppShell() {
   const { t, font } = useLanguage();
+  const { location } = useAppLocation();
+  const { isPlaying, isMuted, toggle, festivalHasAudio } = useFestivalAudio(location);
   const [fontsLoaded, setFontsLoaded] = useState(false);
   const [splashDone, setSplashDone] = useState(false);
 
@@ -82,7 +86,12 @@ function AppShell() {
         opacity: splashDone ? 1 : 0,
         transition: 'opacity 400ms ease',
       }}>
-        <TopBar />
+        <TopBar
+          audioPlaying={isPlaying}
+          audioMuted={isMuted}
+          onToggleAudio={toggle}
+          hasAudio={festivalHasAudio}
+        />
         <div style={styles.scrollArea}>
           <Suspense fallback={<PageLoader />}>
             <Routes>

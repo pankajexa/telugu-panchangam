@@ -1,9 +1,9 @@
 import { useNavigate } from 'react-router-dom';
 import { useLocation as useAppLocation } from '../context/LocationContext';
 import { useLanguage } from '../context/LanguageContext';
-import { MapPin, Settings } from 'lucide-react';
+import { MapPin, Settings, Volume2, VolumeX } from 'lucide-react';
 
-export default function TopBar() {
+export default function TopBar({ audioPlaying, audioMuted, onToggleAudio, hasAudio }) {
   const navigate = useNavigate();
   const { location } = useAppLocation();
   const { pick, font } = useLanguage();
@@ -16,11 +16,53 @@ export default function TopBar() {
           {pick(location.label, location.labelEn || location.label)}
         </span>
       </div>
-      <button style={styles.gearBtn} onClick={() => navigate('/settings')} aria-label="Settings">
-        <Settings size={20} color="#666" strokeWidth={1.8} />
-      </button>
+      <div style={styles.rightWrap}>
+        {/* Festival chant toggle — only visible on festival days with audio */}
+        {hasAudio && (
+          <button
+            style={styles.audioBtn}
+            onClick={onToggleAudio}
+            aria-label={audioMuted ? 'Unmute chant' : 'Mute chant'}
+          >
+            <div style={{
+              ...styles.audioBtnInner,
+              background: audioMuted
+                ? 'rgba(0,0,0,0.04)'
+                : 'linear-gradient(135deg, rgba(230,59,46,0.12), rgba(230,59,46,0.06))',
+              boxShadow: audioPlaying && !audioMuted
+                ? '0 0 0 3px rgba(230,59,46,0.15)'
+                : 'none',
+            }}>
+              {audioMuted ? (
+                <VolumeX size={18} color="#999" strokeWidth={1.8} />
+              ) : (
+                <Volume2 size={18} color="#E63B2E" strokeWidth={1.8} />
+              )}
+            </div>
+            {/* Pulse animation when playing */}
+            {audioPlaying && !audioMuted && <div style={styles.pulse} />}
+          </button>
+        )}
+        <button style={styles.gearBtn} onClick={() => navigate('/settings')} aria-label="Settings">
+          <Settings size={20} color="#666" strokeWidth={1.8} />
+        </button>
+      </div>
     </div>
   );
+}
+
+// Pulse keyframes via a style tag (injected once)
+if (typeof document !== 'undefined' && !document.getElementById('audio-pulse-css')) {
+  const style = document.createElement('style');
+  style.id = 'audio-pulse-css';
+  style.textContent = `
+    @keyframes audioPulse {
+      0% { transform: scale(1); opacity: 0.6; }
+      50% { transform: scale(1.8); opacity: 0; }
+      100% { transform: scale(1); opacity: 0; }
+    }
+  `;
+  document.head.appendChild(style);
 }
 
 const styles = {
@@ -51,6 +93,44 @@ const styles = {
     fontWeight: 600,
     color: '#1A1A1A',
     letterSpacing: '0.01em',
+  },
+  rightWrap: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '4px',
+  },
+  audioBtn: {
+    position: 'relative',
+    background: 'none',
+    border: 'none',
+    cursor: 'pointer',
+    padding: 0,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    WebkitTapHighlightColor: 'transparent',
+  },
+  audioBtnInner: {
+    width: 36,
+    height: 36,
+    borderRadius: 12,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    transition: 'all 0.3s ease',
+  },
+  pulse: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    width: 20,
+    height: 20,
+    marginTop: -10,
+    marginLeft: -10,
+    borderRadius: '50%',
+    background: 'rgba(230,59,46,0.3)',
+    animation: 'audioPulse 2s ease-in-out infinite',
+    pointerEvents: 'none',
   },
   gearBtn: {
     background: 'none',
