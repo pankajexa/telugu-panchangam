@@ -132,7 +132,7 @@ function drawHorizontalRule(ctx, y, xPad = 60) {
 }
 
 function drawOmSymbol(ctx, x, y) {
-  setFont(ctx, 56, '700', "'Noto Sans Devanagari', sans-serif");
+  setFont(ctx, 56, '700', FONT_DEVANAGARI);
   ctx.fillStyle = GOLD;
   ctx.globalAlpha = 0.85;
   ctx.textAlign = 'center';
@@ -144,7 +144,7 @@ function drawFaintWatermark(ctx) {
   ctx.save();
   ctx.translate(W / 2, H / 2);
   ctx.rotate(0);
-  setFont(ctx, 280, '700', "'Noto Sans Devanagari', sans-serif");
+  setFont(ctx, 280, '700', FONT_DEVANAGARI);
   ctx.fillStyle = GOLD;
   ctx.globalAlpha = 0.04;
   ctx.textAlign = 'center';
@@ -153,12 +153,24 @@ function drawFaintWatermark(ctx) {
   ctx.restore();
 }
 
+// Safe font families — canvas needs unquoted names with fallbacks
+const FONT_DEVANAGARI = 'Noto Sans Devanagari, Noto Serif Devanagari, sans-serif';
+const FONT_TELUGU = 'Noto Sans Telugu, Noto Serif Telugu, sans-serif';
+const FONT_LATIN = 'Plus Jakarta Sans, Inter, Helvetica, Arial, sans-serif';
+
 export async function generateShlokaCard(shloka) {
-  // Ensure fonts are loaded
+  // Ensure fonts are loaded — wait up to 3s
   try {
-    await document.fonts.load(`700 24px 'Noto Sans Devanagari'`);
-    await document.fonts.load(`600 24px 'Noto Sans Telugu'`);
-    await document.fonts.load(`600 24px 'Plus Jakarta Sans'`);
+    await Promise.race([
+      Promise.all([
+        document.fonts.load('700 24px "Noto Sans Devanagari"'),
+        document.fonts.load('600 24px "Noto Sans Telugu"'),
+        document.fonts.load('600 24px "Plus Jakarta Sans"'),
+      ]),
+      new Promise(r => setTimeout(r, 3000)),
+    ]);
+    // Extra wait for font rendering
+    await new Promise(r => setTimeout(r, 100));
   } catch (_) { /* use whatever is available */ }
 
   const canvas = document.createElement('canvas');
@@ -192,7 +204,7 @@ export async function generateShlokaCard(shloka) {
   drawOmSymbol(ctx, W / 2, 140);
 
   // Title line
-  setFont(ctx, 22, '600', "'Plus Jakarta Sans', sans-serif");
+  setFont(ctx, 22, '600', FONT_LATIN);
   ctx.fillStyle = INK2;
   ctx.globalAlpha = 0.75;
   ctx.textAlign = 'center';
@@ -211,10 +223,10 @@ export async function generateShlokaCard(shloka) {
     if (!trimmed) continue;
     // Auto-size: start at 46px, shrink to fit
     let fontSize = 46;
-    setFont(ctx, fontSize, '600', "'Noto Sans Devanagari', sans-serif");
+    setFont(ctx, fontSize, '600', FONT_DEVANAGARI);
     while (ctx.measureText(trimmed).width > W - 140 && fontSize > 28) {
       fontSize -= 2;
-      setFont(ctx, fontSize, '600', "'Noto Sans Devanagari', sans-serif");
+      setFont(ctx, fontSize, '600', FONT_DEVANAGARI);
     }
     ctx.fillText(trimmed, W / 2, y);
     y += fontSize * 1.6;
@@ -231,10 +243,10 @@ export async function generateShlokaCard(shloka) {
     const trimmed = line.trim();
     if (!trimmed) continue;
     let fontSize = 32;
-    setFont(ctx, fontSize, '500', "'Noto Sans Telugu', sans-serif");
+    setFont(ctx, fontSize, '500', FONT_TELUGU);
     while (ctx.measureText(trimmed).width > W - 140 && fontSize > 20) {
       fontSize -= 2;
-      setFont(ctx, fontSize, '500', "'Noto Sans Telugu', sans-serif");
+      setFont(ctx, fontSize, '500', FONT_TELUGU);
     }
     ctx.fillText(trimmed, W / 2, y);
     y += fontSize * 1.6;
@@ -245,9 +257,9 @@ export async function generateShlokaCard(shloka) {
   drawHorizontalRule(ctx, y, 100);
   y += 40;
 
-  setFont(ctx, 26, '400', "'Plus Jakarta Sans', sans-serif");
+  setFont(ctx, 26, '400', FONT_LATIN);
   ctx.fillStyle = INK;
-  ctx.font = `italic 26px 'Plus Jakarta Sans', sans-serif`;
+  ctx.font = `italic 26px ${FONT_LATIN}`;
   ctx.textAlign = 'center';
   // Wrap meaning text
   const words = shloka.englishMeaning.split(' ');
@@ -271,7 +283,7 @@ export async function generateShlokaCard(shloka) {
   // ── Purpose chip ─────────────────────────────────────────────────────────────
   y += 20;
   const chipLabel = shloka.purpose.toUpperCase();
-  setFont(ctx, 20, '700', "'Plus Jakarta Sans', sans-serif");
+  setFont(ctx, 20, '700', FONT_LATIN);
   const chipW = ctx.measureText(chipLabel).width + 50;
   const chipX = (W - chipW) / 2;
   ctx.strokeStyle = GOLD;
@@ -287,8 +299,8 @@ export async function generateShlokaCard(shloka) {
   y += 50;
 
   // ── Source ───────────────────────────────────────────────────────────────────
-  setFont(ctx, 20, '400', "'Plus Jakarta Sans', sans-serif");
-  ctx.font = `italic 20px 'Plus Jakarta Sans', sans-serif`;
+  setFont(ctx, 20, '400', FONT_LATIN);
+  ctx.font = `italic 20px ${FONT_LATIN}`;
   ctx.fillStyle = INK3;
   ctx.globalAlpha = 0.75;
   ctx.fillText(shloka.source, W / 2, y);
@@ -297,12 +309,12 @@ export async function generateShlokaCard(shloka) {
   // ── Branding footer ───────────────────────────────────────────────────────────
   drawHorizontalRule(ctx, H - 100, 80);
 
-  setFont(ctx, 34, '700', "'Noto Sans Telugu', sans-serif");
+  setFont(ctx, 34, '700', FONT_TELUGU);
   ctx.fillStyle = GOLD_DARK;
   ctx.textAlign = 'center';
   ctx.fillText('మనCalendar', W / 2, H - 66);
 
-  setFont(ctx, 19, '400', "'Plus Jakarta Sans', sans-serif");
+  setFont(ctx, 19, '400', FONT_LATIN);
   ctx.fillStyle = INK3;
   ctx.globalAlpha = 0.65;
   ctx.fillText('Telugu Panchangam · Ramayana Shlokas', W / 2, H - 42);
