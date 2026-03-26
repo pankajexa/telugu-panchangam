@@ -11,13 +11,30 @@ import TodayPage from './pages/TodayPage';
 import SplashScreen from './components/SplashScreen';
 import './styles/paper.css';
 
-// Lazy load heavier pages so tab switches are instant
-const CalendarPage = lazy(() => import('./pages/CalendarPage'));
-const FestivalsPage = lazy(() => import('./pages/FestivalsPage'));
-const MuhurtaPage = lazy(() => import('./pages/MuhurtaPage'));
-const ShareCenterPage = lazy(() => import('./pages/ShareCenterPage'));
-const SettingsPage = lazy(() => import('./pages/SettingsPage'));
-const PrivacyPolicyPage = lazy(() => import('./pages/PrivacyPolicyPage'));
+// Lazy load heavier pages — but preload them after splash so tabs feel instant
+const calendarImport = () => import('./pages/CalendarPage');
+const festivalsImport = () => import('./pages/FestivalsPage');
+const muhurtaImport = () => import('./pages/MuhurtaPage');
+const shareCenterImport = () => import('./pages/ShareCenterPage');
+const settingsImport = () => import('./pages/SettingsPage');
+const privacyImport = () => import('./pages/PrivacyPolicyPage');
+
+const CalendarPage = lazy(calendarImport);
+const FestivalsPage = lazy(festivalsImport);
+const MuhurtaPage = lazy(muhurtaImport);
+const ShareCenterPage = lazy(shareCenterImport);
+const SettingsPage = lazy(settingsImport);
+const PrivacyPolicyPage = lazy(privacyImport);
+
+// Preload all page chunks so tab switches are instant
+function preloadAllPages() {
+  calendarImport();
+  festivalsImport();
+  muhurtaImport();
+  shareCenterImport();
+  settingsImport();
+  privacyImport();
+}
 
 // Only load Vercel Analytics on the web (not inside Capacitor)
 const isCapacitor = typeof window !== 'undefined' && window.Capacitor?.isNativePlatform?.();
@@ -84,7 +101,7 @@ function AppShell() {
       {splashDone && <TabBar />}
 
       {/* Splash screen — shows on first load */}
-      <SplashScreen visible={!splashDone} onDone={() => setSplashDone(true)} />
+      <SplashScreen visible={!splashDone} onDone={() => { setSplashDone(true); preloadAllPages(); }} />
     </div>
   );
 }

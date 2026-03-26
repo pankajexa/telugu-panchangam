@@ -403,9 +403,148 @@ export const SHLOKAS = [
   },
 ];
 
+// ── DURGA SAPTA SHLOKI — Daily Shloka (non-festival days) ────────────────────
+// Source: Vaidika Vignanam (vignanam.org), Devi Mahatmyam / Durga Saptashati
+export const DURGA_SAPTA_SHLOKI = [
+  {
+    id: 'dss-1',
+    sanskritDevanagari:
+      'ज्ञानिनामपि चेतांसि देवी भगवती हि सा ।\nबलादाकृष्य मोहाय महामाया प्रयच्छति ॥',
+    transliterationIAST:
+      'jñānināmapi cētāṃsi dēvī bhagavatī hi sā |\nbalādākṛṣya mōhāya mahāmāyā prayacchati ||',
+    teluguTransliteration:
+      'జ్ఞానినామపి చేతాంసి దేవీ భగవతీ హి సా |\nబలాదాకృష్య మోహాయ మహామాయా ప్రయచ్ఛతి ||',
+    teluguMeaning:
+      'ఆ భగవతి అయిన దేవి మహామాయ, జ్ఞానుల మనస్సులను కూడా బలవంతముగా ఆకర్షించి మోహములో పడవేయును.',
+    englishMeaning:
+      'That Devi Bhagavati, the Mahamaya, forcibly attracts even the minds of the wise and casts them into delusion.',
+    purpose: 'Divine Power of Devi',
+    purposeCategory: 'devotion',
+    source: 'Devi Mahatmyam (Durga Saptashati), Chapter 1, Verse 55',
+    shastraBacking:
+      'From the Markandeya Purana. Part of the Durga Sapta Shloki — seven essential verses prescribed for daily recitation from the 700 verses of Devi Mahatmyam.',
+    festivalTags: ['navaratri', 'dussehra', 'durga_ashtami'],
+  },
+  {
+    id: 'dss-2',
+    sanskritDevanagari:
+      'दुर्गे स्मृता हरसि भीतिमशेषजन्तोः\nस्वस्थैः स्मृता मतिमतीव शुभां ददासि ।\nदारिद्र्यदुःख भयहारिणि का त्वदन्या\nसर्वोपकारकरणाय सदार्द्र चित्ता ॥',
+    transliterationIAST:
+      'durgē smṛtā harasi bhītimaśēṣajantōḥ\nsvasthaiḥ smṛtā matimatīva śubhāṃ dadāsi |\ndāridryaduḥkha bhayahāriṇi kā tvadanyā\nsarvōpakārakaraṇāya sadārdra cittā ||',
+    teluguTransliteration:
+      'దుర్గే స్మృతా హరసి భీతిమశేషజంతోః\nస్వస్థైః స్మృతా మతిమతీవ శుభాం దదాసి |\nదారిద్ర్యదుఃఖ భయహారిణి కా త్వదన్యా\nసర్వోపకారకరణాయ సదార్ద్ర చిత్తా ||',
+    teluguMeaning:
+      'ఓ దుర్గా! నిన్ను స్మరించినంతనే సకల ప్రాణుల భయమును హరించెదవు. ప్రశాంత చిత్తులు స్మరించినచో అత్యంత శుభకరమైన బుద్ధిని ప్రసాదించెదవు. దారిద్ర్యమును, దుఃఖమును, భయమును పోగొట్టువారు నీవు తప్ప ఇంకెవరు? సర్వోపకారము చేయుటకు సదా ఆర్ద్ర హృదయురాలవు.',
+    englishMeaning:
+      'O Durga! When remembered, you destroy the fear of all beings. When remembered by those at peace, you grant supremely auspicious intellect. Who else but you removes poverty, sorrow, and fear? Your heart is ever moist with compassion for the welfare of all.',
+    purpose: 'Removal of Fear & Sorrow',
+    purposeCategory: 'protection',
+    source: 'Devi Mahatmyam, Chapter 4, Verse 17',
+    shastraBacking:
+      'From the Shakradi Stuti in Devi Mahatmyam. One of the most recited verses for daily protection and removal of all fears.',
+    festivalTags: ['navaratri', 'dussehra'],
+  },
+  {
+    id: 'dss-3',
+    sanskritDevanagari:
+      'सर्वमङ्गलमाङ्गल्ये शिवे सर्वार्थसाधिके ।\nशरण्ये त्र्यम्बके गौरी नारायणि नमोऽस्तु ते ॥',
+    transliterationIAST:
+      'sarvamaṅgaḻamāṅgaḻyē śivē sarvārthasādhikē |\nśaraṇyē tryambakē gaurī nārāyaṇi namōstu tē ||',
+    teluguTransliteration:
+      'సర్వమంగళమాంగళ్యే శివే సర్వార్థసాధికే |\nశరణ్యే త్ర్యంబకే గౌరీ నారాయణి నమోఽస్తు తే ||',
+    teluguMeaning:
+      'సర్వమంగళములకు మంగళస్వరూపిణీ, శుభకారిణీ, సర్వార్థములను సాధించిపెట్టునదీ, శరణుజొచ్చువారికి రక్షణనిచ్చునదీ, త్రినేత్రీ, గౌరీ, నారాయణీ! నీకు నమస్కారము.',
+    englishMeaning:
+      'O auspiciousness of all that is auspicious, O Shiva (consort of Shiva), O fulfiller of all objectives, O refuge, O three-eyed Gauri, O Narayani — salutations to you!',
+    purpose: 'All-Auspiciousness',
+    purposeCategory: 'blessings',
+    source: 'Devi Mahatmyam, Chapter 11, Verse 10',
+    shastraBacking:
+      'One of the most universally recited Devi shlokas. From the Narayani Stuti in Devi Mahatmyam. Recited at all shubha karyas, weddings, and daily prayers.',
+    festivalTags: ['navaratri', 'dussehra', 'durga_ashtami'],
+  },
+  {
+    id: 'dss-4',
+    sanskritDevanagari:
+      'शरणागतदीनार्तपरित्राणपरायणे ।\nसर्वस्यार्तिहरे देवि नारायणि नमोऽस्तु ते ॥',
+    transliterationIAST:
+      'śaraṇāgatadīnārtaparitrāṇaparāyaṇē |\nsarvasyārtiharē dēvi nārāyaṇi namōstu tē ||',
+    teluguTransliteration:
+      'శరణాగతదీనార్తపరిత్రాణపరాయణే |\nసర్వస్యార్తిహరే దేవి నారాయణి నమోఽస్తు తే ||',
+    teluguMeaning:
+      'శరణు జొచ్చిన దీనులను, ఆర్తులను రక్షించుటలో తత్పరురాలవు. సర్వుల బాధలను తొలగించు దేవీ నారాయణీ! నీకు నమస్కారము.',
+    englishMeaning:
+      'O Narayani, you are devoted to protecting the distressed and afflicted who seek your refuge. O Devi who removes the suffering of all — salutations to you!',
+    purpose: 'Refuge & Compassion',
+    purposeCategory: 'protection',
+    source: 'Devi Mahatmyam, Chapter 11, Verse 12',
+    shastraBacking:
+      'From the Narayani Stuti. Addresses Devi as the ultimate refuge for the oppressed and distressed.',
+    festivalTags: ['navaratri'],
+  },
+  {
+    id: 'dss-5',
+    sanskritDevanagari:
+      'सर्वस्वरूपे सर्वेशे सर्वशक्तिसमन्विते ।\nभयेभ्यस्त्राहि नो देवि दुर्गे देवि नमोऽस्तु ते ॥',
+    transliterationIAST:
+      'sarvasvarūpē sarvēśē sarvaśaktisamanvitē |\nbhayēbhyastrāhi nō dēvi durgē dēvi namōstu tē ||',
+    teluguTransliteration:
+      'సర్వస్వరూపే సర్వేశే సర్వశక్తిసమన్వితే |\nభయేభ్యస్త్రాహి నో దేవి దుర్గే దేవి నమోఽస్తు తే ||',
+    teluguMeaning:
+      'సర్వస్వరూపిణీ, సర్వేశ్వరీ, సర్వశక్తి సమన్వితురాలా! భయముల నుండి మమ్ములను రక్షింపుము. దుర్గా దేవీ! నీకు నమస్కారము.',
+    englishMeaning:
+      'O you who are the form of everything, the sovereign of all, endowed with all powers — protect us from fears! O Devi Durga, salutations to you!',
+    purpose: 'Protection from All Fears',
+    purposeCategory: 'courage',
+    source: 'Devi Mahatmyam, Chapter 11, Verse 24',
+    shastraBacking:
+      'From the Narayani Stuti. A powerful protective invocation addressing Devi as omnipotent and all-encompassing.',
+    festivalTags: ['navaratri', 'dussehra'],
+  },
+  {
+    id: 'dss-6',
+    sanskritDevanagari:
+      'रोगानशेषानपहंसि तुष्टा\nरुष्टा तु कामान् सकलानभीष्टान् ।\nत्वामाश्रितानां न विपन्नराणां\nत्वामाश्रिता ह्याश्रयतां प्रयान्ति ॥',
+    transliterationIAST:
+      'rōgānaśēṣānapahaṃsi tuṣṭā\nruṣṭā tu kāmān sakalānabhīṣṭān |\ntvāmāśritānāṃ na vipannarāṇāṃ\ntvāmāśritā hyāśrayatāṃ prayānti ||',
+    teluguTransliteration:
+      'రోగానశేషానపహంసి తుష్టా\nరుష్టా తు కామాన్ సకలానభీష్టాన్ |\nత్వామాశ్రితానాం న విపన్నరాణాం\nత్వామాశ్రితా హ్యాశ్రయతాం ప్రయాంతి ||',
+    teluguMeaning:
+      'నీవు ప్రసన్నురాలవైతే సమస్త రోగములను నాశనము చేయుదువు. కోపించినచో కోరిన కోరికలన్నియూ నశించును. నిన్ను ఆశ్రయించిన వారికి ఆపదలు రావు. నిన్ను ఆశ్రయించినవారు ఇతరులకు ఆశ్రయమగుదురు.',
+    englishMeaning:
+      'When pleased, you destroy all diseases without exception. When angered, you annihilate all desired wishes. Those who take refuge in you never face calamity — they themselves become a refuge for others.',
+    purpose: 'Health & Well-being',
+    purposeCategory: 'peace',
+    source: 'Devi Mahatmyam, Chapter 11, Verse 30',
+    shastraBacking:
+      'From the Narayani Stuti. Describes the supreme power of Devi to grant health and protect from all misfortunes.',
+    festivalTags: ['navaratri'],
+  },
+  {
+    id: 'dss-7',
+    sanskritDevanagari:
+      'सर्वबाधाप्रशमनं त्रैलोक्यस्याखिलेश्वरि ।\nएवमेव त्वया कार्यमस्मद्वैरि विनाशनम् ॥',
+    transliterationIAST:
+      'sarvabādhāpraśamanaṃ trailōkyasyākhilēśvari |\nēvamēva tvayā kāryamasmadvairi vināśanam ||',
+    teluguTransliteration:
+      'సర్వబాధాప్రశమనం త్రైలోక్యస్యాఖిలేశ్వరి |\nఏవమేవ త్వయా కార్యమస్మద్వైరి వినాశనమ్ ||',
+    teluguMeaning:
+      'ముల్లోకములకు అధీశ్వరీ! ఈ విధముగా సర్వబాధలను శమింపజేయుము. మా శత్రువులను వినాశనము చేయుము.',
+    englishMeaning:
+      'O sovereign of the three worlds! Thus should you pacify all afflictions and destroy our enemies.',
+    purpose: 'Removal of All Obstacles',
+    purposeCategory: 'obstacles',
+    source: 'Devi Mahatmyam, Chapter 11, Verse 35',
+    shastraBacking:
+      'The concluding verse of the Durga Sapta Shloki. A powerful prayer for the destruction of all obstacles and enemies.',
+    festivalTags: ['navaratri', 'dussehra'],
+  },
+];
+
 /**
- * Get the shloka of the day, rotating through all shlokas.
- * On festival days, prefer festival-tagged shlokas.
+ * Get the shloka of the day.
+ * - On festival days: prefer festival-tagged Ramayana shloka matching the festival
+ * - On non-festival days: rotate through Durga Sapta Shloki (7 shlokas)
  * @param {Date} date
  * @param {string|null} festivalEnglish - English name of today's festival (if any)
  */
@@ -417,9 +556,10 @@ export function getShlokaOfTheDay(date, festivalEnglish = null) {
     );
     if (match) return match;
   }
+  // Non-festival days: rotate through Durga Sapta Shloki
   const start = new Date(date.getFullYear(), 0, 0);
   const dayOfYear = Math.floor((date - start) / 86400000);
-  return SHLOKAS[dayOfYear % SHLOKAS.length];
+  return DURGA_SAPTA_SHLOKI[dayOfYear % DURGA_SAPTA_SHLOKI.length];
 }
 
 /**
