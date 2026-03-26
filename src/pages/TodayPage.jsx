@@ -38,13 +38,13 @@ export default function TodayPage() {
         {/* Sunrise / Sunset / Moonrise strip */}
         <SunMoonStrip data={data} detailed={detailed} t={t} />
 
-        {/* Festival banner (if today has a festival) */}
+        {/* Festival banner with integrated practices (expandable) */}
         {data.festival && (
-          <FestivalBanner festival={data.festival} font={font} pick={pick} t={t} />
+          <FestivalBanner festival={data.festival} font={font} pick={pick} t={t} practices={practices} />
         )}
 
-        {/* Practices card (festival or vrat day practices) */}
-        {practices && <PracticesCard practices={practices} />}
+        {/* Standalone practices card — only if there are practices but no festival banner */}
+        {practices && !data.festival && <PracticesCard practices={practices} />}
 
         {/* Panchang cards: Tithi, Nakshatra, Yoga, Karana — with expandable transitions */}
         <PanchangCards data={data} detailed={detailed} font={font} pick={pick} t={t} />
