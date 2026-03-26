@@ -1,11 +1,15 @@
 /**
- * Local notification scheduling for daily panchangam share reminders
- * and smart sandhya alarms.
+ * Local notification scheduling for daily panchangam share reminders,
+ * smart sandhya alarms, festival/vratham/puja reminders.
  * Uses @capacitor/local-notifications on native, no-op on web.
  */
 
 const SHARE_NOTIFICATION_ID = 1001;
 const FESTIVAL_NOTIFICATION_BASE_ID = 2000;
+const VRATHAM_NOTIFICATION_BASE_ID = 4000;
+const PUJA_NOTIFICATION_ID = 5001;
+const SUNRISE_NOTIFICATION_ID = 5002;
+const SUNSET_NOTIFICATION_ID = 5003;
 
 // Smart alarm IDs (fixed per alarm type)
 const ALARM_IDS = {
@@ -15,18 +19,46 @@ const ALARM_IDS = {
   sayamSandhya: 3004,
 };
 
-let LocalNotifications = null;
-let channelCreated = false;
+// Available notification sounds
+export const ALARM_SOUNDS = {
+  temple_bell: { id: 'temple_bell', label: 'Temple Bell', labelTe: 'గుడి గంట' },
+  temple_bell_soft: { id: 'temple_bell_soft', label: 'Soft Bell', labelTe: 'మృదు గంట' },
+  conch_shell: { id: 'conch_shell', label: 'Conch Shell', labelTe: 'శంఖనాదం' },
+  default: { id: 'default', label: 'System Default', labelTe: 'సిస్టమ్ డిఫాల్ట్' },
+};
 
-// Alarm notification channel for Android (HIGH importance = heads-up + sound)
-const ALARM_CHANNEL = {
-  id: 'sandhya-alarms',
-  name: 'Sandhya Alarms',
-  description: 'Smart alarms for Brahma Muhurta and Sandhya times',
-  importance: 4, // HIGH — heads-up notification with sound
-  visibility: 1, // PUBLIC — show on lock screen
-  vibration: true,
-  sound: undefined, // Use system default notification sound
+let LocalNotifications = null;
+let channelsCreated = {};
+
+// Notification channels for Android
+const CHANNELS = {
+  sandhya: {
+    id: 'sandhya-alarms',
+    name: 'Sandhya Alarms',
+    description: 'Smart alarms for Brahma Muhurta and Sandhya times',
+    importance: 4, // HIGH — heads-up notification with sound
+    visibility: 1, // PUBLIC — show on lock screen
+    vibration: true,
+    sound: 'temple_bell', // Custom temple bell sound from res/raw
+  },
+  reminders: {
+    id: 'daily-reminders',
+    name: 'Daily Reminders',
+    description: 'Daily panchangam share, puja, and sunrise/sunset reminders',
+    importance: 3, // DEFAULT
+    visibility: 1,
+    vibration: true,
+    sound: 'temple_bell_soft',
+  },
+  festivals: {
+    id: 'festival-reminders',
+    name: 'Festival & Vratham Reminders',
+    description: 'Reminders for upcoming festivals and vrathams',
+    importance: 3, // DEFAULT
+    visibility: 1,
+    vibration: true,
+    sound: 'conch_shell',
+  },
 };
 
 async function getPlugin() {
@@ -41,15 +73,23 @@ async function getPlugin() {
   }
 }
 
-/** Create the Android notification channel (no-op on iOS, idempotent) */
-async function ensureAlarmChannel() {
-  if (channelCreated) return;
+/** Create Android notification channels (no-op on iOS, idempotent) */
+async function ensureChannel(channelKey) {
+  if (channelsCreated[channelKey]) return;
   const plugin = await getPlugin();
   if (!plugin) return;
+  const channel = CHANNELS[channelKey];
+  if (!channel) return;
   try {
-    await plugin.createChannel(ALARM_CHANNEL);
-    channelCreated = true;
+    await plugin.createChannel(channel);
+    channelsCreated[channelKey] = true;
   } catch {}
+}
+
+async function ensureAllChannels() {
+  for (const key of Object.keys(CHANNELS)) {
+    await ensureChannel(key);
+  }
 }
 
 /**
@@ -190,7 +230,7 @@ export async function scheduleSmartAlarm(alarmKey, time, lang = 'te') {
   const config = ALARM_CONFIG[alarmKey];
   if (!config) return;
 
-  await ensureAlarmChannel();
+  await ensureChannel('sandhya');
 
   const isTe = lang === 'te';
 
@@ -214,10 +254,10 @@ export async function scheduleSmartAlarm(alarmKey, time, lang = 'te') {
       title: isTe ? config.title : config.titleEn,
       body: isTe ? config.body : config.bodyEn,
       schedule: { at: alarmDate },
-      channelId: ALARM_CHANNEL.id,  // Android: uses high-importance channel
-      smallIcon: 'ic_launcher', // Uses app launcher icon as notification icon
+      channelId: CHANNELS.sandhya.id,
+      smallIcon: 'ic_launcher',
       iconColor: '#C49B2A',
-      // Uses system default sound (channel-level)
+      sound: 'temple_bell',
       extra: { action: 'sandhya_alarm', type: alarmKey },
     }],
   });
@@ -269,5 +309,251 @@ export async function cancelAllSmartAlarms() {
     await plugin.cancel({
       notifications: Object.values(ALARM_IDS).map(id => ({ id })),
     });
+  } catch {}
+}
+
+// ─── FESTIVAL REMINDERS ─────────────────────────────────
+
+/**
+ * Schedule festival reminders for the next 30 days.
+ * @param {Array} festivals - array of { date: Date, telugu: string, english: string, major: boolean }
+ * @param {string} time - "HH:MM" format
+ * @param {string} [lang='te']
+ */
+export async function scheduleFestivalReminders(festivals, time, lang = 'te') {
+  const plugin = await getPlugin();
+  if (!plugin || !festivals?.length) return;
+
+  await ensureChannel('festivals');
+  const [hour, minute] = time.split(':').map(Number);
+  const isTe = lang === 'te';
+
+  // Cancel existing festival notifications
+  const cancelIds = [];
+  for (let i = 0; i < 30; i++) cancelIds.push({ id: FESTIVAL_NOTIFICATION_BASE_ID + i });
+  try { await plugin.cancel({ notifications: cancelIds }); } catch {}
+
+  const notifications = [];
+  const now = new Date();
+
+  festivals.forEach((fest, idx) => {
+    if (idx >= 30) return; // Max 30 festival notifications
+    const festDate = new Date(fest.date);
+    // Schedule reminder for the day before the festival
+    const reminderDate = new Date(festDate);
+    reminderDate.setDate(reminderDate.getDate() - 1);
+    reminderDate.setHours(hour, minute, 0, 0);
+
+    if (reminderDate <= now) return; // Skip past dates
+
+    notifications.push({
+      id: FESTIVAL_NOTIFICATION_BASE_ID + idx,
+      title: isTe ? `🎊 రేపు: ${fest.telugu}` : `🎊 Tomorrow: ${fest.english}`,
+      body: isTe
+        ? `${fest.telugu} — పూజ, వ్రతం సన్నాహాలు చేసుకోండి`
+        : `${fest.english} — Prepare for puja and observances`,
+      schedule: { at: reminderDate },
+      channelId: CHANNELS.festivals.id,
+      smallIcon: 'ic_launcher',
+      iconColor: '#C49B2A',
+      sound: 'conch_shell',
+      extra: { action: 'festival_reminder', festival: fest.english },
+    });
+  });
+
+  if (notifications.length > 0) {
+    await plugin.schedule({ notifications });
+  }
+}
+
+/**
+ * Cancel all festival reminders.
+ */
+export async function cancelFestivalReminders() {
+  const plugin = await getPlugin();
+  if (!plugin) return;
+  const cancelIds = [];
+  for (let i = 0; i < 30; i++) cancelIds.push({ id: FESTIVAL_NOTIFICATION_BASE_ID + i });
+  try { await plugin.cancel({ notifications: cancelIds }); } catch {}
+}
+
+// ─── VRATHAM REMINDERS ──────────────────────────────────
+
+/**
+ * Schedule vratham reminders (Ekadashi, Sankashti Chaturthi, etc.)
+ * @param {Array} vrathams - array of { date: Date, telugu: string, english: string, type: string }
+ * @param {string} time - "HH:MM" format
+ * @param {string} [lang='te']
+ */
+export async function scheduleVrathamReminders(vrathams, time, lang = 'te') {
+  const plugin = await getPlugin();
+  if (!plugin || !vrathams?.length) return;
+
+  await ensureChannel('festivals');
+  const [hour, minute] = time.split(':').map(Number);
+  const isTe = lang === 'te';
+
+  // Cancel existing
+  const cancelIds = [];
+  for (let i = 0; i < 30; i++) cancelIds.push({ id: VRATHAM_NOTIFICATION_BASE_ID + i });
+  try { await plugin.cancel({ notifications: cancelIds }); } catch {}
+
+  const notifications = [];
+  const now = new Date();
+
+  vrathams.forEach((vrat, idx) => {
+    if (idx >= 30) return;
+    const vratDate = new Date(vrat.date);
+    // Remind on the morning of the vratham day
+    const reminderDate = new Date(vratDate);
+    reminderDate.setHours(hour, minute, 0, 0);
+
+    if (reminderDate <= now) return;
+
+    notifications.push({
+      id: VRATHAM_NOTIFICATION_BASE_ID + idx,
+      title: isTe ? `🙏 నేడు: ${vrat.telugu}` : `🙏 Today: ${vrat.english}`,
+      body: isTe
+        ? `${vrat.telugu} వ్రతం — ఉపవాసం, పూజ చేయండి`
+        : `${vrat.english} Vratham — Observe fasting and puja`,
+      schedule: { at: reminderDate },
+      channelId: CHANNELS.festivals.id,
+      smallIcon: 'ic_launcher',
+      iconColor: '#C49B2A',
+      sound: 'temple_bell',
+      extra: { action: 'vratham_reminder', type: vrat.type },
+    });
+  });
+
+  if (notifications.length > 0) {
+    await plugin.schedule({ notifications });
+  }
+}
+
+/**
+ * Cancel all vratham reminders.
+ */
+export async function cancelVrathamReminders() {
+  const plugin = await getPlugin();
+  if (!plugin) return;
+  const cancelIds = [];
+  for (let i = 0; i < 30; i++) cancelIds.push({ id: VRATHAM_NOTIFICATION_BASE_ID + i });
+  try { await plugin.cancel({ notifications: cancelIds }); } catch {}
+}
+
+// ─── PUJA REMINDER ──────────────────────────────────────
+
+/**
+ * Schedule a daily puja reminder.
+ * @param {string} time - "HH:MM" format
+ * @param {string} [lang='te']
+ */
+export async function schedulePujaReminder(time, lang = 'te') {
+  const plugin = await getPlugin();
+  if (!plugin) return;
+
+  await ensureChannel('reminders');
+  const [hour, minute] = time.split(':').map(Number);
+  const isTe = lang === 'te';
+
+  try { await plugin.cancel({ notifications: [{ id: PUJA_NOTIFICATION_ID }] }); } catch {}
+
+  await plugin.schedule({
+    notifications: [{
+      id: PUJA_NOTIFICATION_ID,
+      title: isTe ? '🪷 పూజ సమయం' : '🪷 Puja Time',
+      body: isTe ? 'నిత్య పూజ చేయండి — దీపం, ధూపం, నైవేద్యం' : 'Time for daily puja — light the lamp and offer prayers',
+      schedule: { on: { hour, minute }, repeats: true, every: 'day' },
+      channelId: CHANNELS.reminders.id,
+      smallIcon: 'ic_launcher',
+      iconColor: '#C49B2A',
+      sound: 'temple_bell_soft',
+      extra: { action: 'puja_reminder' },
+    }],
+  });
+}
+
+/**
+ * Cancel puja reminder.
+ */
+export async function cancelPujaReminder() {
+  const plugin = await getPlugin();
+  if (!plugin) return;
+  try { await plugin.cancel({ notifications: [{ id: PUJA_NOTIFICATION_ID }] }); } catch {}
+}
+
+// ─── SUNRISE / SUNSET REMINDERS ─────────────────────────
+
+/**
+ * Schedule sunrise/sunset reminders for today based on actual times.
+ * @param {string} sunrise - "HH:MM" format
+ * @param {string} sunset - "HH:MM" format
+ * @param {Object} prefs - { sunrise: bool, sunriseOffset: number, sunset: bool, sunsetOffset: number }
+ * @param {string} [lang='te']
+ */
+export async function scheduleSunReminders(sunrise, sunset, prefs, lang = 'te') {
+  const plugin = await getPlugin();
+  if (!plugin) return;
+
+  await ensureChannel('reminders');
+  const isTe = lang === 'te';
+  const now = new Date();
+
+  // Cancel existing
+  try {
+    await plugin.cancel({ notifications: [{ id: SUNRISE_NOTIFICATION_ID }, { id: SUNSET_NOTIFICATION_ID }] });
+  } catch {}
+
+  if (prefs.sunrise && sunrise && sunrise !== '--') {
+    const [h, m] = sunrise.split(':').map(Number);
+    const alarmDate = new Date();
+    alarmDate.setHours(h, m - (prefs.sunriseOffset || 0), 0, 0);
+    if (alarmDate > now) {
+      await plugin.schedule({
+        notifications: [{
+          id: SUNRISE_NOTIFICATION_ID,
+          title: isTe ? '🌅 సూర్యోదయం' : '🌅 Sunrise',
+          body: isTe ? `సూర్యోదయం ${sunrise} — సూర్యనమస్కారాలు` : `Sunrise at ${sunrise} — Surya Namaskar time`,
+          schedule: { at: alarmDate },
+          channelId: CHANNELS.reminders.id,
+          smallIcon: 'ic_launcher',
+          iconColor: '#C49B2A',
+          sound: 'temple_bell_soft',
+          extra: { action: 'sunrise_reminder' },
+        }],
+      });
+    }
+  }
+
+  if (prefs.sunset && sunset && sunset !== '--') {
+    const [h, m] = sunset.split(':').map(Number);
+    const alarmDate = new Date();
+    alarmDate.setHours(h, m - (prefs.sunsetOffset || 0), 0, 0);
+    if (alarmDate > now) {
+      await plugin.schedule({
+        notifications: [{
+          id: SUNSET_NOTIFICATION_ID,
+          title: isTe ? '🌇 సూర్యాస్తమయం' : '🌇 Sunset',
+          body: isTe ? `సూర్యాస్తమయం ${sunset} — సాయం దీపం వెలిగించండి` : `Sunset at ${sunset} — Light the evening lamp`,
+          schedule: { at: alarmDate },
+          channelId: CHANNELS.reminders.id,
+          smallIcon: 'ic_launcher',
+          iconColor: '#C49B2A',
+          sound: 'temple_bell_soft',
+          extra: { action: 'sunset_reminder' },
+        }],
+      });
+    }
+  }
+}
+
+/**
+ * Cancel sunrise/sunset reminders.
+ */
+export async function cancelSunReminders() {
+  const plugin = await getPlugin();
+  if (!plugin) return;
+  try {
+    await plugin.cancel({ notifications: [{ id: SUNRISE_NOTIFICATION_ID }, { id: SUNSET_NOTIFICATION_ID }] });
   } catch {}
 }
