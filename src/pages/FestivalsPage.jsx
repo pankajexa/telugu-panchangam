@@ -43,14 +43,15 @@ export default function FestivalsPage() {
     }
   }, [selectedFestival]);
 
-  // Compute festival list after first paint so the tab switches instantly
+  // Compute festival list AFTER first paint so the tab switches instantly
   useEffect(() => {
-    // Use rAF to defer heavy computation past first frame
-    const raf = requestAnimationFrame(() => {
+    setLoading(true);
+    // setTimeout(0) truly yields to the browser — lets the loading UI paint first
+    const t = setTimeout(() => {
       setAllFestivals(getAllFestivals(location));
       setLoading(false);
-    });
-    return () => cancelAnimationFrame(raf);
+    }, 0);
+    return () => clearTimeout(t);
   }, [location]);
 
   const filtered = useMemo(() => {
@@ -97,8 +98,18 @@ export default function FestivalsPage() {
           })}
         </div>
 
+        {/* Loading state */}
+        {loading && (
+          <div style={styles.loadingBox}>
+            <div style={styles.spinner} />
+            <div style={{ fontSize: 14, color: '#999', marginTop: 12, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              {language === 'te' ? 'పండుగలు లోడ్ అవుతున్నాయి...' : 'Loading festivals...'}
+            </div>
+          </div>
+        )}
+
         {/* Festival list */}
-        {grouped.map((group, gi) => (
+        {!loading && grouped.map((group, gi) => (
           <div key={gi} style={styles.group}>
             <div style={styles.monthHeader}>{group.label}</div>
             <div style={styles.list}>
@@ -147,9 +158,9 @@ export default function FestivalsPage() {
           </div>
         ))}
 
-        {loading && (
+        {!loading && grouped.length === 0 && (
           <div style={styles.empty}>
-            <div style={{ width: 24, height: 24, border: '3px solid rgba(230,59,46,0.15)', borderTopColor: '#E63B2E', borderRadius: '50%', animation: 'spin 0.6s linear infinite' }} />
+            <div style={{ fontSize: 14, color: '#999' }}>{language === 'te' ? 'పండుగలు లేవు' : 'No festivals found'}</div>
           </div>
         )}
         {!loading && filtered.length === 0 && (
@@ -337,5 +348,20 @@ const styles = {
     WebkitOverflowScrolling: 'touch',
     touchAction: 'pan-y',
     overscrollBehavior: 'contain',
+  },
+  loadingBox: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '60px 0',
+  },
+  spinner: {
+    width: 28,
+    height: 28,
+    border: '3px solid rgba(230,59,46,0.15)',
+    borderTopColor: '#E63B2E',
+    borderRadius: '50%',
+    animation: 'spin 0.6s linear infinite',
   },
 };
