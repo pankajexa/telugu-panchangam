@@ -9,6 +9,11 @@ import { ensureFonts, canvasToBlob } from './cardUtils.js';
 const W = 1080;
 const H = 1920;
 
+// Safe font families with fallbacks for canvas rendering
+const FONT_DEVANAGARI = 'Noto Sans Devanagari, Noto Serif Devanagari, sans-serif';
+const FONT_TELUGU = 'Noto Sans Telugu, Noto Serif Telugu, sans-serif';
+const FONT_LATIN = 'Plus Jakarta Sans, Inter, Helvetica, Arial, sans-serif';
+
 const ASSET_BASE = '/assets/greetings';
 
 // Festival → deity image + color theme
@@ -137,7 +142,7 @@ export async function generateFestivalShlokaCard(shloka, festivalEnglish, wishTe
 
   // ── Festival title ──
   ctx.textAlign = 'center';
-  setFont(ctx, 18, '600', "'Plus Jakarta Sans', sans-serif");
+  setFont(ctx, 18, '600', FONT_LATIN);
   ctx.fillStyle = `${theme.accent}AA`;
   ctx.letterSpacing = '4px';
   ctx.fillText(theme.titleEn.toUpperCase(), W / 2, y);
@@ -165,7 +170,7 @@ export async function generateFestivalShlokaCard(shloka, festivalEnglish, wishTe
 
   // ── Shloka (Devanagari) ──
   const devaLines = shloka.sanskritDevanagari.split('\n').filter(l => l.trim());
-  setFont(ctx, 30, '600', "'Noto Sans Devanagari', sans-serif");
+  setFont(ctx, 30, '600', FONT_DEVANAGARI);
   ctx.fillStyle = theme.accentLight;
   for (const line of devaLines) {
     ctx.fillText(line.trim(), W / 2, y);
@@ -175,7 +180,7 @@ export async function generateFestivalShlokaCard(shloka, festivalEnglish, wishTe
 
   // ── Telugu transliteration ──
   const teLines = shloka.teluguTransliteration.split('\n').filter(l => l.trim());
-  setFont(ctx, 24, '500', "'Noto Sans Telugu', sans-serif");
+  setFont(ctx, 24, '500', FONT_TELUGU);
   ctx.fillStyle = 'rgba(255,255,255,0.6)';
   for (const line of teLines) {
     ctx.fillText(line.trim(), W / 2, y);
@@ -184,7 +189,7 @@ export async function generateFestivalShlokaCard(shloka, festivalEnglish, wishTe
   y += 14;
 
   // ── English meaning ──
-  setFont(ctx, 22, '400', "'Plus Jakarta Sans', sans-serif");
+  setFont(ctx, 22, '400', FONT_LATIN);
   ctx.fillStyle = 'rgba(255,255,255,0.5)';
   const meaningLines = wrapText(ctx, shloka.englishMeaning, W - 120);
   for (const line of meaningLines.slice(0, 4)) {
@@ -194,15 +199,15 @@ export async function generateFestivalShlokaCard(shloka, festivalEnglish, wishTe
   y += 12;
 
   // ── Source ──
-  setFont(ctx, 18, '400', "'Plus Jakarta Sans', sans-serif");
+  setFont(ctx, 18, '400', FONT_LATIN);
   ctx.fillStyle = `${theme.accent}66`;
-  ctx.font = `italic 18px 'Plus Jakarta Sans', sans-serif`;
+  ctx.font = `italic 18px ${FONT_LATIN}`;
   ctx.fillText(`— ${shloka.source}`, W / 2, y);
   y += 40;
 
   // ── Wish text (if provided) ──
   if (wishText) {
-    setFont(ctx, 20, '500', "'Noto Sans Telugu', sans-serif");
+    setFont(ctx, 20, '500', FONT_TELUGU);
     ctx.fillStyle = 'rgba(255,255,255,0.4)';
     ctx.fillText(wishText, W / 2, y);
     y += 30;
@@ -210,7 +215,7 @@ export async function generateFestivalShlokaCard(shloka, festivalEnglish, wishTe
 
   // ── Footer branding ──
   const footerY = H - 40;
-  setFont(ctx, 16, '500', "'Plus Jakarta Sans', sans-serif");
+  setFont(ctx, 16, '500', FONT_LATIN);
   ctx.fillStyle = 'rgba(255,255,255,0.25)';
   ctx.fillText('మనCalendar — Telugu Panchangam', W / 2, footerY);
 
