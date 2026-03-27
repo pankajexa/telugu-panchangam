@@ -229,7 +229,7 @@ const translations = {
 
     // Guided Puja
     'puja.guided.title': 'గణపతి పంచోపచార పూజ',
-    'puja.guided.subtitle': 'మానస పూజ • 10 నిమిషాలు',
+    'puja.guided.subtitle': 'పంచోపచార పూజ • 7 నిమిషాలు',
     'puja.guided.itemsNeeded': 'కావలసిన సామగ్రి',
     'puja.guided.begin': 'పూజ ప్రారంభించండి',
     'puja.guided.pause': 'ఆపు',
@@ -484,7 +484,7 @@ const translations = {
 
     // Guided Puja
     'puja.guided.title': 'Ganapathi Panchopachara Puja',
-    'puja.guided.subtitle': 'Manasa Pooja • 10 minutes',
+    'puja.guided.subtitle': 'Panchopachara Puja • 7 minutes',
     'puja.guided.itemsNeeded': 'Items Needed',
     'puja.guided.begin': 'Begin Puja',
     'puja.guided.pause': 'Pause',
