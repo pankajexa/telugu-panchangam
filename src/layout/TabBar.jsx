@@ -1,11 +1,12 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
-import { Sun, CalendarDays, Share2, Sparkles, Clock } from 'lucide-react';
+import { Sun, CalendarDays, Sparkles, Clock } from 'lucide-react';
+import { DiyaIcon } from '../components/icons/HinduIcons';
 
 const tabs = [
   { path: '/', labelKey: 'tab.today', Icon: Sun },
   { path: '/calendar', labelKey: 'tab.calendar', Icon: CalendarDays },
-  { path: '/share', labelKey: 'tab.share', Icon: Share2, isCenter: true },
+  { path: '/devotion', labelKey: 'tab.devotion', Icon: DiyaIcon, isCenter: true },
   { path: '/festivals', labelKey: 'tab.festivals', Icon: Sparkles },
   { path: '/muhurta', labelKey: 'tab.muhurta', Icon: Clock },
 ];
