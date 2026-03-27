@@ -103,12 +103,12 @@ export const VAHANA_PUJA_STEPS = [
     hasBreathingGuide: false,
     mantra: {
       devanagari:
-        'ॐ भूर्भुवः स्वः। तत्सवितुर्वरेण्यम्।\nभर्गो देवस्य धीमहि। धियो यो नः प्रचोदयात्॥',
+        'दशाङ्गं गुग्गुलं धूपं सर्वसौरभकारकम्।\nगृहाण त्वं मया दत्तं वाहनाय नमो नमः॥\n\nनानाजातिभवं दीपं गृहाण वाहनाधिप।\nअज्ञानमलजं दीपं हरन्तं ज्योतिरूपकम्॥',
       telugu:
-        'ఓం భూర్భువః స్వః। తత్సవితుర్వరేణ్యమ్।\nభర్గో దేవస్య ధీమహి। ధియో యో నః ప్రచోదయాత్॥',
+        'దశాంగం గుగ్గులం ధూపం సర్వసౌరభకారకమ్।\nగృహాణ త్వం మయా దత్తం వాహనాయ నమో నమః॥\n\nనానాజాతిభవం దీపం గృహాణ వాహనాధిప।\nఅజ్ఞానమలజం దీపం హరంతం జ్యోతిరూపకమ్॥',
       english:
-        'We meditate upon the divine light of the Sun God Savitri. May that supreme light illuminate our intellect and guide us on the right path.',
-      source: 'Gayatri Mantra — Rig Veda 3.62.10',
+        'Accept this ten-ingredient incense offering, the source of all fragrance. Salutations to the vehicle.\n\nAccept this lamp born of various substances, O lord of the vehicle. This light removes the darkness of ignorance.',
+      source: 'Dhoopa-Deepa Samarpana Mantra',
     },
     instructions: {
       te: 'అగరబత్తి వెలిగించి, వాహనం చుట్టూ ప్రదక్షిణంగా తిప్పండి. దీపం వెలిగించి చూపించండి.',
