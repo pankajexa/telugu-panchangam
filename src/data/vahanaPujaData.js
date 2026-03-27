@@ -1,5 +1,5 @@
 /**
- * Vahana (Vehicle) Puja — 9 guided steps
+ * Vahana (Vehicle) Puja — 7 guided steps
  * Shastra-backed vehicle blessing puja with Revanta Dhyanam.
  * Total duration: ~7 minutes (420 seconds)
  */
@@ -10,7 +10,7 @@ export const VAHANA_PUJA_STEPS = [
     nameKey: 'puja.step.purification',
     nameSanskrit: 'पवित्रीकरणम्',
     nameEnglish: 'Purification',
-    duration: 25,
+    duration: 30,
     icon: 'kalash',
     hasBreathingGuide: false,
     mantra: {
@@ -32,7 +32,7 @@ export const VAHANA_PUJA_STEPS = [
     nameKey: 'puja.step.ganapathi',
     nameSanskrit: 'गणपति प्रार्थना',
     nameEnglish: 'Ganapathi Prayer',
-    duration: 40,
+    duration: 45,
     icon: 'om',
     hasBreathingGuide: false,
     mantra: {
@@ -54,7 +54,7 @@ export const VAHANA_PUJA_STEPS = [
     nameKey: 'puja.step.revanta_dhyanam',
     nameSanskrit: 'रेवन्त ध्यानम्',
     nameEnglish: 'Revanta Dhyanam',
-    duration: 60,
+    duration: 70,
     icon: 'om',
     hasBreathingGuide: false,
     mantra: {
@@ -74,9 +74,9 @@ export const VAHANA_PUJA_STEPS = [
   {
     id: 4,
     nameKey: 'puja.step.swastik',
-    nameSanskrit: 'स्वस्तिक चिह्नम्',
-    nameEnglish: 'Swastik Mark',
-    duration: 40,
+    nameSanskrit: 'स्वस्तिक-पुष्प-गन्धम्',
+    nameEnglish: 'Swastik, Flowers & Offerings',
+    duration: 60,
     icon: 'lotus',
     hasBreathingGuide: false,
     mantra: {
@@ -89,118 +89,74 @@ export const VAHANA_PUJA_STEPS = [
       source: 'Rig Veda — Swasti Mantra',
     },
     instructions: {
-      te: 'పసుపు-కుంకుమ మిశ్రమంతో వాహనం బోనెట్ మీద స్వస్తిక్ గుర్తు పెట్టండి. ఆ గుర్తు మీద అక్షతలు (బియ్యం) అతికించండి.',
-      en: 'Draw a Swastik symbol on the bonnet with turmeric-kumkum paste. Press rice grains (akshat) onto the wet mark.',
+      te: 'పసుపు-కుంకుమతో బోనెట్ మీద స్వస్తిక్ గుర్తు పెట్టండి. అక్షతలు అతికించండి. పూలమాల వేసి, గంధం అద్దండి.',
+      en: 'Draw a Swastik on the bonnet with turmeric-kumkum. Press rice grains on it. Adorn with a flower garland and apply sandalwood paste.',
     },
   },
   {
     id: 5,
-    nameKey: 'puja.step.pushpa_gandha',
-    nameSanskrit: 'पुष्प-गन्ध अर्पणम्',
-    nameEnglish: 'Flowers & Garland',
-    duration: 30,
-    icon: 'lotus',
-    hasBreathingGuide: false,
-    mantra: {
-      devanagari:
-        'ॐ रेवन्ताय नमः। गन्धं समर्पयामि।\nॐ रेवन्ताय नमः। पुष्पं समर्पयामि॥',
-      telugu:
-        'ఓం రేవంతాయ నమః। గంధం సమర్పయామి।\nఓం రేవంతాయ నమః। పుష్పం సమర్పయామి॥',
-      english:
-        'Om, Salutations to Revanta. I offer fragrance.\nOm, Salutations to Revanta. I offer flowers.',
-      source: 'Vahana Puja Panchopacharam',
-    },
-    instructions: {
-      te: 'వాహనానికి పూలమాల వేయండి. గంధం లేదా కుంకుమ అద్దండి.',
-      en: 'Adorn the vehicle with a flower garland. Apply sandalwood paste or kumkum.',
-    },
-  },
-  {
-    id: 6,
     nameKey: 'puja.step.dhoopa_deepa',
-    nameSanskrit: 'धूप-दीप दर्शनम्',
+    nameSanskrit: 'धूप-दीपम्',
     nameEnglish: 'Incense & Lamp',
     duration: 40,
     icon: 'diya',
     hasBreathingGuide: false,
     mantra: {
       devanagari:
-        'ॐ रेवन्ताय नमः। धूपमागर्पयामि।\nॐ रेवन्ताय नमः। दीपं दर्शयामि॥',
+        'ॐ भूर्भुवः स्वः। तत्सवितुर्वरेण्यम्।\nभर्गो देवस्य धीमहि। धियो यो नः प्रचोदयात्॥',
       telugu:
-        'ఓం రేవంతాయ నమః। ధూపమాఘ్రాపయామి।\nఓం రేవంతాయ నమః। దీపం దర్శయామి॥',
+        'ఓం భూర్భువః స్వః। తత్సవితుర్వరేణ్యమ్।\nభర్గో దేవస్య ధీమహి। ధియో యో నః ప్రచోదయాత్॥',
       english:
-        'Om, Salutations to Revanta. I offer incense.\nOm, Salutations to Revanta. I show the lamp.',
-      source: 'Vahana Puja Panchopacharam',
+        'We meditate upon the divine light of the Sun God Savitri. May that supreme light illuminate our intellect and guide us on the right path.',
+      source: 'Gayatri Mantra — Rig Veda 3.62.10',
     },
     instructions: {
-      te: 'అగరబత్తి వెలిగించి, వాహనం చుట్టూ ప్రదక్షిణంగా తిప్పండి. దీపం వెలిగించి, చూపించండి.',
-      en: 'Light incense sticks and wave clockwise around the vehicle. Light a diya and show it to the vehicle.',
+      te: 'అగరబత్తి వెలిగించి, వాహనం చుట్టూ ప్రదక్షిణంగా తిప్పండి. దీపం వెలిగించి చూపించండి.',
+      en: 'Light incense and wave clockwise around the vehicle. Light a diya and show it.',
     },
   },
   {
-    id: 7,
-    nameKey: 'puja.step.narikela',
-    nameSanskrit: 'नारिकेल विसर्जनम्',
-    nameEnglish: 'Coconut Offering',
-    duration: 40,
-    icon: 'kalash',
-    hasBreathingGuide: false,
-    mantra: {
-      devanagari:
-        'इदं फलं मया देव स्थापितं पुरतस्तव।\nतेन मे सफलावाप्तिर्भवेज्जन्मनि जन्मनि॥',
-      telugu:
-        'ఇదం ఫలం మయా దేవ స్థాపితం పురతస్తవ।\nతేన మే సఫలావాప్తిర్భవేజ్జన్మని జన్మని॥',
-      english:
-        'O Lord, I place this fruit before you. May it bring me fruitful results in every birth.',
-      source: 'Narikela Samarpana Mantra',
-    },
-    instructions: {
-      te: 'కొబ్బరికాయను వాహనం కుడి ముందు టైరు దగ్గర కొట్టండి. కొబ్బరి నీళ్ళు నాలుగు టైర్లపై చల్లండి.',
-      en: 'Break a coconut near the right front tire. Sprinkle coconut water on all four tires.',
-    },
-  },
-  {
-    id: 8,
-    nameKey: 'puja.step.aarti',
-    nameSanskrit: 'आरतिः',
-    nameEnglish: 'Aarti',
-    duration: 60,
+    id: 6,
+    nameKey: 'puja.step.narikela_aarti',
+    nameSanskrit: 'नारिकेल-आरतिः',
+    nameEnglish: 'Coconut & Aarti',
+    duration: 85,
     icon: 'diya',
     hasBreathingGuide: false,
     mantra: {
       devanagari:
-        'ॐ नमो भगवते शक्ति रुद्राय मारुति नमः॥\n\n(इस मन्त्र को ७ बार जपें)\n\nसर्वमङ्गलमाङ्गल्ये शिवे सर्वार्थसाधिके।\nशरण्ये त्र्यम्बके गौरि नारायणि नमोऽस्तु ते॥',
+        'इदं फलं मया देव स्थापितं पुरतस्तव।\nतेन मे सफलावाप्तिर्भवेज्जन्मनि जन्मनि॥\n\nकर्पूरगौरं करुणावतारं संसारसारं भुजगेन्द्रहारम्।\nसदा वसन्तं हृदयारविन्दे भवं भवानीसहितं नमामि॥',
       telugu:
-        'ఓం నమో భగవతే శక్తి రుద్రాయ మారుతి నమః॥\n\n(ఈ మంత్రాన్ని 7 సార్లు జపించండి)\n\nసర్వమంగళమాంగళ్యే శివే సర్వార్థసాధికే।\nశరణ్యే త్ర్యంబకే గౌరి నారాయణి నమోస్తు తే॥',
+        'ఇదం ఫలం మయా దేవ స్థాపితం పురతస్తవ।\nతేన మే సఫలావాప్తిర్భవేజ్జన్మని జన్మని॥\n\nకర్పూరగౌరం కరుణావతారం సంసారసారం భుజగేంద్రహారమ్।\nసదా వసంతం హృదయారవిందే భవం భవానీసహితం నమామి॥',
       english:
-        'Om, Salutations to the powerful Lord Rudra and Maruti.\n\n(Chant this mantra 7 times)\n\nO auspicious Goddess, fulfiller of all desires, refuge of all, three-eyed Gauri — O Narayani, I bow to you.',
-      source: 'Vahana Raksha Mantra / Sarva Mangala Stotram',
+        'O Lord, I place this fruit before you. May it bring me fruitful results in every birth.\n\nI bow to the one who is white as camphor, the incarnation of compassion, the essence of worldly existence, who wears the king of serpents as a garland, who always dwells in the lotus of the heart — I bow to Lord Shiva along with Bhavani.',
+      source: 'Narikela Samarpana / Karpura Gauram (Aarti Shloka)',
     },
     instructions: {
-      te: 'కర్పూరం వెలిగించి, వాహనం చుట్టూ ప్రదక్షిణంగా ఆరతి ఇవ్వండి. రక్షా మంత్రం 7 సార్లు చదవండి.',
-      en: 'Light camphor and perform aarti around the vehicle in clockwise direction. Chant the protection mantra 7 times.',
+      te: 'కొబ్బరికాయను కుడి ముందు టైరు దగ్గర కొట్టండి. నీళ్ళు టైర్లపై చల్లండి.\n\nకర్పూరం వెలిగించి, కర్పూర గౌరం శ్లోకంతో వాహనం చుట్టూ ఆరతి ఇవ్వండి.',
+      en: 'Break coconut near the right front tire. Sprinkle coconut water on all tires.\n\nLight camphor and perform aarti around the vehicle while chanting Karpura Gauram.',
     },
   },
   {
-    id: 9,
+    id: 7,
     nameKey: 'puja.step.prarthana',
     nameSanskrit: 'प्रार्थना',
     nameEnglish: 'Closing Prayer',
-    duration: 85,
+    duration: 90,
     icon: 'bell',
     hasBreathingGuide: false,
     mantra: {
       devanagari:
-        'कायेन वाचा मनसेन्द्रियैर्वा\nबुद्ध्यात्मना वा प्रकृतेः स्वभावात्।\nकरोमि यद्यत् सकलं परस्मै\nनारायणायेति समर्पयामि॥\n\nसूर्यपुत्र नमस्तेस्तु नमस्ते पञ्चवक्त्रक।\nनमो गन्धर्व देवाय रेवन्ताय नमो नमः॥\n\nॐ शान्तिः शान्तिः शान्तिः॥',
+        'कायेन वाचा मनसेन्द्रियैर्वा\nबुद्ध्यात्मना वा प्रकृतेः स्वभावात्।\nकरोमि यद्यत् सकलं परस्मै\nनारायणायेति समर्पयामि॥\n\nॐ शान्तिः शान्तिः शान्तिः॥',
       telugu:
-        'కాయేన వాచా మనసేంద్రియైర్వా\nబుద్ధ్యాత్మనా వా ప్రకృతేః స్వభావాత్।\nకరోమి యద్యత్ సకలం పరస్మై\nనారాయణాయేతి సమర్పయామి॥\n\nసూర్యపుత్ర నమస్తేస్తు నమస్తే పంచవక్త్రక।\nనమోగంధర్వ దేవాయ రేవంతాయ నమోనమః॥\n\nఓం శాంతిః శాంతిః శాంతిః॥',
+        'కాయేన వాచా మనసేంద్రియైర్వా\nబుద్ధ్యాత్మనా వా ప్రకృతేః స్వభావాత్।\nకరోమి యద్యత్ సకలం పరస్మై\nనారాయణాయేతి సమర్పయామి॥\n\nఓం శాంతిః శాంతిః శాంతిః॥',
       english:
-        'Whatever I do with body, speech, mind, senses, intellect, or by nature — I offer all of it to the Supreme Lord Narayana.\n\nSalutations to the son of Surya, the five-faced one. Salutations to Gandharva Deva Revanta, again and again.\n\nOm Peace, Peace, Peace.',
-      source: 'Panduranga Ashtakam / Revanta Stuti',
+        'Whatever I do with body, speech, mind, senses, intellect, or by nature — I offer all of it to the Supreme Lord Narayana.\n\nOm Peace, Peace, Peace.',
+      source: 'Panduranga Ashtakam',
     },
     instructions: {
-      te: 'చేతులు జోడించి, హృదయపూర్వకంగా ప్రార్థన చేయండి. రేవంతునికి, మీ కులదేవతకు నమస్కారం చేయండి.\n\n🍋 నాలుగు నిమ్మకాయలను నాలుగు టైర్ల కింద ఉంచి, ముందుకు నడిపించండి.',
-      en: 'Join your palms in Namaste. Pray with all your heart. Bow to Revanta and your Kuladevata (family deity).\n\n🍋 Place four lemons under the four tires and drive forward slowly to crush them.',
+      te: 'చేతులు జోడించి, హృదయపూర్వకంగా ప్రార్థన చేయండి. మీ కులదేవతకు నమస్కారం చేయండి.\n\n🍋 నాలుగు నిమ్మకాయలను నాలుగు టైర్ల కింద ఉంచి, ముందుకు నడిపించండి.',
+      en: 'Join your palms in Namaste. Pray with all your heart. Bow to your Kuladevata (family deity).\n\n🍋 Place four lemons under the four tires and drive forward slowly to crush them.',
     },
   },
 ];
