@@ -25,16 +25,19 @@ export function OmIcon({ size = 24, color = 'currentColor', ...props }) {
 export function DiyaIcon({ size = 24, color = 'currentColor', ...props }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" {...props}>
-      {/* Flame */}
-      <path d="M12 3c0 0-2.5 3-2.5 4.5C9.5 9 10.5 10 12 10s2.5-1 2.5-2.5C14.5 6 12 3 12 3z"
-        fill={color} opacity="0.25" stroke={color} strokeWidth="1.2" strokeLinejoin="round" />
+      {/* Flame — yellowish orange like real deepam */}
+      <path d="M12 2c0 0-3 3.5-3 5.5C9 9.5 10.3 11 12 11s3-1.5 3-3.5C15 5.5 12 2 12 2z"
+        fill="#F5A623" opacity="0.9" stroke="#E8912D" strokeWidth="1" strokeLinejoin="round" />
+      {/* Inner flame glow */}
+      <path d="M12 4.5c0 0-1.4 1.8-1.4 2.8C10.6 8.3 11.2 9 12 9s1.4-.7 1.4-1.7C13.4 6.3 12 4.5 12 4.5z"
+        fill="#FFD93D" opacity="0.8" />
       {/* Lamp body */}
-      <path d="M7 14c0-2 2.2-3 5-3s5 1 5 3" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M7 15c0-2.2 2.2-3.5 5-3.5s5 1.3 5 3.5" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
       {/* Base */}
-      <path d="M6 14h12c0 0-.5 4-6 4s-6-4-6-4z" stroke={color} strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="M6 15h12c0 0-.5 4-6 4s-6-4-6-4z" stroke={color} strokeWidth="1.5" strokeLinejoin="round" fill={color} opacity="0.08" />
       {/* Stand */}
-      <line x1="12" y1="18" x2="12" y2="20" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
-      <line x1="9" y1="20" x2="15" y2="20" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="12" y1="19" x2="12" y2="21" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="9" y1="21" x2="15" y2="21" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
     </svg>
   );
 }

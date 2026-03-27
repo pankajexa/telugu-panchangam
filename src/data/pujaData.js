@@ -1,7 +1,7 @@
 /**
  * Ganapathi Panchopachara Puja — 10 guided steps
  * Shastra-backed daily puja with Sanskrit mantras, Telugu transliteration, and English meaning.
- * Total duration: ~10 minutes
+ * Total duration: ~7 minutes
  */
 
 export const GANAPATHI_PUJA_STEPS = [
@@ -10,7 +10,7 @@ export const GANAPATHI_PUJA_STEPS = [
     nameKey: 'puja.step.purification',
     nameSanskrit: 'पवित्रीकरणम्',
     nameEnglish: 'Purification',
-    duration: 30,
+    duration: 20,
     icon: 'kalash',
     hasBreathingGuide: false,
     mantra: {
@@ -32,7 +32,7 @@ export const GANAPATHI_PUJA_STEPS = [
     nameKey: 'puja.step.pranayama',
     nameSanskrit: 'प्राणायामः',
     nameEnglish: 'Pranayama',
-    duration: 120,
+    duration: 90,
     icon: 'om',
     hasBreathingGuide: true,
     mantra: {
@@ -54,7 +54,7 @@ export const GANAPATHI_PUJA_STEPS = [
     nameKey: 'puja.step.sankalpa',
     nameSanskrit: 'सङ्कल्पम्',
     nameEnglish: 'Sankalpa',
-    duration: 30,
+    duration: 20,
     icon: 'mala',
     hasBreathingGuide: false,
     mantra: {
@@ -76,7 +76,7 @@ export const GANAPATHI_PUJA_STEPS = [
     nameKey: 'puja.step.dhyanam',
     nameSanskrit: 'ध्यानम्',
     nameEnglish: 'Meditation',
-    duration: 120,
+    duration: 90,
     icon: 'lotus',
     hasBreathingGuide: false,
     mantra: {
@@ -98,7 +98,7 @@ export const GANAPATHI_PUJA_STEPS = [
     nameKey: 'puja.step.gandham',
     nameSanskrit: 'गन्धम्',
     nameEnglish: 'Sandalwood Paste',
-    duration: 30,
+    duration: 20,
     icon: 'lotus',
     hasBreathingGuide: false,
     mantra: {
@@ -111,8 +111,8 @@ export const GANAPATHI_PUJA_STEPS = [
       source: 'Ganapathi Panchopachara Puja',
     },
     instructions: {
-      te: 'గంధం లేదా కుంకుమ తీసుకుని విగ్రహానికి అలంకరించండి. మానస పూజలో, మనసులో అర్పించండి.',
-      en: 'Apply sandalwood paste or kumkum to the deity. In Manasa Pooja, offer it mentally with devotion.',
+      te: 'గంధం లేదా కుంకుమ తీసుకుని విగ్రహానికి అలంకరించండి. భక్తితో అర్పించండి.',
+      en: 'Apply sandalwood paste or kumkum to the deity. Offer with devotion.',
     },
   },
   {
@@ -120,7 +120,7 @@ export const GANAPATHI_PUJA_STEPS = [
     nameKey: 'puja.step.pushpam',
     nameSanskrit: 'पुष्पम्',
     nameEnglish: 'Flowers',
-    duration: 30,
+    duration: 20,
     icon: 'lotus',
     hasBreathingGuide: false,
     mantra: {
@@ -142,7 +142,7 @@ export const GANAPATHI_PUJA_STEPS = [
     nameKey: 'puja.step.dhoopam',
     nameSanskrit: 'धूपम्',
     nameEnglish: 'Incense',
-    duration: 30,
+    duration: 20,
     icon: 'diya',
     hasBreathingGuide: false,
     mantra: {
@@ -164,7 +164,7 @@ export const GANAPATHI_PUJA_STEPS = [
     nameKey: 'puja.step.deepam',
     nameSanskrit: 'दीपम्',
     nameEnglish: 'Lamp',
-    duration: 30,
+    duration: 20,
     icon: 'diya',
     hasBreathingGuide: false,
     mantra: {
@@ -186,7 +186,7 @@ export const GANAPATHI_PUJA_STEPS = [
     nameKey: 'puja.step.naivedyam',
     nameSanskrit: 'नैवेद्यम्',
     nameEnglish: 'Food Offering',
-    duration: 60,
+    duration: 40,
     icon: 'kalash',
     hasBreathingGuide: false,
     mantra: {
@@ -208,7 +208,7 @@ export const GANAPATHI_PUJA_STEPS = [
     nameKey: 'puja.step.prarthana',
     nameSanskrit: 'प्रार्थना',
     nameEnglish: 'Closing Prayer',
-    duration: 120,
+    duration: 80,
     icon: 'bell',
     hasBreathingGuide: false,
     mantra: {
@@ -232,10 +232,10 @@ export const PUJA_ITEMS_NEEDED = {
   en: ['Water', 'Sandalwood paste / Kumkum', 'Flowers / Durva grass', 'Incense stick', 'Lamp (ghee or oil)', 'Fruit / Sweet offering'],
 };
 
-export const TOTAL_DURATION = 600; // 10 minutes in seconds
+export const TOTAL_DURATION = 420; // 7 minutes in seconds
 
 export const PUJA_META = {
   title: { te: 'గణపతి పంచోపచార పూజ', en: 'Ganapathi Panchopachara Puja' },
-  subtitle: { te: 'మానస పూజ • 10 నిమిషాలు', en: 'Manasa Pooja • 10 minutes' },
+  subtitle: { te: 'పంచోపచార పూజ • 7 నిమిషాలు', en: 'Panchopachara Puja • 7 minutes' },
   deity: 'Ganapathi',
 };

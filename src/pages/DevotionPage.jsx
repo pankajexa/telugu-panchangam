@@ -205,10 +205,9 @@ export default function DevotionPage() {
             onClick={() => sharingRef.current?.scrollIntoView({ behavior: 'smooth' })}
           />
           <WidgetCard
-            icon={<DiyaIcon size={28} color="#C49B2A" />}
+            icon={<DiyaIcon size={36} color="#C49B2A" />}
             title={pick('నిత్య పూజ', 'Daily Puja')}
-            subtitle={pick('గణపతి పంచోపచార • 10 ని', 'Ganapathi Panchopachara • 10 min')}
-            badge={pick('మానస పూజ', 'Manasa Pooja')}
+            subtitle={pick('గణపతి పంచోపచార • 7 ని', 'Ganapathi Panchopachara • 7 min')}
             onClick={() => navigate('/devotion/puja')}
           />
         </div>
