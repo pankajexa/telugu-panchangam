@@ -102,6 +102,7 @@ function AppShell() {
               <Route path="/calendar" element={<CalendarPage />} />
               <Route path="/devotion" element={<DevotionPage />} />
               <Route path="/devotion/puja" element={<GuidedPujaPage />} />
+              <Route path="/devotion/vahana-puja" element={<GuidedPujaPage pujaType="vahana" />} />
               <Route path="/festivals" element={<FestivalsPage />} />
               <Route path="/muhurta" element={<MuhurtaPage />} />
               <Route path="/settings" element={<SettingsPage />} />
