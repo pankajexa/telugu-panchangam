@@ -210,6 +210,12 @@ export default function DevotionPage() {
             subtitle={pick('గణపతి పంచోపచార • 7 ని', 'Ganapathi Panchopachara • 7 min')}
             onClick={() => navigate('/devotion/puja')}
           />
+          <WidgetCard
+            icon={<OmIcon size={28} color="#C49B2A" />}
+            title={pick('వాహన పూజ', 'Vahana Puja')}
+            subtitle={pick('వాహన రక్షణ • 7 ని', 'Vehicle Blessing • 7 min')}
+            onClick={() => navigate('/devotion/vahana-puja')}
+          />
         </div>
 
         {/* ═══════════════════════════════════════════ */}

@@ -7,15 +7,39 @@ import {
   PUJA_META,
   TOTAL_DURATION,
 } from '../data/pujaData';
+import {
+  VAHANA_PUJA_STEPS,
+  VAHANA_PUJA_ITEMS,
+  VAHANA_PUJA_META,
+  VAHANA_TOTAL_DURATION,
+} from '../data/vahanaPujaData';
 import BreathingGuide from '../components/puja/BreathingGuide';
 import { ArrowLeft, ChevronRight, Pause, Play, SkipForward } from 'lucide-react';
 import { OmIcon, DiyaIcon, KalashIcon, LotusIcon } from '../components/icons/HinduIcons';
 
 // ---------------------------------------------------------------------------
+// Puja data lookup by type
+// ---------------------------------------------------------------------------
+const PUJA_CONFIGS = {
+  ganapathi: {
+    steps: GANAPATHI_PUJA_STEPS,
+    items: PUJA_ITEMS_NEEDED,
+    meta: PUJA_META,
+    totalDuration: TOTAL_DURATION,
+  },
+  vahana: {
+    steps: VAHANA_PUJA_STEPS,
+    items: VAHANA_PUJA_ITEMS,
+    meta: VAHANA_PUJA_META,
+    totalDuration: VAHANA_TOTAL_DURATION,
+  },
+};
+
+// ---------------------------------------------------------------------------
 // GuidedPujaPage
 // ---------------------------------------------------------------------------
 
-export default function GuidedPujaPage() {
+export default function GuidedPujaPage({ pujaType = 'ganapathi' }) {
   const { language, t } = useLanguage();
   const navigate = useNavigate();
 
@@ -38,7 +62,8 @@ export default function GuidedPujaPage() {
   // Wake lock ref
   const wakeLockRef = useRef(null);
 
-  const steps = GANAPATHI_PUJA_STEPS;
+  const config = PUJA_CONFIGS[pujaType] || PUJA_CONFIGS.ganapathi;
+  const steps = config.steps;
   const currentStep = steps[currentStepIndex];
   const lang = language === 'te' ? 'te' : 'en';
 
@@ -201,7 +226,7 @@ export default function GuidedPujaPage() {
   // Computed values
   // ---------------------------------------------------------------------------
   const overallProgress = useMemo(
-    () => Math.min(overallElapsed / TOTAL_DURATION, 1),
+    () => Math.min(overallElapsed / config.totalDuration, 1),
     [overallElapsed]
   );
 
@@ -220,7 +245,7 @@ export default function GuidedPujaPage() {
   // Render: Preparation
   // ---------------------------------------------------------------------------
   if (pujaState === 'prep') {
-    const items = PUJA_ITEMS_NEEDED[lang] || PUJA_ITEMS_NEEDED.en;
+    const items = config.items[lang] || config.items.en;
     return (
       <div style={styles.page}>
         {/* Back */}
@@ -236,10 +261,10 @@ export default function GuidedPujaPage() {
 
           {/* Title */}
           <h1 style={styles.prepTitle}>
-            {PUJA_META.title[lang] || PUJA_META.title.en}
+            {config.meta.title[lang] || config.meta.title.en}
           </h1>
           <p style={styles.prepSubtitle}>
-            {PUJA_META.subtitle[lang] || PUJA_META.subtitle.en}
+            {config.meta.subtitle[lang] || config.meta.subtitle.en}
           </p>
 
           {/* Items Needed */}
