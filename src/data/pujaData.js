@@ -37,12 +37,12 @@ export const GANAPATHI_PUJA_STEPS = [
     hasBreathingGuide: true,
     mantra: {
       devanagari:
-        'ॐ भूः। ॐ भुवः। ओँ सुवः। ॐ महः। ॐ जनः। ॐ तपः। ओँ सत्यम्।\nॐ तत्सवितुर्वरेण्यं भर्गो देवस्य धीमहि।\nधियो यो नः प्रचोदयात्॥',
+        'पूरकं कुम्भकं चैव रेचकं तदनन्तरम्।\nप्राणायाम मिदं प्रोक्तं सर्व देव नमस्कृतम्॥',
       telugu:
-        'ఓం భూః। ఓం భువః। ఓం సువః। ఓం మహః। ఓం జనః। ఓం తపః। ఓం సత్యమ్।\nఓం తత్సవితుర్వరేణ్యం భర్గో దేవస్య ధీమహి।\nధియో యో నః ప్రచోదయాత్॥',
+        'పూరకం కుంభకం చైవ రేచకం తదనంతరం।\nప్రాణాయామ మిదం ప్రోక్తం సర్వ దేవ నమస్కృతం॥',
       english:
-        'We meditate upon the divine light of the Sun God Savitri. May that supreme light illuminate our intellect and guide us on the right path.',
-      source: 'Rig Veda 3.62.10 (Gayatri Mantra)',
+        'Inhaling (Puraka), retaining (Kumbhaka), and then exhaling (Rechaka) — this is called Pranayama, which is revered by all the Gods.',
+      source: 'Pranayama Mantra',
     },
     instructions: {
       te: 'కుడి చేతి బొటనవేలుతో కుడి నాసికను మూసి, ఎడమ నాసిక ద్వారా శ్వాస తీసుకోండి. రెండూ మూసి ధారణ చేయండి. కుడి నాసిక ద్వారా వదలండి.',
@@ -221,8 +221,8 @@ export const GANAPATHI_PUJA_STEPS = [
       source: 'Ganapathi Panchopachara Puja / Panduranga Ashtakam',
     },
     instructions: {
-      te: 'చేతులు జోడించి, హృదయపూర్వకంగా ప్రార్థన చేయండి. గణపతికి నమస్కరించండి.',
-      en: 'Join your palms in Namaste. Pray with all your heart. Bow to Lord Ganapathi.',
+      te: 'చేతులు జోడించి, హృదయపూర్వకంగా ప్రార్థన చేయండి. గణపతికి నమస్కరించండి.\n\nచివరగా, మీ కులదేవతకు నమస్కారం చేయండి.',
+      en: 'Join your palms in Namaste. Pray with all your heart. Bow to Lord Ganapathi.\n\nFinally, offer Namaskaram to your Kuladevata (family deity).',
     },
   },
 ];
