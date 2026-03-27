@@ -111,8 +111,8 @@ export const GANAPATHI_PUJA_STEPS = [
       source: 'Ganapathi Panchopachara Puja',
     },
     instructions: {
-      te: 'గంధం లేదా కుంకుమ తీసుకుని విగ్రహానికి అలంకరించండి. మానస పూజలో, మనసులో అర్పించండి.',
-      en: 'Apply sandalwood paste or kumkum to the deity. In Manasa Pooja, offer it mentally with devotion.',
+      te: 'గంధం లేదా కుంకుమ తీసుకుని విగ్రహానికి అలంకరించండి. భక్తితో అర్పించండి.',
+      en: 'Apply sandalwood paste or kumkum to the deity. Offer with devotion.',
     },
   },
   {

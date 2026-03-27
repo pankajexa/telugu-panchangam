@@ -225,7 +225,6 @@ const translations = {
     'devotion.sharingSub': 'పంచాంగం & శ్లోకాలు పంపండి',
     'devotion.pujaWidget': 'నిత్య పూజ',
     'devotion.pujaSub': 'గణపతి పంచోపచార పూజ',
-    'devotion.manasaPooja': 'మానస పూజ',
 
     // Guided Puja
     'puja.guided.title': 'గణపతి పంచోపచార పూజ',
@@ -480,7 +479,6 @@ const translations = {
     'devotion.sharingSub': 'Share Panchangam & Shlokas',
     'devotion.pujaWidget': 'Daily Puja',
     'devotion.pujaSub': 'Ganapathi Panchopachara Puja',
-    'devotion.manasaPooja': 'Manasa Pooja',
 
     // Guided Puja
     'puja.guided.title': 'Ganapathi Panchopachara Puja',
