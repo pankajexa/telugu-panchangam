@@ -17,14 +17,16 @@ import './styles/paper.css';
 const calendarImport = () => import('./pages/CalendarPage');
 const festivalsImport = () => import('./pages/FestivalsPage');
 const muhurtaImport = () => import('./pages/MuhurtaPage');
-const shareCenterImport = () => import('./pages/ShareCenterPage');
+const devotionImport = () => import('./pages/DevotionPage');
+const guidedPujaImport = () => import('./pages/GuidedPujaPage');
 const settingsImport = () => import('./pages/SettingsPage');
 const privacyImport = () => import('./pages/PrivacyPolicyPage');
 
 const CalendarPage = lazy(calendarImport);
 const FestivalsPage = lazy(festivalsImport);
 const MuhurtaPage = lazy(muhurtaImport);
-const ShareCenterPage = lazy(shareCenterImport);
+const DevotionPage = lazy(devotionImport);
+const GuidedPujaPage = lazy(guidedPujaImport);
 const SettingsPage = lazy(settingsImport);
 const PrivacyPolicyPage = lazy(privacyImport);
 
@@ -33,7 +35,8 @@ function preloadAllPages() {
   calendarImport();
   festivalsImport();
   muhurtaImport();
-  shareCenterImport();
+  devotionImport();
+  guidedPujaImport();
   settingsImport();
   privacyImport();
 }
@@ -97,7 +100,8 @@ function AppShell() {
             <Routes>
               <Route path="/" element={<TodayPage />} />
               <Route path="/calendar" element={<CalendarPage />} />
-              <Route path="/share" element={<ShareCenterPage />} />
+              <Route path="/devotion" element={<DevotionPage />} />
+              <Route path="/devotion/puja" element={<GuidedPujaPage />} />
               <Route path="/festivals" element={<FestivalsPage />} />
               <Route path="/muhurta" element={<MuhurtaPage />} />
               <Route path="/settings" element={<SettingsPage />} />
