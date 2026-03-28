@@ -24,9 +24,9 @@ const MoonPhase = memo(function MoonPhase({ tithiIndex = 0, paksha, pakshaEn, ti
   const warmGlow = `rgba(255, 240, 180, ${0.2 + g * 0.4})`;
 
   return (
-    <div style={S.wrapper}>
+    <div data-moon="true" style={S.wrapper}>
       {/* Deep space background with stars */}
-      <div style={S.spaceBackground}>
+      <div data-moon="true" style={S.spaceBackground}>
         {STARS.map((star, i) => (
           <div key={i} style={{
             position: 'absolute', borderRadius: '50%', background: '#FFF',
