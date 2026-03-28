@@ -1,6 +1,8 @@
 import { memo } from 'react';
+import { useTheme } from '../../context/ThemeContext';
 
 const AdditionalInfoCard = memo(function AdditionalInfoCard({ detailed, t, font, pick }) {
+  const { isNight, colors } = useTheme();
   // Extract from detailed panchangam data
   const rows = [];
 
@@ -17,13 +19,13 @@ const AdditionalInfoCard = memo(function AdditionalInfoCard({ detailed, t, font,
   if (rows.length === 0) return null;
 
   return (
-    <div style={styles.card}>
-      <div style={styles.sectionLabel}>{t('today.moreDetails')}</div>
+    <div style={{ ...styles.card, background: colors.cardBg, border: `1px solid ${colors.border}` }}>
+      <div style={{ ...styles.sectionLabel, color: colors.textFaint }}>{t('today.moreDetails')}</div>
       {rows.map((item, i) => (
-        <div key={i} style={{ ...styles.row, borderTop: i > 0 ? '1px solid rgba(0,0,0,0.04)' : 'none' }}>
-          <span style={{ ...styles.label, fontFamily: font }}>{item.label}</span>
+        <div key={i} style={{ ...styles.row, borderTop: i > 0 ? `1px solid ${colors.border}` : 'none' }}>
+          <span style={{ ...styles.label, fontFamily: font, color: colors.textMuted }}>{item.label}</span>
           <div style={styles.valueWrap}>
-            <span style={{ ...styles.value, fontFamily: font }}>{item.value}</span>
+            <span style={{ ...styles.value, fontFamily: font, color: colors.text }}>{item.value}</span>
             <div style={{ ...styles.dot, background: item.dot }} />
           </div>
         </div>

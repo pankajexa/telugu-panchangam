@@ -1,7 +1,9 @@
 import { memo } from 'react';
 import { Sunrise, Sunset, MoonStar } from 'lucide-react';
+import { useTheme } from '../../context/ThemeContext';
 
 const SunMoonStrip = memo(function SunMoonStrip({ data, detailed, t }) {
+  const { isNight, colors } = useTheme();
   // Format moonrise from HH:MM 24h to 12h display
   const fmt12 = (t24) => {
     if (!t24 || t24 === '--') return '--';
@@ -18,12 +20,12 @@ const SunMoonStrip = memo(function SunMoonStrip({ data, detailed, t }) {
   ];
 
   return (
-    <div style={styles.strip}>
+    <div style={{ ...styles.strip, border: `1px solid ${colors.border}` }}>
       {items.map((item, i) => (
-        <div key={i} style={{ ...styles.cell, background: item.bg, borderRight: i < 2 ? '1px solid rgba(0,0,0,0.04)' : 'none' }}>
+        <div key={i} style={{ ...styles.cell, background: item.bg, borderRight: i < 2 ? `1px solid ${colors.border}` : 'none' }}>
           <div style={styles.icon}><item.Icon size={18} color={item.color} strokeWidth={1.8} /></div>
-          <div style={styles.label}>{item.label}</div>
-          <div style={styles.time}>{item.time}</div>
+          <div style={{ ...styles.label, color: colors.textMuted }}>{item.label}</div>
+          <div style={{ ...styles.time, color: colors.text }}>{item.time}</div>
         </div>
       ))}
     </div>

@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback, useRef } from 'react';
 import { useLanguage } from '../context/LanguageContext';
+import { useTheme } from '../context/ThemeContext';
 import { useLocation } from '../context/LocationContext';
 import { getPanchangamForDate } from '../data/panchangam';
 import { TITHIS, TITHIS_EN } from '../data/constants';
@@ -164,6 +165,7 @@ const miniS = {
 // ═══════════════════════════════════════════════════
 export default function CalendarPage() {
   const { t, pick, font, language } = useLanguage();
+  const { isNight, colors } = useTheme();
   const { location, teluguMonths } = useLocation();
 
   const today = useMemo(() => new Date(), []);
@@ -258,13 +260,13 @@ export default function CalendarPage() {
           <div style={{ flex: 1 }}>
             {calendarMode === 'english' ? (
               <>
-                <h1 style={S.title}>{viewMode === 'month' ? `${MONTH_NAMES_EN[currentMonth]} ${currentYear}` : currentYear}</h1>
+                <h1 style={{ ...S.title, color: colors.text }}>{viewMode === 'month' ? `${MONTH_NAMES_EN[currentMonth]} ${currentYear}` : currentYear}</h1>
                 {viewMode === 'year' && <div style={S.subtitle}>{language === 'te' ? 'సంవత్సర వీక్షణ' : 'Year View'}</div>}
               </>
             ) : (
               <>
                 <h1 style={{ ...S.title, color: hmc.text }}>{pick(currentTeluguMonth?.telugu, currentTeluguMonth?.english)}</h1>
-                <div style={S.subtitle}>{hinduSpanLabel}</div>
+                <div style={{ ...S.subtitle, color: colors.textMuted }}>{hinduSpanLabel}</div>
               </>
             )}
           </div>
@@ -274,8 +276,8 @@ export default function CalendarPage() {
                 {viewMode === 'month' ? <Grid3x3 size={16} color="#666" strokeWidth={1.8} /> : <CalendarDays size={16} color="white" strokeWidth={1.8} />}
               </button>
             )}
-            <button style={S.navBtn} onClick={handlePrev}><ChevronLeft size={18} color="#666" /></button>
-            <button style={S.navBtn} onClick={handleNext}><ChevronRight size={18} color="#666" /></button>
+            <button style={{ ...S.navBtn, background: colors.cardBg, border: `1px solid ${colors.border}` }} onClick={handlePrev}><ChevronLeft size={18} color={colors.iconColor} /></button>
+            <button style={{ ...S.navBtn, background: colors.cardBg, border: `1px solid ${colors.border}` }} onClick={handleNext}><ChevronRight size={18} color={colors.iconColor} /></button>
           </div>
         </div>
 
@@ -434,15 +436,15 @@ export default function CalendarPage() {
         {selectedData && viewMode === 'month' && (calendarMode === 'english' ? selectedDay : selectedTithiIdx >= 0) && (
           <div style={S.dayDetail}>
             {/* Date header */}
-            <div style={S.dayDetailHeader}>
+            <div style={{ ...S.dayDetailHeader, background: colors.cardBg, border: `1px solid ${colors.border}` }}>
               <div>
-                <div style={S.dayDetailDate}>
+                <div style={{ ...S.dayDetailDate, color: colors.text }}>
                   {calendarMode === 'hindu'
                     ? pick(TITHIS[selectedData.tithiIndex], TITHIS_EN[selectedData.tithiIndex])
                     : `${selectedData.dateNum} ${MONTH_NAMES_EN[calendarMode === 'hindu' ? hinduDays[selectedTithiIdx]?.gregMonth : currentMonth]} ${currentYear}`
                   }
                 </div>
-                <div style={{ ...S.dayDetailDay, fontFamily: font }}>
+                <div style={{ ...S.dayDetailDay, fontFamily: font, color: colors.textSecondary }}>
                   {calendarMode === 'hindu'
                     ? `${selectedData.dateNum} ${MONTH_NAMES_EN[hinduDays[selectedTithiIdx]?.gregMonth]} ${hinduDays[selectedTithiIdx]?.gregYear} • ${language === 'te' ? 'తిథి' : 'Tithi'} ${selectedTithiIdx + 1}`
                     : pick(selectedData.vaaram, selectedData.englishDay)
@@ -496,22 +498,22 @@ export default function CalendarPage() {
             )}
 
             {/* Sunrise / Sunset */}
-            <div style={S.daySunRow}>
-              <div style={S.daySunItem}><Sunrise size={15} color="#D4790A" strokeWidth={1.8} /><div><div style={S.daySunLabel}>{t('today.sunrise')}</div><div style={S.daySunTime}>{selectedData.sunrise}</div></div></div>
+            <div style={{ ...S.daySunRow, background: colors.cardBg, border: `1px solid ${colors.border}` }}>
+              <div style={S.daySunItem}><Sunrise size={15} color="#D4790A" strokeWidth={1.8} /><div><div style={{ ...S.daySunLabel, color: colors.textMuted }}>{t('today.sunrise')}</div><div style={{ ...S.daySunTime, color: colors.text }}>{selectedData.sunrise}</div></div></div>
               <div style={S.daySunDivider} />
-              <div style={S.daySunItem}><Sunset size={15} color="#C74530" strokeWidth={1.8} /><div><div style={S.daySunLabel}>{t('today.sunset')}</div><div style={S.daySunTime}>{selectedData.sunset}</div></div></div>
+              <div style={S.daySunItem}><Sunset size={15} color="#C74530" strokeWidth={1.8} /><div><div style={{ ...S.daySunLabel, color: colors.textMuted }}>{t('today.sunset')}</div><div style={{ ...S.daySunTime, color: colors.text }}>{selectedData.sunset}</div></div></div>
             </div>
 
             {/* Panchang summary */}
-            <div style={S.dayPanchRow}>
+            <div style={{ ...S.dayPanchRow, background: colors.cardBg, border: `1px solid ${colors.border}` }}>
               {[
                 { label: t('today.nakshatra'), value: pick(selectedData.nakshatra.name, selectedData.nakshatra.nameEn) },
                 { label: t('today.yoga'), value: pick(selectedData.yogam.name, selectedData.yogam.nameEn) },
                 { label: t('today.karana'), value: pick(selectedData.karanam.name, selectedData.karanam.nameEn) },
               ].map((item, idx, arr) => (
-                <div key={idx} style={{ ...S.dayPanchItem, borderRight: idx < arr.length - 1 ? '1px solid rgba(0,0,0,0.05)' : 'none' }}>
-                  <div style={S.dayPanchLabel}>{item.label}</div>
-                  <div style={{ ...S.dayPanchValue, fontFamily: font }}>{item.value}</div>
+                <div key={idx} style={{ ...S.dayPanchItem, borderRight: idx < arr.length - 1 ? `1px solid ${colors.border}` : 'none' }}>
+                  <div style={{ ...S.dayPanchLabel, color: colors.textFaint }}>{item.label}</div>
+                  <div style={{ ...S.dayPanchValue, fontFamily: font, color: colors.text }}>{item.value}</div>
                 </div>
               ))}
             </div>

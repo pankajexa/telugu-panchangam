@@ -1,10 +1,12 @@
 import { memo } from 'react';
 import MoonPhase from './MoonPhase';
+import { useTheme } from '../../context/ThemeContext';
 
 const ENGLISH_DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const TELUGU_DAYS = ['ఆదివారం', 'సోమవారం', 'మంగళవారం', 'బుధవారం', 'గురువారం', 'శుక్రవారం', 'శనివారం'];
 
 const DayHeader = memo(function DayHeader({ data, detailed, font, pick, language, t }) {
+  const { isNight, colors } = useTheme();
   const today = new Date();
   const dayName = pick(TELUGU_DAYS[today.getDay()], ENGLISH_DAYS[today.getDay()]);
   const dateStr = `${data.dateNum} ${data.englishMonth}, ${data.year}`;
@@ -18,9 +20,9 @@ const DayHeader = memo(function DayHeader({ data, detailed, font, pick, language
           <span style={{ ...styles.masaName, fontFamily: font }}>{masaLabel}</span>
         </div>
         {/* Large date (primary) */}
-        <h1 style={styles.dateNum}>{dateStr}</h1>
+        <h1 style={{ ...styles.dateNum, color: colors.text }}>{dateStr}</h1>
         {/* Day name (secondary, smaller) */}
-        <div style={{ ...styles.dayName, fontFamily: font }}>{dayName}</div>
+        <div style={{ ...styles.dayName, fontFamily: font, color: colors.iconColor }}>{dayName}</div>
       </div>
       {/* Moon phase */}
       <MoonPhase

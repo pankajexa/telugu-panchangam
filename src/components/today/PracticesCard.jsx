@@ -1,9 +1,11 @@
 import { memo, useState } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
+import { useTheme } from '../../context/ThemeContext';
 import { ChevronDown, ChevronUp, BookOpen, UtensilsCrossed, Clock, Music } from 'lucide-react';
 
 const PracticesCard = memo(function PracticesCard({ practices }) {
   const { pick, font } = useLanguage();
+  const { isNight, colors } = useTheme();
   const [expanded, setExpanded] = useState(true);
 
   if (!practices) return null;
@@ -11,16 +13,16 @@ const PracticesCard = memo(function PracticesCard({ practices }) {
   const title = pick(practices.title_te, practices.title_en);
 
   return (
-    <div style={styles.card}>
+    <div style={{ ...styles.card, background: colors.cardBg, border: `1px solid ${colors.border}` }}>
       {/* Header — tap to expand/collapse */}
       <button style={styles.header} onClick={() => setExpanded(e => !e)}>
         <div style={styles.headerLeft}>
           <BookOpen size={18} color="#E63B2E" strokeWidth={2} />
-          <span style={{ ...styles.title, fontFamily: font }}>{title}</span>
+          <span style={{ ...styles.title, fontFamily: font, color: colors.text }}>{title}</span>
         </div>
         {expanded
-          ? <ChevronUp size={18} color="#999" strokeWidth={1.8} />
-          : <ChevronDown size={18} color="#999" strokeWidth={1.8} />
+          ? <ChevronUp size={18} color={colors.textMuted} strokeWidth={1.8} />
+          : <ChevronDown size={18} color={colors.textMuted} strokeWidth={1.8} />
         }
       </button>
 
@@ -31,7 +33,7 @@ const PracticesCard = memo(function PracticesCard({ practices }) {
             {practices.steps.map((step, i) => (
               <div key={i} style={styles.stepRow}>
                 <div style={styles.stepNum}>{i + 1}</div>
-                <div style={{ ...styles.stepText, fontFamily: font }}>
+                <div style={{ ...styles.stepText, fontFamily: font, color: colors.textSecondary }}>
                   {pick(step.te, step.en)}
                 </div>
               </div>
@@ -41,7 +43,7 @@ const PracticesCard = memo(function PracticesCard({ practices }) {
           {/* Mantra */}
           {practices.mantra && (
             <div style={styles.mantraBox}>
-              <div style={styles.sectionLabel}>
+              <div style={{ ...styles.sectionLabel, color: colors.textMuted }}>
                 <Music size={13} color="#E63B2E" strokeWidth={2} />
                 <span>{pick('మంత్రం', 'Mantra')}</span>
               </div>

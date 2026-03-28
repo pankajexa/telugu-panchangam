@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useLanguage } from '../context/LanguageContext';
+import { useTheme } from '../context/ThemeContext';
 import { useLocation } from '../context/LocationContext';
 import { getPanchangamForDate } from '../data/panchangam';
 import { getShlokaOfTheDay, getShlokasByCategory, SHLOKAS, CATEGORY_LABELS } from '../data/shlokas';
@@ -16,6 +17,7 @@ const ASSET_BASE = '/assets/greetings';
 
 export default function ShareCenterPage() {
   const { t, pick, font, language } = useLanguage();
+  const { isNight, colors } = useTheme();
   const { location } = useLocation();
 
   const today = useMemo(() => new Date(), []);
@@ -111,9 +113,9 @@ export default function ShareCenterPage() {
 
             {/* Festival wishes card */}
             {data.festival?.major && (
-              <div style={S.festWishCard}>
+              <div style={{ ...S.festWishCard, background: colors.cardBg, border: `1px solid ${colors.border}` }}>
                 <div style={S.festWishHeader}>
-                  <div style={{ ...S.festWishName, fontFamily: font }}>
+                  <div style={{ ...S.festWishName, fontFamily: font, color: colors.text }}>
                     {pick(`${festivalName} శుభాకాంక్షలు పంపండి`, `Send ${festivalName} Wishes`)}
                   </div>
                 </div>
@@ -127,19 +129,19 @@ export default function ShareCenterPage() {
             </div>
             <div style={S.festShlokaGrid}>
               {festivalShlokas.map((shloka) => (
-                <div key={shloka.id} style={S.festShlokaCard}>
+                <div key={shloka.id} style={{ ...S.festShlokaCard, background: colors.cardBg, border: `1px solid ${colors.border}` }}>
                   {/* Shloka content */}
-                  <div style={{ ...S.festShlokaDevanagari, fontFamily: "'Noto Sans Devanagari', sans-serif" }}>
+                  <div style={{ ...S.festShlokaDevanagari, fontFamily: "'Noto Sans Devanagari', sans-serif", color: colors.text }}>
                     {shloka.sanskritDevanagari.split('\n')[0]}…
                   </div>
-                  <div style={{ ...S.festShlokaTelugu, fontFamily: "'Noto Sans Telugu', sans-serif" }}>
+                  <div style={{ ...S.festShlokaTelugu, fontFamily: "'Noto Sans Telugu', sans-serif", color: colors.iconColor }}>
                     {shloka.teluguTransliteration.split('\n')[0]}
                   </div>
                   <div style={S.festShlokaMeaning}>
                     {shloka.englishMeaning.length > 100 ? shloka.englishMeaning.slice(0, 100) + '…' : shloka.englishMeaning}
                   </div>
-                  <div style={S.festShlokaFooter}>
-                    <span style={S.festShlokaSource}>{shloka.source}</span>
+                  <div style={{ ...S.festShlokaFooter, borderTop: `1px solid ${colors.border}` }}>
+                    <span style={{ ...S.festShlokaSource, color: colors.textFaint }}>{shloka.source}</span>
                     <div style={S.festShlokaBtns}>
                       <button style={S.festReadBtn} onClick={() => setSelectedShloka(shloka)}>
                         {pick('చదవండి', 'Read')}
@@ -165,8 +167,8 @@ export default function ShareCenterPage() {
           /* ═══ Regular header (non-festival day) ═══ */
           <div style={S.headerRow}>
             <div>
-              <h1 style={S.title}>{t('share.title')}</h1>
-              <div style={S.subtitle}>{t('share.subtitle')}</div>
+              <h1 style={{ ...S.title, color: colors.text }}>{t('share.title')}</h1>
+              <div style={{ ...S.subtitle, color: colors.textMuted }}>{t('share.subtitle')}</div>
             </div>
             <Share2 size={24} color="#E63B2E" strokeWidth={1.8} />
           </div>
@@ -177,28 +179,28 @@ export default function ShareCenterPage() {
         {/* ═══════════════════════════════════════════ */}
 
         {/* Section: Today's Panchangam */}
-        <div style={S.sectionLabel}>{t('share.todayPanchangam')}</div>
-        <div style={S.panchangCard}>
+        <div style={{ ...S.sectionLabel, color: colors.textFaint }}>{t('share.todayPanchangam')}</div>
+        <div style={{ ...S.panchangCard, background: colors.cardBg, border: `1px solid ${colors.border}` }}>
           <div style={S.panchangHeader}>
             <div>
-              <div style={{ ...S.panchangDate, fontFamily: "'Playfair Display', serif" }}>
+              <div style={{ ...S.panchangDate, fontFamily: "'Playfair Display', serif", color: colors.text }}>
                 {data.dateNum} {data.englishMonth} {data.year}
               </div>
-              <div style={{ ...S.panchangDay, fontFamily: font }}>
+              <div style={{ ...S.panchangDay, fontFamily: font, color: colors.textSecondary }}>
                 {pick(data.vaaram, data.englishDay)} • {pick(data.masam?.telugu, data.masam?.english)}
               </div>
             </div>
             <div style={S.panchangTithi}>
               <CrescentIcon size={14} color="#E8A817" />
-              <span style={{ ...S.panchangTithiText, fontFamily: font }}>{pick(data.tithi.name, data.tithi.nameEn)}</span>
+              <span style={{ ...S.panchangTithiText, fontFamily: font, color: colors.text }}>{pick(data.tithi.name, data.tithi.nameEn)}</span>
             </div>
           </div>
-          <div style={S.quickRow}>
-            <div style={S.quickItem}><Sunrise size={13} color="#D4790A" strokeWidth={1.8} /><span style={S.quickTime}>{data.sunrise}</span></div>
+          <div style={{ ...S.quickRow, borderTop: `1px solid ${colors.border}`, borderBottom: `1px solid ${colors.border}` }}>
+            <div style={S.quickItem}><Sunrise size={13} color="#D4790A" strokeWidth={1.8} /><span style={{ ...S.quickTime, color: colors.text }}>{data.sunrise}</span></div>
             <div style={S.quickDivider} />
-            <div style={S.quickItem}><Sunset size={13} color="#C74530" strokeWidth={1.8} /><span style={S.quickTime}>{data.sunset}</span></div>
+            <div style={S.quickItem}><Sunset size={13} color="#C74530" strokeWidth={1.8} /><span style={{ ...S.quickTime, color: colors.text }}>{data.sunset}</span></div>
             <div style={S.quickDivider} />
-            <div style={S.quickItem}><span style={{ ...S.quickLabel, fontFamily: font }}>{pick(data.nakshatra.name, data.nakshatra.nameEn)}</span></div>
+            <div style={S.quickItem}><span style={{ ...S.quickLabel, fontFamily: font, color: colors.text }}>{pick(data.nakshatra.name, data.nakshatra.nameEn)}</span></div>
           </div>
           {festivalName && !isFestivalSpecial && <div style={S.panchangFest}>🎊 {festivalName}</div>}
           <div style={S.shareButtonWrap}><ShareButton data={data} /></div>
@@ -221,8 +223,8 @@ export default function ShareCenterPage() {
             const active = activeCategory === key;
             return (
               <button key={key} onClick={() => setActiveCategory(key)} style={{
-                ...S.chip, background: active ? '#1A1A1A' : 'white', color: active ? 'white' : '#999',
-                border: active ? 'none' : '1px solid rgba(0,0,0,0.08)',
+                ...S.chip, background: active ? colors.text : colors.cardBg, color: active ? (isNight ? '#0B0F19' : 'white') : colors.textMuted,
+                border: active ? 'none' : `1px solid ${colors.chipBorder}`,
               }}>{label} ({categories[key].length})</button>
             );
           })}
