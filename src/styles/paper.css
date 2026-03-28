@@ -221,12 +221,16 @@
 [data-theme="night"] [data-moon] *,
 [data-theme="night"] [data-moon],
 [data-theme="night"] [data-bar],
-[data-theme="night"] [data-bar] > * {
+[data-theme="night"] [data-bar] *,
+[data-theme="night"] [data-bar] button,
+[data-theme="night"] [data-bar] svg,
+[data-theme="night"] [data-bar] span {
   background: revert !important;
   backdrop-filter: revert !important;
   -webkit-backdrop-filter: revert !important;
   border-color: revert !important;
-  filter: none !important;
+  /* Keep filter: revert (not none!) so moon brightness/contrast filters work */
+  filter: revert !important;
   color: revert !important;
 }
 
