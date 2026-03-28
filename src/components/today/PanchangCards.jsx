@@ -32,13 +32,19 @@ const TRANSITION_KEYS = {
 };
 
 /**
- * Format a formatDT object { time, date, sameDay } into display string.
- * Always shows full date + time for clarity (e.g., "Mar 28 8:46 AM").
+ * Render a formatDT object as JSX with bold date and regular time.
+ * e.g., **Mar 28** 8:46 AM
  */
-function fmtFull(dt) {
-  if (!dt || typeof dt === 'string') return dt || '--';
-  if (dt.time === '--') return '--';
-  return `${dt.date} ${dt.time}`;
+function DateTimeLabel({ dt, isActive }) {
+  if (!dt || typeof dt === 'string') return <span>{dt || '--'}</span>;
+  if (dt.time === '--') return <span>--</span>;
+  return (
+    <span>
+      <span style={{ fontWeight: 700, color: isActive ? '#C42E23' : '#555' }}>{dt.date}</span>
+      {' '}
+      <span style={{ fontWeight: 400 }}>{dt.time}</span>
+    </span>
+  );
 }
 
 /**
@@ -97,8 +103,6 @@ function PanchangCardItem({ cardKey, label, name, time, transitions, iconBg, fon
         <div style={styles.transitions}>
           {transitions.map((tr, i) => {
             const trName = pick(tr.telugu, tr.english);
-            const startStr = fmtFull(tr.start);
-            const endStr = fmtFull(tr.end);
             // Check if this transition is currently active
             const now = Date.now();
             const isActive = tr.rawStart && tr.rawEnd && now >= tr.rawStart && now < tr.rawEnd;
@@ -122,7 +126,9 @@ function PanchangCardItem({ cardKey, label, name, time, transitions, iconBg, fon
                     ...styles.transitionTime,
                     ...(isActive ? styles.transitionTimeActive : {}),
                   }}>
-                    {startStr} – {endStr}
+                    <DateTimeLabel dt={tr.start} isActive={isActive} />
+                    <span style={{ margin: '0 4px', opacity: 0.5 }}>–</span>
+                    <DateTimeLabel dt={tr.end} isActive={isActive} />
                   </div>
                 </div>
                 {isActive && <div style={styles.activeBadge}>NOW</div>}
