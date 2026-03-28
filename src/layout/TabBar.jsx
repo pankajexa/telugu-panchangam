@@ -1,5 +1,6 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
+import { useTheme } from '../context/ThemeContext';
 import { Sun, CalendarDays, Sparkles, Clock } from 'lucide-react';
 import { DiyaIcon } from '../components/icons/HinduIcons';
 
@@ -15,12 +16,13 @@ export default function TabBar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { t, font } = useLanguage();
+  const { isNight, colors } = useTheme();
 
   return (
-    <nav style={styles.bar}>
+    <nav style={{ ...styles.bar, background: colors.tabBarBg, borderTop: `1px solid ${colors.tabBarBorder}` }}>
       {tabs.map((tab) => {
         const active = location.pathname === tab.path;
-        const color = tab.isCenter ? 'white' : active ? '#E63B2E' : '#B0B0B0';
+        const color = tab.isCenter ? 'white' : active ? '#E63B2E' : (isNight ? '#6A6050' : '#B0B0B0');
 
         if (tab.isCenter) {
           // ── Center accent tab ──

@@ -4,6 +4,7 @@ import { LocationProvider } from './context/LocationContext';
 import { LanguageProvider } from './context/LanguageContext';
 import { ReminderProvider } from './context/ReminderContext';
 import { PanchangamPrefsProvider } from './context/PanchangamPrefsContext';
+import { ThemeProvider } from './context/ThemeContext';
 import TabBar from './layout/TabBar';
 import TopBar from './layout/TopBar';
 import { useLanguage } from './context/LanguageContext';
@@ -122,18 +123,20 @@ function AppShell() {
 
 export default function App() {
   return (
-    <LocationProvider>
-      <LanguageProvider>
-        <ReminderProvider>
-          <PanchangamPrefsProvider>
-            <HashRouter>
-              <AppShell />
-            </HashRouter>
-            {!isCapacitor && <VercelAnalytics />}
-          </PanchangamPrefsProvider>
-        </ReminderProvider>
-      </LanguageProvider>
-    </LocationProvider>
+    <ThemeProvider>
+      <LocationProvider>
+        <LanguageProvider>
+          <ReminderProvider>
+            <PanchangamPrefsProvider>
+              <HashRouter>
+                <AppShell />
+              </HashRouter>
+              {!isCapacitor && <VercelAnalytics />}
+            </PanchangamPrefsProvider>
+          </ReminderProvider>
+        </LanguageProvider>
+      </LocationProvider>
+    </ThemeProvider>
   );
 }
 

@@ -2,12 +2,14 @@ import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLocation as useAppLocation } from '../context/LocationContext';
 import { useLanguage } from '../context/LanguageContext';
+import { useTheme } from '../context/ThemeContext';
 import { MapPin, Settings, Volume2, VolumeX, Globe } from 'lucide-react';
 
 export default function TopBar({ audioPlaying, audioMuted, onToggleAudio, hasAudio }) {
   const navigate = useNavigate();
   const { location } = useAppLocation();
   const { pick, font, language, setLanguage } = useLanguage();
+  const { isNight, colors } = useTheme();
   const [showLangPicker, setShowLangPicker] = useState(false);
 
   const handleLangSelect = useCallback((lang) => {
@@ -16,10 +18,10 @@ export default function TopBar({ audioPlaying, audioMuted, onToggleAudio, hasAud
   }, [setLanguage]);
 
   return (
-    <div style={styles.bar}>
+    <div style={{ ...styles.bar, background: colors.topBarBg, borderBottom: `1px solid ${colors.tabBarBorder}` }}>
       <div style={styles.locationWrap}>
         <MapPin size={14} color="#E63B2E" strokeWidth={2.2} />
-        <span style={{ ...styles.locationText, fontFamily: font }}>
+        <span style={{ ...styles.locationText, fontFamily: font, color: colors.text }}>
           {pick(location.label, location.labelEn || location.label)}
         </span>
       </div>
@@ -60,7 +62,7 @@ export default function TopBar({ audioPlaying, audioMuted, onToggleAudio, hasAud
         </button>
 
         <button style={styles.gearBtn} onClick={() => navigate('/settings')} aria-label="Settings">
-          <Settings size={20} color="#666" strokeWidth={1.8} />
+          <Settings size={20} color={colors.iconColor} strokeWidth={1.8} />
         </button>
       </div>
 
