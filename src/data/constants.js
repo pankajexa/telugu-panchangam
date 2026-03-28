@@ -90,6 +90,19 @@ export const KARANAMS_EN = [
   'Vanija', 'Vishti', 'Shakuni', 'Chatushpada', 'Naga', 'Kimstughna',
 ];
 
+// 12 Rashis (Zodiac Signs)
+export const RASHIS = [
+  'మేషం', 'వృషభం', 'మిథునం', 'కర్కాటకం', 'సింహం', 'కన్య',
+  'తుల', 'వృశ్చికం', 'ధనస్సు', 'మకరం', 'కుంభం', 'మీనం',
+];
+
+export const RASHIS_EN = [
+  'Mesha (Aries)', 'Vrishabha (Taurus)', 'Mithuna (Gemini)',
+  'Karkataka (Cancer)', 'Simha (Leo)', 'Kanya (Virgo)',
+  'Tula (Libra)', 'Vrischika (Scorpio)', 'Dhanus (Sagittarius)',
+  'Makara (Capricorn)', 'Kumbha (Aquarius)', 'Meena (Pisces)',
+];
+
 // Color palette — Golden Yellow
 export const COLORS = {
   PAPER_BASE: '#F5E4A8',       // soft modern gold
