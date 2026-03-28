@@ -9,7 +9,7 @@ export default function TopBar({ audioPlaying, audioMuted, onToggleAudio, hasAud
   const navigate = useNavigate();
   const { location } = useAppLocation();
   const { pick, font, language, setLanguage } = useLanguage();
-  const { isNight, colors } = useTheme();
+  const { colors } = useTheme();
   const [showLangPicker, setShowLangPicker] = useState(false);
 
   const handleLangSelect = useCallback((lang) => {
@@ -18,7 +18,7 @@ export default function TopBar({ audioPlaying, audioMuted, onToggleAudio, hasAud
   }, [setLanguage]);
 
   return (
-    <div data-bar="true" style={{ ...styles.bar, background: colors.topBarBg, borderBottom: `1px solid ${colors.tabBarBorder}` }}>
+    <div style={{ ...styles.bar, background: colors.topBarBg, borderBottom: `1px solid ${colors.tabBarBorder}` }}>
       <div style={styles.locationWrap}>
         <MapPin size={14} color="#E63B2E" strokeWidth={2.2} />
         <span style={{ ...styles.locationText, fontFamily: font, color: colors.text }}>
