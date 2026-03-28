@@ -33,12 +33,12 @@ const TRANSITION_KEYS = {
 
 /**
  * Format a formatDT object { time, date, sameDay } into display string.
- * Shows "Mar 25 01:50 PM" format for full context.
+ * Always shows full date + time for clarity (e.g., "Mar 28 8:46 AM").
  */
 function fmtFull(dt) {
   if (!dt || typeof dt === 'string') return dt || '--';
   if (dt.time === '--') return '--';
-  return dt.sameDay ? dt.time : `${dt.date} ${dt.time}`;
+  return `${dt.date} ${dt.time}`;
 }
 
 /**
@@ -99,18 +99,33 @@ function PanchangCardItem({ cardKey, label, name, time, transitions, iconBg, fon
             const trName = pick(tr.telugu, tr.english);
             const startStr = fmtFull(tr.start);
             const endStr = fmtFull(tr.end);
+            // Check if this transition is currently active
+            const now = Date.now();
+            const isActive = tr.rawStart && tr.rawEnd && now >= tr.rawStart && now < tr.rawEnd;
             return (
               <div key={i} style={{
                 ...styles.transitionRow,
                 borderTop: i > 0 ? '1px solid rgba(0,0,0,0.04)' : 'none',
+                ...(isActive ? styles.transitionRowActive : {}),
               }}>
-                <div style={styles.transitionNum}>{i + 1}</div>
+                <div style={{
+                  ...styles.transitionNum,
+                  ...(isActive ? styles.transitionNumActive : {}),
+                }}>{i + 1}</div>
                 <div style={styles.transitionInfo}>
-                  <div style={{ ...styles.transitionName, fontFamily: font }}>{trName}</div>
-                  <div style={styles.transitionTime}>
+                  <div style={{
+                    ...styles.transitionName,
+                    fontFamily: font,
+                    ...(isActive ? styles.transitionNameActive : {}),
+                  }}>{trName}</div>
+                  <div style={{
+                    ...styles.transitionTime,
+                    ...(isActive ? styles.transitionTimeActive : {}),
+                  }}>
                     {startStr} – {endStr}
                   </div>
                 </div>
+                {isActive && <div style={styles.activeBadge}>NOW</div>}
               </div>
             );
           })}
@@ -283,5 +298,36 @@ const styles = {
     fontSize: 12,
     color: '#888',
     marginTop: 2,
+  },
+  // Active transition highlighting
+  transitionRowActive: {
+    background: 'rgba(230,59,46,0.04)',
+    borderRadius: 10,
+    padding: '10px 10px',
+    margin: '0 -10px',
+    borderLeft: '3px solid #E63B2E',
+  },
+  transitionNumActive: {
+    background: '#E63B2E',
+    color: '#fff',
+  },
+  transitionNameActive: {
+    color: '#E63B2E',
+  },
+  transitionTimeActive: {
+    color: '#C42E23',
+    fontWeight: 600,
+  },
+  activeBadge: {
+    fontSize: 9,
+    fontWeight: 800,
+    color: '#fff',
+    background: '#E63B2E',
+    borderRadius: 6,
+    padding: '2px 6px',
+    letterSpacing: 0.5,
+    fontFamily: "'Plus Jakarta Sans', sans-serif",
+    alignSelf: 'center',
+    flexShrink: 0,
   },
 };

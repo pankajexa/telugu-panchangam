@@ -640,6 +640,8 @@ export function getDetailedPanchangam(date, location, prefs) {
             english: enName,
             start: fmtDT(lastPrev.startTime),
             end: fmtDT(actualEnd),
+            rawStart: new Date(lastPrev.startTime).getTime(),
+            rawEnd: new Date(actualEnd).getTime(),
           });
         }
       }
@@ -667,6 +669,8 @@ export function getDetailedPanchangam(date, location, prefs) {
           english: enName,
           start: fmtDT(t.startTime),
           end: fmtDT(t.endTime),
+          rawStart: new Date(t.startTime).getTime(),
+          rawEnd: new Date(t.endTime).getTime(),
         });
       }
 
