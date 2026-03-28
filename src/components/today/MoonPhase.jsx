@@ -3,10 +3,9 @@ import { memo } from 'react';
 /**
  * MoonPhase — Photorealistic moon with dramatic glow effects.
  * NASA moon photo with CSS gradient phase masking.
- * In night mode: no card, moon floats directly in the night sky.
- * In day mode: dark card with stars background.
+ * Always shows as a dark card with stars background.
  */
-const MoonPhase = memo(function MoonPhase({ tithiIndex = 0, paksha, pakshaEn, tithiName, t, isNight = false }) {
+const MoonPhase = memo(function MoonPhase({ tithiIndex = 0, paksha, pakshaEn, tithiName, t }) {
   let illumination;
   if (tithiIndex <= 14) {
     illumination = (tithiIndex + 1) / 15;
@@ -21,36 +20,30 @@ const MoonPhase = memo(function MoonPhase({ tithiIndex = 0, paksha, pakshaEn, ti
   const warmGlow = `rgba(255, 240, 180, ${0.2 + g * 0.4})`;
 
   return (
-    <div data-moon="true" style={{
-      ...S.wrapper,
-      // In night mode: transparent, no border-radius, float in the sky
-      ...(isNight ? { background: 'transparent', borderRadius: 0 } : {}),
-    }}>
-      {/* Dark sky background — only in day mode (night mode uses page background) */}
-      {!isNight && (
-        <div data-moon="true" style={S.spaceBackground}>
-          {STARS.map((star, i) => (
-            <div key={i} style={{
-              position: 'absolute', borderRadius: '50%', background: '#FFF',
-              width: star.s, height: star.s,
-              left: `${star.x}%`, top: `${star.y}%`,
-              opacity: star.o,
-              animation: star.tw ? `twinkle ${star.tw}s ease-in-out infinite` : undefined,
-            }} />
-          ))}
-        </div>
-      )}
+    <div style={S.wrapper}>
+      {/* Dark sky background with stars */}
+      <div style={S.spaceBackground}>
+        {STARS.map((star, i) => (
+          <div key={i} style={{
+            position: 'absolute', borderRadius: '50%', background: '#FFF',
+            width: star.s, height: star.s,
+            left: `${star.x}%`, top: `${star.y}%`,
+            opacity: star.o,
+            animation: star.tw ? `twinkle ${star.tw}s ease-in-out infinite` : undefined,
+          }} />
+        ))}
+      </div>
 
       {/* Atmospheric haze */}
-      <div data-moon="true" style={{
+      <div style={{
         ...S.atmosphericHaze,
         background: `radial-gradient(circle, ${warmGlow} 0%, rgba(255,240,180,${g * 0.08}) 50%, transparent 70%)`,
       }} />
 
       {/* Moon body */}
-      <div data-moon="true" style={S.moonContainer}>
+      <div style={S.moonContainer}>
         {/* Glow rings */}
-        <div data-moon="true" style={{
+        <div style={{
           ...S.glowRing,
           boxShadow: `
             0 0 ${20 + g * 30}px rgba(255,245,200,${0.15 + g * 0.2}),
@@ -61,7 +54,7 @@ const MoonPhase = memo(function MoonPhase({ tithiIndex = 0, paksha, pakshaEn, ti
         }} />
 
         {/* Dark moon base */}
-        <picture data-moon="true" style={S.moonPicture}>
+        <picture style={S.moonPicture}>
           <source srcSet="/assets/images/moon.webp" type="image/webp" />
           <img src="/assets/images/moon.png" alt="" style={{
             ...S.moonImg,
@@ -70,12 +63,12 @@ const MoonPhase = memo(function MoonPhase({ tithiIndex = 0, paksha, pakshaEn, ti
         </picture>
 
         {/* Lit moon surface */}
-        <div data-moon="true" style={{
+        <div style={{
           ...S.moonLitLayer,
           WebkitMaskImage: phaseMask,
           maskImage: phaseMask,
         }}>
-          <picture data-moon="true">
+          <picture>
             <source srcSet="/assets/images/moon.webp" type="image/webp" />
             <img src="/assets/images/moon.png" alt="" style={{
               ...S.moonImg,
@@ -85,21 +78,21 @@ const MoonPhase = memo(function MoonPhase({ tithiIndex = 0, paksha, pakshaEn, ti
         </div>
 
         {/* Edge highlight */}
-        <div data-moon="true" style={{
+        <div style={{
           ...S.edgeHighlight,
           background: `radial-gradient(circle at ${isWaxing ? '70%' : '30%'} 35%, rgba(255,252,240,${0.12 + g * 0.08}), transparent 50%)`,
         }} />
       </div>
 
       {/* Tithi label */}
-      <div data-moon="true" style={{ textAlign: 'center', position: 'relative', zIndex: 2, marginTop: 6 }}>
-        <div data-moon="true" style={{
+      <div style={{ textAlign: 'center', position: 'relative', zIndex: 2, marginTop: 6 }}>
+        <div style={{
           ...S.tithiName,
-          color: isNight ? '#F0E8D4' : '#F0E8D4',
+          color: '#F0E8D4',
         }}>
           {paksha || pakshaEn || ''}{tithiName ? ` ${tithiName}` : ''}
         </div>
-        <div data-moon="true" style={S.illumination}>
+        <div style={S.illumination}>
           {percent}% {t ? t('today.illuminated') : 'Illuminated'}
         </div>
       </div>

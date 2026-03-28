@@ -6,7 +6,7 @@ const ENGLISH_DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'F
 const TELUGU_DAYS = ['ఆదివారం', 'సోమవారం', 'మంగళవారం', 'బుధవారం', 'గురువారం', 'శుక్రవారం', 'శనివారం'];
 
 const DayHeader = memo(function DayHeader({ data, detailed, font, pick, language, t }) {
-  const { isNight, colors } = useTheme();
+  const { colors } = useTheme();
   const today = new Date();
   const dayName = pick(TELUGU_DAYS[today.getDay()], ENGLISH_DAYS[today.getDay()]);
   const dateStr = `${data.dateNum} ${data.englishMonth}, ${data.year}`;
@@ -30,7 +30,6 @@ const DayHeader = memo(function DayHeader({ data, detailed, font, pick, language
         tithiName={pick(data.tithi.name, data.tithi.nameEn)}
         paksha={pick(data.paksha, data.pakshaEn)}
         t={t}
-        isNight={isNight}
       />
     </div>
   );
