@@ -2,16 +2,19 @@ import { memo } from 'react';
 import { Sunrise, Sunset, MoonStar } from 'lucide-react';
 
 const SunMoonStrip = memo(function SunMoonStrip({ data, detailed, t }) {
-  // moonrise from detailed panchangam is a formatDT object { time, date, sameDay }
-  const moonriseRaw = detailed?.timings?.moonrise;
-  const moonrise = moonriseRaw
-    ? (typeof moonriseRaw === 'string' ? moonriseRaw : (moonriseRaw.time || '--'))
-    : '--';
+  // Format moonrise from HH:MM 24h to 12h display
+  const fmt12 = (t24) => {
+    if (!t24 || t24 === '--') return '--';
+    const [h, m] = t24.split(':').map(Number);
+    const period = h >= 12 ? 'PM' : 'AM';
+    const h12 = h % 12 || 12;
+    return `${h12}:${m.toString().padStart(2, '0')} ${period}`;
+  };
 
   const items = [
-    { label: t('today.sunrise'), time: data.sunrise || '--', Icon: Sunrise, color: '#D4790A', bg: 'var(--sunrise-bg)' },
-    { label: t('today.sunset'), time: data.sunset || '--', Icon: Sunset, color: '#C74530', bg: 'var(--sunset-bg)' },
-    { label: t('today.moonrise'), time: moonrise, Icon: MoonStar, color: '#6366A0', bg: 'var(--moonrise-bg)' },
+    { label: t('today.sunrise'), time: fmt12(data.sunrise) || '--', Icon: Sunrise, color: '#D4790A', bg: 'var(--sunrise-bg)' },
+    { label: t('today.sunset'), time: fmt12(data.sunset) || '--', Icon: Sunset, color: '#C74530', bg: 'var(--sunset-bg)' },
+    { label: t('today.moonrise'), time: fmt12(data.moonrise) || '--', Icon: MoonStar, color: '#6366A0', bg: 'var(--moonrise-bg)' },
   ];
 
   return (
