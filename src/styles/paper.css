@@ -191,119 +191,166 @@
   z-index: 1;
 }
 
-/* ═══ Nuclear overrides — force ALL hardcoded colors to night ═══ */
+/* ═══ NUCLEAR DARK MODE — Override EVERYTHING ═══ */
+/* React inline styles use JS property names which render as HTML style attributes.
+   The only reliable way to override them is to target ALL elements broadly. */
 
-/* ALL white/light backgrounds → glass panels */
-[data-theme="night"] div[style*="background: white"],
-[data-theme="night"] div[style*="background: #FFF"],
-[data-theme="night"] div[style*="background: rgb(255"],
-[data-theme="night"] div[style*="background-color: white"],
-[data-theme="night"] div[style*="background-color: #FFF"],
-[data-theme="night"] div[style*="background: #FAFAF"] {
-  background: rgba(8, 12, 25, 0.4) !important;
+/* Force ALL div/section/main backgrounds dark — this is the sledgehammer */
+[data-theme="night"] div,
+[data-theme="night"] section,
+[data-theme="night"] main,
+[data-theme="night"] article,
+[data-theme="night"] aside,
+[data-theme="night"] header,
+[data-theme="night"] footer,
+[data-theme="night"] nav {
+  background-color: transparent !important;
+  border-color: rgba(255,255,255,0.05) !important;
+}
+
+/* Cards — any div with border-radius (our card pattern) gets glass treatment */
+[data-theme="night"] div[style*="border-radius"],
+[data-theme="night"] div[style*="borderRadius"] {
+  background: rgba(8, 12, 25, 0.35) !important;
   backdrop-filter: blur(8px) !important;
   -webkit-backdrop-filter: blur(8px) !important;
-  border-color: rgba(255,255,255,0.04) !important;
+  border-color: rgba(255,255,255,0.05) !important;
 }
 
-/* Cream/warm backgrounds → subtle glass */
-[data-theme="night"] div[style*="background: #FFF9"],
-[data-theme="night"] div[style*="background: #FDF"],
-[data-theme="night"] div[style*="background: #F5F3"],
-[data-theme="night"] div[style*="background: #FFF0"],
-[data-theme="night"] div[style*="background: #FFF1"],
-[data-theme="night"] div[style*="background: #FFF3"],
-[data-theme="night"] div[style*="background: #FFF8"],
-[data-theme="night"] div[style*="background: #FFF6"] {
-  background: rgba(12, 18, 35, 0.35) !important;
-  backdrop-filter: blur(6px) !important;
-  -webkit-backdrop-filter: blur(6px) !important;
+/* But don't glass-ify tiny elements like dots, badges, chips that use border-radius */
+[data-theme="night"] div[style*="border-radius"][style*="width: 6"],
+[data-theme="night"] div[style*="border-radius"][style*="width: 8"],
+[data-theme="night"] div[style*="border-radius"][style*="width: 10"],
+[data-theme="night"] div[style*="borderRadius"][style*="height: 6"],
+[data-theme="night"] div[style*="borderRadius"][style*="height: 8"],
+[data-theme="night"] span[style*="border-radius"] {
+  background: revert !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
-/* Green success/food sections → dark glass */
-[data-theme="night"] div[style*="background: #E0FFE0"],
-[data-theme="night"] div[style*="background: #F0FFF0"],
-[data-theme="night"] div[style*="background: rgb(224, 255"],
-[data-theme="night"] div[style*="background: linear-gradient(135deg, #F0FFF0"] {
-  background: rgba(20, 50, 30, 0.25) !important;
-  border-color: rgba(74,222,128,0.12) !important;
+/* Calendar day cells — keep their identity but darken */
+[data-theme="night"] div[style*="background: linear-gradient"] {
+  filter: brightness(0.3) contrast(1.3) !important;
 }
 
-/* Yellow/warning sections → dark glass */
-[data-theme="night"] div[style*="background: #FFF8E1"],
-[data-theme="night"] div[style*="background: #FFFCF0"],
-[data-theme="night"] div[style*="background: linear-gradient(135deg, #FFFCF0"] {
-  background: rgba(50, 40, 15, 0.25) !important;
-  border-color: rgba(232,200,64,0.12) !important;
-}
-
-/* Red/pink sections → dark glass */
-[data-theme="night"] div[style*="background: #FFE0E0"],
-[data-theme="night"] div[style*="background: #FFF1F0"],
-[data-theme="night"] div[style*="background: #FFF0F0"] {
-  background: rgba(50, 15, 15, 0.25) !important;
-  border-color: rgba(248,113,113,0.12) !important;
-}
-
-/* Page containers → fully transparent */
-[data-theme="night"] div[style*="max-width: 480px"],
-[data-theme="night"] div[style*="maxWidth: 480"],
-[data-theme="night"] div[style*="max-width: '480px'"] {
-  background: transparent !important;
-}
-
-/* Buttons → glass */
-[data-theme="night"] button[style*="background: #FFF"],
-[data-theme="night"] button[style*="background: white"] {
-  background: rgba(10, 15, 30, 0.4) !important;
-  backdrop-filter: blur(6px) !important;
-  -webkit-backdrop-filter: blur(6px) !important;
-  border-color: rgba(255,255,255,0.06) !important;
+/* Buttons — transparent glass */
+[data-theme="night"] button {
+  background-color: transparent !important;
   color: #E8E4DC !important;
+  border-color: rgba(255,255,255,0.08) !important;
 }
 
-/* Overlay sheets → deep dark */
-[data-theme="night"] div[style*="background: #FAFAF8"] {
-  background: rgba(5, 8, 16, 0.95) !important;
+/* Keep accent buttons (red) visible */
+[data-theme="night"] button[style*="background: #E63B2E"],
+[data-theme="night"] button[style*="background: rgb(230, 59, 46"] {
+  background: #E63B2E !important;
+  color: white !important;
+}
+
+/* Keep the Share/Devotion center circle button */
+[data-theme="night"] button[style*="background: #1A1A1A"],
+[data-theme="night"] button[style*="background: rgb(26, 26, 26"] {
+  background: #1A1A1A !important;
+}
+
+/* Toggle buttons that should show active state */
+[data-theme="night"] button[style*="background: rgba(230"] {
+  background: rgba(230, 59, 46, 0.15) !important;
+}
+
+/* Overlay/modal backgrounds — solid dark */
+[data-theme="night"] div[style*="position: fixed"][style*="inset"] {
+  background: rgba(2, 4, 10, 0.85) !important;
+}
+[data-theme="night"] div[style*="position: fixed"] > div[style*="border-radius"] {
+  background: rgba(8, 12, 22, 0.92) !important;
   backdrop-filter: blur(20px) !important;
   -webkit-backdrop-filter: blur(20px) !important;
 }
 
-/* ALL text colors → light for readability */
-[data-theme="night"] div[style*="color: #1A1A1A"],
-[data-theme="night"] span[style*="color: #1A1A1A"],
-[data-theme="night"] h1[style*="color: #1A1A1A"],
-[data-theme="night"] h2[style*="color: #1A1A1A"],
-[data-theme="night"] p[style*="color: #1A1A1A"] {
+/* ═══ TEXT — Force ALL text light ═══ */
+[data-theme="night"] h1,
+[data-theme="night"] h2,
+[data-theme="night"] h3,
+[data-theme="night"] h4,
+[data-theme="night"] h5,
+[data-theme="night"] h6 {
   color: #E8E4DC !important;
 }
 
-[data-theme="night"] div[style*="color: #333"],
-[data-theme="night"] span[style*="color: #333"],
-[data-theme="night"] div[style*="color: #444"],
-[data-theme="night"] span[style*="color: #444"] {
-  color: #C8C0B4 !important;
+[data-theme="night"] p,
+[data-theme="night"] span,
+[data-theme="night"] div,
+[data-theme="night"] label,
+[data-theme="night"] li {
+  color: #D0C8BC !important;
 }
 
-[data-theme="night"] div[style*="color: #666"],
-[data-theme="night"] span[style*="color: #666"],
-[data-theme="night"] div[style*="color: #777"],
-[data-theme="night"] span[style*="color: #777"] {
-  color: #9A9284 !important;
+/* Muted/secondary text — still light but softer */
+[data-theme="night"] [style*="color: #999"],
+[data-theme="night"] [style*="color: #888"],
+[data-theme="night"] [style*="color: #777"],
+[data-theme="night"] [style*="color: #666"],
+[data-theme="night"] [style*="color: #AAA"],
+[data-theme="night"] [style*="color: rgb(153"],
+[data-theme="night"] [style*="color: rgb(136"],
+[data-theme="night"] [style*="color: rgb(119"],
+[data-theme="night"] [style*="color: rgb(102"],
+[data-theme="night"] [style*="color: rgb(170"] {
+  color: #8A8274 !important;
 }
 
-[data-theme="night"] div[style*="color: #888"],
-[data-theme="night"] span[style*="color: #888"],
-[data-theme="night"] div[style*="color: #999"],
-[data-theme="night"] span[style*="color: #999"] {
-  color: #7A7264 !important;
+/* Keep accent colors (red, gold, green) */
+[data-theme="night"] [style*="color: #E63B2E"],
+[data-theme="night"] [style*="color: #C49B2A"],
+[data-theme="night"] [style*="color: #2D8A39"],
+[data-theme="night"] [style*="color: rgb(230, 59"],
+[data-theme="night"] [style*="color: rgb(196, 155"] {
+  color: inherit !important;
 }
 
-/* Section headers */
-[data-theme="night"] div[style*="color: #AAA"],
-[data-theme="night"] span[style*="color: #AAA"] {
-  color: #605848 !important;
+/* SVG icons in night — lighten stroke/fill */
+[data-theme="night"] svg {
+  filter: brightness(1.3) !important;
 }
+/* But not the moon or decorative images */
+[data-theme="night"] svg[width="24"],
+[data-theme="night"] svg[viewBox*="0 0 24"] {
+  filter: brightness(1.5) !important;
+}
+
+/* Calendar cells need special handling — visible but dark */
+[data-theme="night"] div[style*="grid-template-columns"] div,
+[data-theme="night"] div[style*="gridTemplateColumns"] div {
+  background: rgba(10, 14, 28, 0.4) !important;
+  color: #D0C8BC !important;
+}
+
+/* Today highlight in calendar */
+[data-theme="night"] div[style*="background: #E63B2E"] {
+  background: #E63B2E !important;
+  color: white !important;
+}
+
+/* Sunrise/sunset/moonrise strip — keep its gradient identity but darken */
+[data-theme="night"] div[style*="grid-template-columns: 1fr 1fr 1fr"],
+[data-theme="night"] div[style*="gridTemplateColumns"] {
+  opacity: 0.9;
+}
+
+/* Input fields */
+[data-theme="night"] input,
+[data-theme="night"] select,
+[data-theme="night"] textarea {
+  background: rgba(10, 15, 30, 0.5) !important;
+  color: #E8E4DC !important;
+  border-color: rgba(255,255,255,0.08) !important;
+}
+
+/* Scrollbars */
+[data-theme="night"] ::-webkit-scrollbar-track { background: transparent; }
+[data-theme="night"] ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
 
 * {
   margin: 0;
