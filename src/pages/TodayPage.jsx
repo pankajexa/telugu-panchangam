@@ -30,12 +30,14 @@ export default function TodayPage() {
   const detailed = useMemo(() => getDetailedPanchangam(today, location, ALL_PREFS), [today, location]);
   const practices = useMemo(() => data ? getPractices(data.festival, data.vrathams) : null, [data]);
 
-  // Feed sunrise/sunset data to ReminderContext for alarm scheduling
+  // Feed sunrise/sunset data to ReminderContext + cache for theme
   useEffect(() => {
     if (!data?.sunrise || !data?.sunset) return;
     setSunData(data.sunrise, data.sunset);
     const times = getAlarmTimes(data.sunrise, data.sunset);
     if (times) setAlarmTimes(times);
+    // Cache for ThemeContext auto day/night
+    try { localStorage.setItem('lastPanchangam', JSON.stringify({ sunrise: data.sunrise, sunset: data.sunset })); } catch(_) {}
   }, [data?.sunrise, data?.sunset, setSunData, setAlarmTimes]);
 
   if (!data) return null;

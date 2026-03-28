@@ -68,6 +68,95 @@
   --moonrise-bg: linear-gradient(135deg, #F0F0FF, #E8E8FF);
 }
 
+/* ═══ Night Sky Theme ═══ */
+[data-theme="night"] {
+  --bg: #0B0F19;
+  --card-bg: rgba(20, 28, 45, 0.85);
+  --card-shadow: 0 1px 4px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
+  --card-shadow-hover: 0 4px 16px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.3);
+  --card-border: 1px solid rgba(255,255,255,0.06);
+
+  --text-primary: #E8E0D4;
+  --text-secondary: #A0987E;
+  --text-muted: #7A7060;
+  --text-faint: #554D40;
+  --text-label: #443C30;
+
+  --border-subtle: rgba(255,255,255,0.06);
+  --divider: rgba(255,255,255,0.06);
+
+  --cell-bg: linear-gradient(145deg, #151C2E, #111828);
+  --cell-border: rgba(100,120,180,0.15);
+  --cell-selected-bg: linear-gradient(145deg, #1E2840, #1A2238);
+  --cell-selected-border: #C49B2A;
+
+  --tithi-icon-bg: linear-gradient(135deg, #1E1520, #2A1A28);
+  --nakshatra-icon-bg: linear-gradient(135deg, #1E1E10, #2A2818);
+  --yoga-icon-bg: linear-gradient(135deg, #1E1518, #2A1A20);
+  --karana-icon-bg: linear-gradient(135deg, #1E1A10, #2A2218);
+
+  --sunrise-bg: linear-gradient(135deg, #1E1E10, #2A2818);
+  --sunset-bg: linear-gradient(135deg, #1E1518, #2A1A20);
+  --moonrise-bg: linear-gradient(135deg, #12142A, #181C38);
+
+  --color-shubh: #4ADE80;
+  --color-shubh-bg: rgba(45,138,57,0.12);
+  --color-shubh-border: rgba(45,138,57,0.2);
+  --color-avoid: #F87171;
+  --color-avoid-bg: rgba(204,51,51,0.12);
+  --color-avoid-border: rgba(204,51,51,0.2);
+  --color-good: #E8C840;
+  --color-good-bg: rgba(232,168,23,0.1);
+  --color-good-border: rgba(232,168,23,0.2);
+}
+
+[data-theme="night"] body {
+  background: #0B0F19;
+  background-image: radial-gradient(ellipse at 50% 0%, #111828 0%, #0B0F19 50%, #060A12 100%);
+  background-attachment: fixed;
+}
+
+/* Stars overlay — tiny dots scattered across the night sky */
+[data-theme="night"] body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    radial-gradient(1px 1px at 10% 15%, rgba(255,255,255,0.4), transparent),
+    radial-gradient(1px 1px at 25% 8%, rgba(255,255,255,0.3), transparent),
+    radial-gradient(1.5px 1.5px at 40% 22%, rgba(255,255,255,0.5), transparent),
+    radial-gradient(1px 1px at 55% 5%, rgba(255,255,255,0.3), transparent),
+    radial-gradient(1px 1px at 70% 18%, rgba(255,255,255,0.4), transparent),
+    radial-gradient(1.5px 1.5px at 85% 12%, rgba(255,255,255,0.35), transparent),
+    radial-gradient(1px 1px at 95% 25%, rgba(255,255,255,0.3), transparent),
+    radial-gradient(1px 1px at 15% 45%, rgba(255,255,255,0.25), transparent),
+    radial-gradient(1.5px 1.5px at 35% 55%, rgba(255,255,255,0.4), transparent),
+    radial-gradient(1px 1px at 60% 40%, rgba(255,255,255,0.3), transparent),
+    radial-gradient(1px 1px at 80% 50%, rgba(255,255,255,0.35), transparent),
+    radial-gradient(1px 1px at 5% 70%, rgba(255,255,255,0.3), transparent),
+    radial-gradient(1.5px 1.5px at 22% 80%, rgba(255,255,255,0.4), transparent),
+    radial-gradient(1px 1px at 48% 75%, rgba(255,255,255,0.25), transparent),
+    radial-gradient(1px 1px at 72% 82%, rgba(255,255,255,0.35), transparent),
+    radial-gradient(1px 1px at 90% 70%, rgba(255,255,255,0.3), transparent),
+    radial-gradient(1.5px 1.5px at 50% 92%, rgba(255,255,255,0.4), transparent),
+    radial-gradient(1px 1px at 30% 95%, rgba(255,255,255,0.3), transparent);
+  background-size: 100% 100%;
+  animation: starsTwinkle 8s ease-in-out infinite alternate;
+}
+
+@keyframes starsTwinkle {
+  0% { opacity: 0.7; }
+  100% { opacity: 1; }
+}
+
+/* Ensure page content is above stars */
+[data-theme="night"] #root {
+  position: relative;
+  z-index: 1;
+}
+
 * {
   margin: 0;
   padding: 0;
