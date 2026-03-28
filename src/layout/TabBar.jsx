@@ -19,7 +19,7 @@ export default function TabBar() {
   const { isNight, colors } = useTheme();
 
   return (
-    <nav style={{ ...styles.bar, background: colors.tabBarBg, borderTop: `1px solid ${colors.tabBarBorder}` }}>
+    <nav data-bar="true" style={{ ...styles.bar, background: colors.tabBarBg, borderTop: `1px solid ${colors.tabBarBorder}` }}>
       {tabs.map((tab) => {
         const active = location.pathname === tab.path;
         const color = tab.isCenter ? 'white' : active ? '#E63B2E' : (isNight ? '#6A6050' : '#B0B0B0');

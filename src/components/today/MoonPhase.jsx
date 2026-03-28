@@ -2,10 +2,11 @@ import { memo } from 'react';
 
 /**
  * MoonPhase — Photorealistic moon with dramatic glow effects.
- * NASA moon photo (pre-cropped circle) with CSS gradient phase masking.
- * tithiIndex 0-14 = Shukla (waxing), 15-29 = Krishna (waning)
+ * NASA moon photo with CSS gradient phase masking.
+ * In night mode: no card, moon floats directly in the night sky.
+ * In day mode: dark card with stars background.
  */
-const MoonPhase = memo(function MoonPhase({ tithiIndex = 0, paksha, pakshaEn, tithiName, t }) {
+const MoonPhase = memo(function MoonPhase({ tithiIndex = 0, paksha, pakshaEn, tithiName, t, isNight = false }) {
   let illumination;
   if (tithiIndex <= 14) {
     illumination = (tithiIndex + 1) / 15;
@@ -15,39 +16,41 @@ const MoonPhase = memo(function MoonPhase({ tithiIndex = 0, paksha, pakshaEn, ti
   illumination = Math.max(0.02, Math.min(1, illumination));
   const percent = Math.round(illumination * 100);
   const isWaxing = tithiIndex <= 14;
-
-  // Phase mask — reveals the illuminated portion
   const phaseMask = buildPhaseMask(illumination, isWaxing);
-
-  // Glow scales with illumination — more light = more glow
   const g = illumination;
   const warmGlow = `rgba(255, 240, 180, ${0.2 + g * 0.4})`;
 
   return (
-    <div data-moon="true" style={S.wrapper}>
-      {/* Deep space background with stars */}
-      <div data-moon="true" style={S.spaceBackground}>
-        {STARS.map((star, i) => (
-          <div key={i} style={{
-            position: 'absolute', borderRadius: '50%', background: '#FFF',
-            width: star.s, height: star.s,
-            left: `${star.x}%`, top: `${star.y}%`,
-            opacity: star.o,
-            animation: star.tw ? `twinkle ${star.tw}s ease-in-out infinite` : undefined,
-          }} />
-        ))}
-      </div>
+    <div data-moon="true" style={{
+      ...S.wrapper,
+      // In night mode: transparent, no border-radius, float in the sky
+      ...(isNight ? { background: 'transparent', borderRadius: 0 } : {}),
+    }}>
+      {/* Dark sky background — only in day mode (night mode uses page background) */}
+      {!isNight && (
+        <div data-moon="true" style={S.spaceBackground}>
+          {STARS.map((star, i) => (
+            <div key={i} style={{
+              position: 'absolute', borderRadius: '50%', background: '#FFF',
+              width: star.s, height: star.s,
+              left: `${star.x}%`, top: `${star.y}%`,
+              opacity: star.o,
+              animation: star.tw ? `twinkle ${star.tw}s ease-in-out infinite` : undefined,
+            }} />
+          ))}
+        </div>
+      )}
 
-      {/* Outer atmospheric haze */}
-      <div style={{
+      {/* Atmospheric haze */}
+      <div data-moon="true" style={{
         ...S.atmosphericHaze,
         background: `radial-gradient(circle, ${warmGlow} 0%, rgba(255,240,180,${g * 0.08}) 50%, transparent 70%)`,
       }} />
 
       {/* Moon body */}
-      <div style={S.moonContainer}>
-        {/* Glow ring 1 — large soft outer */}
-        <div style={{
+      <div data-moon="true" style={S.moonContainer}>
+        {/* Glow rings */}
+        <div data-moon="true" style={{
           ...S.glowRing,
           boxShadow: `
             0 0 ${20 + g * 30}px rgba(255,245,200,${0.15 + g * 0.2}),
@@ -57,8 +60,8 @@ const MoonPhase = memo(function MoonPhase({ tithiIndex = 0, paksha, pakshaEn, ti
           `,
         }} />
 
-        {/* Dark moon base (unlit surface — dim but visible) */}
-        <picture style={S.moonPicture}>
+        {/* Dark moon base */}
+        <picture data-moon="true" style={S.moonPicture}>
           <source srcSet="/assets/images/moon.webp" type="image/webp" />
           <img src="/assets/images/moon.png" alt="" style={{
             ...S.moonImg,
@@ -66,13 +69,13 @@ const MoonPhase = memo(function MoonPhase({ tithiIndex = 0, paksha, pakshaEn, ti
           }} draggable="false" />
         </picture>
 
-        {/* Lit moon surface — masked to show only illuminated portion */}
-        <div style={{
+        {/* Lit moon surface */}
+        <div data-moon="true" style={{
           ...S.moonLitLayer,
           WebkitMaskImage: phaseMask,
           maskImage: phaseMask,
         }}>
-          <picture>
+          <picture data-moon="true">
             <source srcSet="/assets/images/moon.webp" type="image/webp" />
             <img src="/assets/images/moon.png" alt="" style={{
               ...S.moonImg,
@@ -81,19 +84,22 @@ const MoonPhase = memo(function MoonPhase({ tithiIndex = 0, paksha, pakshaEn, ti
           </picture>
         </div>
 
-        {/* Subtle edge highlight on the lit side */}
-        <div style={{
+        {/* Edge highlight */}
+        <div data-moon="true" style={{
           ...S.edgeHighlight,
           background: `radial-gradient(circle at ${isWaxing ? '70%' : '30%'} 35%, rgba(255,252,240,${0.12 + g * 0.08}), transparent 50%)`,
         }} />
       </div>
 
       {/* Tithi label */}
-      <div style={{ textAlign: 'center', position: 'relative', zIndex: 2, marginTop: 6 }}>
-        <div style={S.tithiName}>
+      <div data-moon="true" style={{ textAlign: 'center', position: 'relative', zIndex: 2, marginTop: 6 }}>
+        <div data-moon="true" style={{
+          ...S.tithiName,
+          color: isNight ? '#F0E8D4' : '#F0E8D4',
+        }}>
           {paksha || pakshaEn || ''}{tithiName ? ` ${tithiName}` : ''}
         </div>
-        <div style={S.illumination}>
+        <div data-moon="true" style={S.illumination}>
           {percent}% {t ? t('today.illuminated') : 'Illuminated'}
         </div>
       </div>
@@ -104,32 +110,18 @@ const MoonPhase = memo(function MoonPhase({ tithiIndex = 0, paksha, pakshaEn, ti
 function buildPhaseMask(illumination, isWaxing) {
   if (illumination >= 0.98) return 'none';
   if (illumination <= 0.02) return 'linear-gradient(to right, transparent, transparent)';
-
-  // For a circular moon, a linear gradient mask at position X% doesn't
-  // correspond to X% illuminated area. We need to account for circular
-  // geometry: area fraction = (θ - sinθcosθ)/π where θ = arccos(1-2x).
-  // Simplified: to show `illumination` fraction of a circle's area as lit,
-  // the linear terminator position from the dark edge should be:
-  //   pos = 0.5 * (1 - cos(π * illumination))
-  // This maps 0→0%, 0.5→50%, 1→100% but with circular correction.
   const corrected = 0.5 * (1 - Math.cos(Math.PI * illumination));
-  // Convert to percentage from the dark side
   const darkPercent = (1 - corrected) * 100;
-
   const softEdge = 6;
-
   if (isWaxing) {
-    // Right side is lit — dark on left
     const t = Math.max(0, darkPercent - softEdge);
     return `linear-gradient(to right, transparent ${t}%, rgba(0,0,0,0.3) ${t + softEdge * 0.4}%, black ${darkPercent}%)`;
   } else {
-    // Left side is lit — dark on right
     const litEnd = corrected * 100;
     return `linear-gradient(to right, black ${litEnd}%, rgba(0,0,0,0.3) ${litEnd + softEdge * 0.4}%, transparent ${Math.min(100, litEnd + softEdge)}%)`;
   }
 }
 
-// Deterministic star positions with optional twinkle
 const STARS = [
   { x: 4, y: 6, s: 1, o: 0.5 }, { x: 14, y: 3, s: 1.5, o: 0.7, tw: 3 },
   { x: 26, y: 10, s: 1, o: 0.3 }, { x: 40, y: 4, s: 2, o: 0.6, tw: 4 },
@@ -176,10 +168,7 @@ const S = {
     background: 'transparent',
     animation: 'moonBreath 6s ease-in-out infinite',
   },
-  moonPicture: {
-    position: 'absolute', inset: 0,
-    display: 'block',
-  },
+  moonPicture: { position: 'absolute', inset: 0, display: 'block' },
   moonImg: {
     width: MOON_SIZE, height: MOON_SIZE,
     display: 'block', userSelect: 'none', pointerEvents: 'none',
@@ -200,11 +189,11 @@ const S = {
   },
   illumination: {
     fontSize: 9, color: 'rgba(255,248,220,0.45)',
-    marginTop: 2,
+    marginTop: 2, position: 'relative', zIndex: 1,
   },
 };
 
-// Inject keyframe animations once
+// Inject animations once
 if (typeof document !== 'undefined' && !document.getElementById('moonStyles')) {
   const style = document.createElement('style');
   style.id = 'moonStyles';

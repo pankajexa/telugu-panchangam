@@ -30,6 +30,7 @@ const DayHeader = memo(function DayHeader({ data, detailed, font, pick, language
         tithiName={pick(data.tithi.name, data.tithi.nameEn)}
         paksha={pick(data.paksha, data.pakshaEn)}
         t={t}
+        isNight={isNight}
       />
     </div>
   );
