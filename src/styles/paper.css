@@ -157,6 +157,51 @@
   z-index: 1;
 }
 
+/* ═══ Night override for hardcoded inline styles ═══ */
+/* These use specificity tricks to override React inline styles */
+
+/* Force all white/light backgrounds on divs to dark */
+[data-theme="night"] div[style*="background: white"],
+[data-theme="night"] div[style*="background: #FFF"],
+[data-theme="night"] div[style*="background: rgb(255"],
+[data-theme="night"] div[style*="background-color: white"],
+[data-theme="night"] div[style*="background-color: #FFF"],
+[data-theme="night"] div[style*="background: #FAFAF"] {
+  background: rgba(20, 28, 45, 0.85) !important;
+  border-color: rgba(255,255,255,0.06) !important;
+}
+
+/* Light cream/warm backgrounds → dark warm */
+[data-theme="night"] div[style*="background: #FFF9"],
+[data-theme="night"] div[style*="background: #FDF"],
+[data-theme="night"] div[style*="background: #F5F3"],
+[data-theme="night"] div[style*="background: #FFF0"],
+[data-theme="night"] div[style*="background: #FFF1"],
+[data-theme="night"] div[style*="background: #FFF3"],
+[data-theme="night"] div[style*="background: #FFF8"],
+[data-theme="night"] div[style*="background: #FFF6"] {
+  background: rgba(30, 35, 50, 0.6) !important;
+}
+
+/* Force page-level containers to transparent */
+[data-theme="night"] div[style*="max-width: 480px"],
+[data-theme="night"] div[style*="maxWidth: 480"] {
+  background: transparent !important;
+}
+
+/* Buttons with white/light backgrounds */
+[data-theme="night"] button[style*="background: #FFF"],
+[data-theme="night"] button[style*="background: white"] {
+  background: rgba(20, 28, 45, 0.85) !important;
+  border-color: rgba(255,255,255,0.08) !important;
+  color: #E8E0D4 !important;
+}
+
+/* Overlay sheets */
+[data-theme="night"] div[style*="background: #FAFAF8"] {
+  background: #0F1520 !important;
+}
+
 * {
   margin: 0;
   padding: 0;

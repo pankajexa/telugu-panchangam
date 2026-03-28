@@ -5,7 +5,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
 import { useReminders } from '../context/ReminderContext';
 import { usePanchangamPrefs } from '../context/PanchangamPrefsContext';
-import { Globe, MapPin, Bell, Sun, Info, ArrowLeft } from 'lucide-react';
+import { Globe, MapPin, Bell, Sun, Moon, SunMoon, Info, ArrowLeft } from 'lucide-react';
 import { DiyaIcon, TrishulIcon, MalaIcon } from '../components/icons/HinduIcons';
 
 // Wrapper to match old API: { size, color } props
@@ -147,7 +147,7 @@ const advStyles = {
 
 export default function SettingsPage() {
   const { t, font, language, setLanguage } = useLanguage();
-  const { isNight, colors } = useTheme();
+  const { isNight, colors, preference, setThemePreference } = useTheme();
   const { prefs, updatePref, requestPermission } = useReminders();
   const { prefs: pPrefs, updatePref: updatePPref } = usePanchangamPrefs();
   const [expandedSection, setExpandedSection] = useState(null);
@@ -200,6 +200,51 @@ export default function SettingsPage() {
               </span>
               {language === 'en' && <span style={styles.langCheck}>✓</span>}
             </button>
+          </div>
+        </div>
+      </div>
+
+      {/* ═══ Theme (Light / Dark / Auto) ═══ */}
+      <div style={styles.section}>
+        <div style={styles.sectionTitleRow}>
+          <SunMoon size={18} color="#E63B2E" />
+          <span style={{ ...styles.sectionTitle, fontFamily: font }}>{pick('థీమ్', 'Theme')}</span>
+        </div>
+        <div style={{ ...styles.card, background: colors.cardBg, border: `1px solid ${colors.border}` }}>
+          <div style={{ display: 'flex', gap: 8 }}>
+            {[
+              { key: 'auto', te: 'ఆటో', en: 'Auto', icon: SunMoon },
+              { key: 'day', te: 'లైట్', en: 'Light', icon: Sun },
+              { key: 'night', te: 'డార్క్', en: 'Dark', icon: Moon },
+            ].map(opt => {
+              const active = preference === opt.key;
+              const Icon = opt.icon;
+              return (
+                <button
+                  key={opt.key}
+                  onClick={() => setThemePreference(opt.key)}
+                  style={{
+                    ...advStyles.pill,
+                    ...(active ? advStyles.pillActive : {}),
+                    flex: 1, justifyContent: 'center', padding: '8px 10px',
+                    background: active ? (isNight ? 'rgba(230,59,46,0.15)' : 'rgba(230,59,46,0.1)') : colors.chipBg,
+                    border: `1.5px solid ${active ? '#E63B2E' : colors.chipBorder}`,
+                  }}
+                >
+                  <Icon size={14} color={active ? '#E63B2E' : colors.textMuted} strokeWidth={2} />
+                  <span style={{ fontSize: 12, color: active ? '#E63B2E' : colors.textMuted, fontWeight: active ? 700 : 500 }}>
+                    {pick(opt.te, opt.en)}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+          <div style={{ fontSize: 11, color: colors.textFaint, marginTop: 8, lineHeight: 1.5, fontFamily: SERIF }}>
+            {preference === 'auto'
+              ? pick('సూర్యోదయం & సూర్యాస్తమయం ఆధారంగా స్వయంచాలకంగా మారుతుంది', 'Automatically switches based on sunrise & sunset times')
+              : preference === 'night'
+              ? pick('ఎల్లప్పుడూ డార్క్ మోడ్‌లో ఉంటుంది', 'Always stays in dark mode')
+              : pick('ఎల్లప్పుడూ లైట్ మోడ్‌లో ఉంటుంది', 'Always stays in light mode')}
           </div>
         </div>
       </div>
