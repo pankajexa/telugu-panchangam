@@ -602,12 +602,24 @@ export function getDetailedPanchangam(date, location, prefs) {
     const prevCached = _rawCache.get(prevKey);
     const prevP = prevCached?.p;
 
+    // Get next day's raw data for end-time correction on the last transition
+    const nextDate = new Date(date);
+    nextDate.setDate(nextDate.getDate() + 1);
+    const nextKey = `${formatDateStr(nextDate)}-${location.id}`;
+    if (!_rawCache.has(nextKey)) {
+      try { getPanchangamForDate(nextDate, location); } catch {}
+    }
+    const nextCached = _rawCache.get(nextKey);
+    const nextP = nextCached?.p;
+
     /**
      * Build complete transition list for a panchang element.
-     * If today's first transition started AFTER sunrise, there's a gap —
-     * the previous day's last transition carries over. We find it and prepend.
+     * - If today's first transition started AFTER sunrise, the previous day's
+     *   last transition carries over. We prepend it with the real start time.
+     * - If today's last transition ends at next sunrise (library cutoff),
+     *   we look at tomorrow's first transition to get the actual end time.
      */
-    function buildTransitions(todayTransitions, prevTransitions, nameMap, nameMapEn, karanaMode) {
+    function buildTransitions(todayTransitions, prevTransitions, nextTransitions, nameMap, nameMapEn, karanaMode) {
       if (!todayTransitions?.length) return [];
 
       const sunrise = p.sunrise;
@@ -678,30 +690,46 @@ export function getDetailedPanchangam(date, location, prefs) {
         });
       }
 
+      // Fix the LAST transition's end time if it's capped at next sunrise
+      // Look at tomorrow's first transition — if same name, use its endTime
+      if (result.length > 0 && nextTransitions?.length) {
+        const lastResult = result[result.length - 1];
+        const firstNext = nextTransitions[0];
+        const nextName = karanaMode
+          ? (nameMap[firstNext.name] || firstNext.name)
+          : (nameMap[firstNext.index] || firstNext.name);
+
+        if (lastResult.telugu === nextName && firstNext.endTime) {
+          // Today's last transition continues into tomorrow — use tomorrow's end time
+          lastResult.end = fmtDT(firstNext.endTime);
+          lastResult.rawEnd = new Date(firstNext.endTime).getTime();
+        }
+      }
+
       return result;
     }
 
     if (prefs.dt_tithiTransitions && p.tithiTransitions?.length) {
       dt.tithiTransitions = buildTransitions(
-        p.tithiTransitions, prevP?.tithiTransitions,
+        p.tithiTransitions, prevP?.tithiTransitions, nextP?.tithiTransitions,
         TITHIS, TITHIS_EN, false
       );
     }
     if (prefs.dt_nakshatraTransitions && p.nakshatraTransitions?.length) {
       dt.nakshatraTransitions = buildTransitions(
-        p.nakshatraTransitions, prevP?.nakshatraTransitions,
+        p.nakshatraTransitions, prevP?.nakshatraTransitions, nextP?.nakshatraTransitions,
         NAKSHATRAS, NAKSHATRAS_EN, false
       );
     }
     if (prefs.dt_yogaTransitions && p.yogaTransitions?.length) {
       dt.yogaTransitions = buildTransitions(
-        p.yogaTransitions, prevP?.yogaTransitions,
+        p.yogaTransitions, prevP?.yogaTransitions, nextP?.yogaTransitions,
         YOGAMS, YOGAMS_EN, false
       );
     }
     if (prefs.dt_karanaTransitions && p.karanaTransitions?.length) {
       dt.karanaTransitions = buildTransitions(
-        p.karanaTransitions, prevP?.karanaTransitions,
+        p.karanaTransitions, prevP?.karanaTransitions, nextP?.karanaTransitions,
         TELUGU_KARANA, {}, true
       );
     }
