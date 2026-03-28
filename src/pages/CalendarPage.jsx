@@ -112,7 +112,7 @@ function buildHinduGrid(teluguMonth, location) {
 // ═══════════════════════════════════════════════════
 // Mini month for year view
 // ═══════════════════════════════════════════════════
-function MiniMonth({ year, month, today, location, onSelectMonth, pick, font }) {
+function MiniMonth({ year, month, today, location, onSelectMonth, pick, font, colors }) {
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const firstDow = (new Date(year, month, 1).getDay() + 6) % 7;
   const isCurrentMonth = today.getFullYear() === year && today.getMonth() === month;
@@ -129,8 +129,8 @@ function MiniMonth({ year, month, today, location, onSelectMonth, pick, font }) 
   for (let d = 1; d <= daysInMonth; d++) cells.push(d);
   const isTodayDay = (d) => d === today.getDate() && isCurrentMonth;
   return (
-    <div style={miniS.card} onClick={() => onSelectMonth(year, month)}>
-      <div style={{ ...miniS.monthName, color: isCurrentMonth ? '#E63B2E' : '#1A1A1A' }}>{MONTH_SHORT[month]}</div>
+    <div style={{ ...miniS.card, background: colors?.cardBg || 'white' }} onClick={() => onSelectMonth(year, month)}>
+      <div style={{ ...miniS.monthName, color: isCurrentMonth ? '#E63B2E' : (colors?.text || '#1A1A1A') }}>{MONTH_SHORT[month]}</div>
       <div style={miniS.weekRow}>{WEEKDAYS_TINY.map((d, i) => <div key={i} style={miniS.weekDay}>{d}</div>)}</div>
       <div style={miniS.grid}>
         {cells.map((d, i) => {
@@ -139,7 +139,7 @@ function MiniMonth({ year, month, today, location, onSelectMonth, pick, font }) 
           const info = dayInfo[d];
           const isMF = info?.festival?.major;
           return (
-            <div key={d} style={{ ...miniS.dayCell, background: isTd ? '#E63B2E' : isMF ? '#FFF0E8' : 'transparent', color: isTd ? 'white' : isMF ? '#C44020' : '#555', fontWeight: isTd || isMF ? 700 : 400, borderRadius: isTd ? 4 : isMF ? 3 : 0, }}>
+            <div key={d} style={{ ...miniS.dayCell, background: isTd ? '#E63B2E' : isMF ? '#FFF0E8' : 'transparent', color: isTd ? 'white' : isMF ? '#C44020' : (colors?.textMuted || '#555'), fontWeight: isTd || isMF ? 700 : 400, borderRadius: isTd ? 4 : isMF ? 3 : 0, }}>
               {d}
               {!isTd && (info?.tithiIndex === 14 || info?.tithiIndex === 29) && <div style={{ position: 'absolute', top: -1, right: -1 }}>{info.tithiIndex === 14 ? <FullMoonBadge size={7} /> : <NewMoonBadge size={7} />}</div>}
               {info?.festival && !isTd && <div style={{ position: 'absolute', bottom: 0, left: '50%', transform: 'translateX(-50%)', width: isMF ? 4 : 3, height: isMF ? 4 : 3, borderRadius: '50%', background: isMF ? '#E63B2E' : '#E8A817' }} />}
@@ -151,7 +151,7 @@ function MiniMonth({ year, month, today, location, onSelectMonth, pick, font }) 
   );
 }
 const miniS = {
-  card: { background: 'white', borderRadius: 12, padding: '10px 8px 8px', border: '1px solid rgba(0,0,0,0.05)', boxShadow: '0 1px 4px rgba(0,0,0,0.04)', cursor: 'pointer', WebkitTapHighlightColor: 'transparent' },
+  card: { borderRadius: 12, padding: '10px 8px 8px', border: '1px solid rgba(0,0,0,0.05)', boxShadow: '0 1px 4px rgba(0,0,0,0.04)', cursor: 'pointer', WebkitTapHighlightColor: 'transparent' },
   monthName: { fontSize: 12, fontWeight: 700, textAlign: 'center', marginBottom: 4, fontFamily: "'Plus Jakarta Sans', sans-serif" },
   weekRow: { display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)' },
   weekDay: { fontSize: 7, color: '#CCC', textAlign: 'center', fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, padding: '1px 0' },
@@ -272,8 +272,8 @@ export default function CalendarPage() {
           </div>
           <div style={S.headerActions}>
             {calendarMode === 'english' && (
-              <button style={{ ...S.viewToggle, background: viewMode === 'year' ? '#E63B2E' : 'white' }} onClick={() => setViewMode(v => v === 'month' ? 'year' : 'month')}>
-                {viewMode === 'month' ? <Grid3x3 size={16} color="#666" strokeWidth={1.8} /> : <CalendarDays size={16} color="white" strokeWidth={1.8} />}
+              <button style={{ ...S.viewToggle, background: viewMode === 'year' ? '#E63B2E' : colors.cardBg, border: `1px solid ${colors.border}` }} onClick={() => setViewMode(v => v === 'month' ? 'year' : 'month')}>
+                {viewMode === 'month' ? <Grid3x3 size={16} color={colors.iconColor} strokeWidth={1.8} /> : <CalendarDays size={16} color="white" strokeWidth={1.8} />}
               </button>
             )}
             <button style={{ ...S.navBtn, background: colors.cardBg, border: `1px solid ${colors.border}` }} onClick={handlePrev}><ChevronLeft size={18} color={colors.iconColor} /></button>
@@ -287,8 +287,8 @@ export default function CalendarPage() {
             {['english', 'hindu'].map(mode => (
               <div key={mode} onClick={() => { setCalendarMode(mode); if (mode === 'hindu') setSelectedTithiIdx(-1); }} style={{
                 ...S.toggleOption,
-                background: calendarMode === mode ? 'white' : 'transparent',
-                color: calendarMode === mode ? '#1A1A1A' : '#999',
+                background: calendarMode === mode ? colors.cardBg : 'transparent',
+                color: calendarMode === mode ? colors.text : colors.textMuted,
                 boxShadow: calendarMode === mode ? '0 1px 4px rgba(0,0,0,0.08)' : 'none',
               }}>
                 {mode === 'english' ? (language === 'te' ? 'ఇంగ్లీష్ నెల' : 'English Month') : (language === 'te' ? 'తెలుగు నెల' : 'Telugu Month')}
@@ -319,7 +319,7 @@ export default function CalendarPage() {
                   </div>
                   <div style={S.spanLegend}>
                     {[{ n: hinduSpan.hindu1, c: mc1 }, { n: hinduSpan.hindu2, c: mc2 }].map(h => (
-                      <div key={h.n} style={S.spanLegendItem}><div style={{ width: 8, height: 8, borderRadius: 4, background: h.c.dot }} /><span style={S.spanLegendText}>{h.n}</span></div>
+                      <div key={h.n} style={S.spanLegendItem}><div style={{ width: 8, height: 8, borderRadius: 4, background: h.c.dot }} /><span style={{ ...S.spanLegendText, color: colors.textMuted }}>{h.n}</span></div>
                     ))}
                   </div>
                 </div>
@@ -367,9 +367,9 @@ export default function CalendarPage() {
 
             {/* Legend */}
             <div style={S.legend}>
-              <div style={S.legendItem}><div style={{ width: 6, height: 6, borderRadius: '50%', background: '#E63B2E' }} /><span style={S.legendText}>{language === 'te' ? 'పండుగ' : 'Festival'}</span></div>
-              <div style={S.legendItem}><div style={{ width: 5, height: 5, borderRadius: '50%', background: '#E8A817' }} /><span style={S.legendText}>{language === 'te' ? 'ఇతర' : 'Observance'}</span></div>
-              <div style={S.legendItem}><div style={{ width: 4, height: 4, borderRadius: '50%', background: '#2D8A39' }} /><span style={S.legendText}>{language === 'te' ? 'వ్రతం' : 'Vrat'}</span></div>
+              <div style={S.legendItem}><div style={{ width: 6, height: 6, borderRadius: '50%', background: '#E63B2E' }} /><span style={{ ...S.legendText, color: colors.textMuted }}>{language === 'te' ? 'పండుగ' : 'Festival'}</span></div>
+              <div style={S.legendItem}><div style={{ width: 5, height: 5, borderRadius: '50%', background: '#E8A817' }} /><span style={{ ...S.legendText, color: colors.textMuted }}>{language === 'te' ? 'ఇతర' : 'Observance'}</span></div>
+              <div style={S.legendItem}><div style={{ width: 4, height: 4, borderRadius: '50%', background: '#2D8A39' }} /><span style={{ ...S.legendText, color: colors.textMuted }}>{language === 'te' ? 'వ్రతం' : 'Vrat'}</span></div>
             </div>
           </>
         )}
@@ -426,7 +426,7 @@ export default function CalendarPage() {
         {/* ═══ YEAR VIEW ═══ */}
         {viewMode === 'year' && (
           <div style={S.yearGrid}>
-            {yearMonths.map(({ year, month }) => <MiniMonth key={`${year}-${month}`} year={year} month={month} today={today} location={location} onSelectMonth={handleSelectMonth} pick={pick} font={font} />)}
+            {yearMonths.map(({ year, month }) => <MiniMonth key={`${year}-${month}`} year={year} month={month} today={today} location={location} onSelectMonth={handleSelectMonth} pick={pick} font={font} colors={colors} />)}
           </div>
         )}
 
@@ -534,11 +534,11 @@ const S = {
   page: { width: '100%', maxWidth: '480px', margin: '0 auto' },
   content: { padding: '8px 20px 100px' },
   header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
-  title: { fontFamily: "'Playfair Display', serif", fontSize: 26, fontWeight: 700, color: '#1A1A1A', margin: 0 },
-  subtitle: { fontSize: 13, color: '#999', marginTop: 2, fontFamily: "'Plus Jakarta Sans', sans-serif" },
+  title: { fontFamily: "'Playfair Display', serif", fontSize: 26, fontWeight: 700, margin: 0 },
+  subtitle: { fontSize: 13, marginTop: 2, fontFamily: "'Plus Jakarta Sans', sans-serif" },
   headerActions: { display: 'flex', gap: 8, alignItems: 'center' },
   viewToggle: { width: 34, height: 34, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(0,0,0,0.08)', cursor: 'pointer', WebkitTapHighlightColor: 'transparent', outline: 'none', transition: 'background 0.2s ease' },
-  navBtn: { width: 34, height: 34, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'white', border: '1px solid rgba(0,0,0,0.08)', cursor: 'pointer', WebkitTapHighlightColor: 'transparent' },
+  navBtn: { width: 34, height: 34, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(0,0,0,0.08)', cursor: 'pointer', WebkitTapHighlightColor: 'transparent' },
 
   // Toggle
   toggleTrack: { display: 'flex', background: '#F0EEEA', borderRadius: 12, padding: 3, marginBottom: 16 },
@@ -548,7 +548,7 @@ const S = {
   spanBar: { display: 'flex', height: 38, borderRadius: 12, overflow: 'hidden', border: '1px solid rgba(0,0,0,0.06)', boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.03)' },
   spanLegend: { display: 'flex', justifyContent: 'center', gap: 14, marginTop: 8 },
   spanLegendItem: { display: 'flex', alignItems: 'center', gap: 5 },
-  spanLegendText: { fontSize: 10, color: '#999', fontWeight: 500, fontFamily: "'Plus Jakarta Sans', sans-serif" },
+  spanLegendText: { fontSize: 10, fontWeight: 500, fontFamily: "'Plus Jakarta Sans', sans-serif" },
 
   // Paksha bar (Hindu view)
   pakshaBar: { display: 'flex', height: 28, borderRadius: 10, overflow: 'hidden', marginBottom: 14 },
@@ -561,30 +561,30 @@ const S = {
 
   legend: { display: 'flex', gap: 16, justifyContent: 'center', marginTop: 14, marginBottom: 6 },
   legendItem: { display: 'flex', alignItems: 'center', gap: 4 },
-  legendText: { fontSize: 10, color: '#999', fontFamily: "'Plus Jakarta Sans', sans-serif" },
+  legendText: { fontSize: 10, fontFamily: "'Plus Jakarta Sans', sans-serif" },
 
   yearGrid: { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 },
 
   // Day detail
   dayDetail: { marginTop: 18 },
-  dayDetailHeader: { background: 'white', borderRadius: 16, padding: '18px 20px', border: '1px solid rgba(0,0,0,0.05)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
-  dayDetailDate: { fontSize: 20, fontWeight: 700, color: '#1A1A1A', fontFamily: "'Playfair Display', serif" },
-  dayDetailDay: { fontSize: 14, color: '#777', marginTop: 3 },
+  dayDetailHeader: { borderRadius: 16, padding: '18px 20px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
+  dayDetailDate: { fontSize: 20, fontWeight: 700, fontFamily: "'Playfair Display', serif" },
+  dayDetailDay: { fontSize: 14, marginTop: 3 },
   dayDetailTithi: { marginTop: 10, display: 'flex', alignItems: 'center', gap: 8, background: 'linear-gradient(135deg, #FFFCF0, #FFF8E6)', padding: '10px 14px', borderRadius: 12, border: '1px solid rgba(232,168,23,0.12)' },
-  dayDetailTithiName: { fontSize: 14, fontWeight: 700, color: '#1A1A1A' },
+  dayDetailTithiName: { fontSize: 14, fontWeight: 700 },
   dayDetailPaksha: { fontSize: 11, color: '#B8860B', marginTop: 1, fontFamily: "'Plus Jakarta Sans', sans-serif" },
   dayFestBanner: { marginTop: 12, padding: '14px 18px', borderRadius: 14, background: 'linear-gradient(135deg, #FFF0E8, #FFE4D4)', border: '1px solid rgba(230,59,46,0.12)', display: 'flex', alignItems: 'center', gap: 12, boxShadow: '0 1px 4px rgba(230,59,46,0.06)' },
   dayFestName: { fontSize: 16, fontWeight: 700, color: '#C44020' },
   dayFestBadge: { fontSize: 10, fontWeight: 600, color: '#E63B2E', marginTop: 3, textTransform: 'uppercase', letterSpacing: '0.06em', fontFamily: "'Plus Jakarta Sans', sans-serif" },
   dayVratBanner: { marginTop: 12, padding: '14px 18px', borderRadius: 14, background: 'linear-gradient(135deg, #F0FFF0, #E8FFE8)', border: '1px solid rgba(45,138,57,0.12)', display: 'flex', alignItems: 'center', gap: 12, boxShadow: '0 1px 4px rgba(45,138,57,0.06)' },
   dayVratName: { fontSize: 14, fontWeight: 600, color: '#2D8A39' },
-  daySunRow: { marginTop: 12, background: 'white', borderRadius: 14, padding: '14px 18px', border: '1px solid rgba(0,0,0,0.05)', boxShadow: '0 1px 4px rgba(0,0,0,0.03)', display: 'flex', alignItems: 'center' },
+  daySunRow: { marginTop: 12, borderRadius: 14, padding: '14px 18px', boxShadow: '0 1px 4px rgba(0,0,0,0.03)', display: 'flex', alignItems: 'center' },
   daySunItem: { flex: 1, display: 'flex', alignItems: 'center', gap: 10 },
   daySunDivider: { width: 1, height: 28, background: 'rgba(0,0,0,0.06)', margin: '0 14px', flexShrink: 0 },
-  daySunLabel: { fontSize: 10, fontWeight: 600, color: '#999', textTransform: 'uppercase', letterSpacing: '0.04em', fontFamily: "'Plus Jakarta Sans', sans-serif" },
-  daySunTime: { fontSize: 15, fontWeight: 700, color: '#1A1A1A', marginTop: 1, fontFamily: "'Plus Jakarta Sans', sans-serif" },
-  dayPanchRow: { marginTop: 12, background: 'white', borderRadius: 14, padding: '14px 18px', border: '1px solid rgba(0,0,0,0.05)', boxShadow: '0 1px 4px rgba(0,0,0,0.03)', display: 'flex' },
+  daySunLabel: { fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em', fontFamily: "'Plus Jakarta Sans', sans-serif" },
+  daySunTime: { fontSize: 15, fontWeight: 700, marginTop: 1, fontFamily: "'Plus Jakarta Sans', sans-serif" },
+  dayPanchRow: { marginTop: 12, borderRadius: 14, padding: '14px 18px', boxShadow: '0 1px 4px rgba(0,0,0,0.03)', display: 'flex' },
   dayPanchItem: { flex: 1, textAlign: 'center', padding: '0 4px' },
-  dayPanchLabel: { fontSize: 10, fontWeight: 600, color: '#BBB', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4, fontFamily: "'Plus Jakarta Sans', sans-serif" },
-  dayPanchValue: { fontSize: 13, fontWeight: 600, color: '#1A1A1A' },
+  dayPanchLabel: { fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4, fontFamily: "'Plus Jakarta Sans', sans-serif" },
+  dayPanchValue: { fontSize: 13, fontWeight: 600 },
 };

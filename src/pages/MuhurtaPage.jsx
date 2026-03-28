@@ -182,7 +182,7 @@ function GeneralMuhurthaSection({ data, t, font }) {
             <div key={i} style={{
               width: `${seg.w}%`, background: seg.bg, borderRadius: 4,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: seg.w > 5 ? 8 : 0, fontWeight: 600, color: '#666', height: 36,
+              fontSize: seg.w > 5 ? 8 : 0, fontWeight: 600, color: '#555', height: 36,
               fontFamily: "'Plus Jakarta Sans', sans-serif", overflow: 'hidden',
               whiteSpace: 'nowrap', minWidth: seg.label ? 2 : 0,
             }}>{seg.w > 5 ? seg.label : ''}</div>
@@ -313,11 +313,11 @@ export default function MuhurtaPage() {
 const styles = {
   page: { width: '100%', maxWidth: '480px', margin: '0 auto' },
   content: { padding: '8px 20px 100px' },
-  title: { fontFamily: "'Playfair Display', serif", fontSize: 26, fontWeight: 700, color: '#1A1A1A', margin: '0 0 4px' },
-  subtitle: { fontSize: 13, color: '#999', marginBottom: 24, fontFamily: "'Plus Jakarta Sans', sans-serif" },
+  title: { fontFamily: "'Playfair Display', serif", fontSize: 26, fontWeight: 700, margin: '0 0 4px' },
+  subtitle: { fontSize: 13, marginBottom: 24, fontFamily: "'Plus Jakarta Sans', sans-serif" },
   timelineCard: {
-    background: 'white', borderRadius: 16, padding: '18px 20px', marginBottom: 24,
-    border: '1px solid rgba(0,0,0,0.04)', boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
+    borderRadius: 16, padding: '18px 20px', marginBottom: 24,
+    boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
   },
   timelineLabel: { fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#CCC', marginBottom: 14, fontFamily: "'Plus Jakarta Sans', sans-serif" },
   timelineBar: { display: 'flex', height: 36, borderRadius: 10, overflow: 'hidden', gap: 2 },
@@ -326,17 +326,17 @@ const styles = {
   legend: { display: 'flex', gap: 16, marginTop: 12, justifyContent: 'center' },
   legendItem: { display: 'flex', alignItems: 'center', gap: 4 },
   legendDot: { width: 10, height: 10, borderRadius: 3 },
-  legendText: { fontSize: 9, color: '#999', fontFamily: "'Plus Jakarta Sans', sans-serif" },
+  legendText: { fontSize: 9, fontFamily: "'Plus Jakarta Sans', sans-serif" },
   section: { marginBottom: 24 },
   sectionHeader: { display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 },
   dot: { width: 8, height: 8, borderRadius: 4 },
   sectionLabel: { fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', fontFamily: "'Plus Jakarta Sans', sans-serif" },
   list: { display: 'flex', flexDirection: 'column', gap: 10 },
   card: {
-    background: 'white', borderRadius: 14, padding: '14px 18px',
+    borderRadius: 14, padding: '14px 18px',
     display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-    border: '1px solid rgba(0,0,0,0.04)', boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
   },
-  name: { fontSize: 14, fontWeight: 600, color: '#1A1A1A' },
-  time: { fontSize: 12, color: '#999', marginTop: 3, fontFamily: "'Plus Jakarta Sans', sans-serif" },
+  name: { fontSize: 14, fontWeight: 600 },
+  time: { fontSize: 12, marginTop: 3, fontFamily: "'Plus Jakarta Sans', sans-serif" },
 };

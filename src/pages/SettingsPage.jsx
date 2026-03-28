@@ -262,7 +262,7 @@ export default function SettingsPage() {
           <span style={{ ...styles.sectionTitle, fontFamily: font }}>{pick('సంప్రదాయం', 'Tradition')}</span>
         </div>
         <div style={{ ...styles.card, background: colors.cardBg, border: `1px solid ${colors.border}` }}>
-          <div style={{ fontSize: 13, color: '#888', fontFamily: SERIF, marginBottom: 10, lineHeight: 1.5 }}>
+          <div style={{ fontSize: 13, color: colors.textMuted, fontFamily: SERIF, marginBottom: 10, lineHeight: 1.5 }}>
             {pick(
               'ఏకాదశి వ్రతం ఆచరించే విధానం మీ సంప్రదాయం ప్రకారం మారుతుంది.',
               'Ekadashi observance date differs based on your tradition.'
@@ -290,7 +290,7 @@ export default function SettingsPage() {
               );
             })}
           </div>
-          <div style={{ fontSize: 11, color: '#AAA', fontFamily: SERIF, marginTop: 8, lineHeight: 1.5 }}>
+          <div style={{ fontSize: 11, color: colors.textFaint, fontFamily: SERIF, marginTop: 8, lineHeight: 1.5 }}>
             {sampradaya === 'smartha'
               ? pick(
                   'స్మార్త: సూర్యోదయం సమయంలో ఏకాదశి తిథి ఉంటే ఆచరించాలి.',
@@ -343,7 +343,7 @@ export default function SettingsPage() {
                 <span style={styles.subLabel}>{pick('షేర్ రిమైండర్ సమయం', 'Reminder time')}</span>
                 <TimeSelector value={prefs.dailyShareTime} onChange={(v) => updatePref('dailyShareTime', v)} />
               </div>
-              <div style={{ ...styles.subLabel, fontSize: '10px', color: '#BBB', paddingTop: '6px' }}>
+              <div style={{ ...styles.subLabel, fontSize: '10px', color: colors.textFaint, paddingTop: '6px' }}>
                 {pick(
                   'ఈ సమయానికి నోటిఫికేషన్ వస్తుంది. ట్యాప్ చేస్తే పంచాంగం ఇమేజ్ తో షేర్ డైలాగ్ ఓపెన్ అవుతుంది.',
                   'You\'ll get a notification at this time. Tap it to open share with today\'s panchangam image.'
@@ -489,7 +489,7 @@ export default function SettingsPage() {
                 </div>
               </div>
             </div>
-            <span style={styles.chevron}>{expandedSection === 'sun' ? '▾' : '▸'}</span>
+            <span style={{ ...styles.chevron, color: colors.textFaint }}>{expandedSection === 'sun' ? '▾' : '▸'}</span>
           </div>
           {expandedSection === 'sun' && (
             <div style={styles.expandedContent}>
@@ -724,13 +724,11 @@ export default function SettingsPage() {
 
 const styles = {
   container: { padding: '0 20px 20px', maxWidth: '432px', margin: '0 auto', overflowY: 'auto', height: '100%' },
-  title: { fontSize: '24px', fontWeight: 800, color: '#1A1A1A', textAlign: 'center', margin: '0 0 16px' },
+  title: { fontSize: '24px', fontWeight: 800, textAlign: 'center', margin: '0 0 16px' },
   section: { marginBottom: '20px' },
   sectionTitleRow: { display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' },
   sectionTitle: { fontSize: '15px', fontWeight: 700, color: '#E63B2E' },
   card: {
-    background: '#FFFFFF',
-    border: '1px solid rgba(0,0,0,0.06)',
     borderRadius: '16px',
     padding: '0',
     boxShadow: '0 2px 12px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04)',
@@ -754,20 +752,20 @@ const styles = {
   },
   reminderHeaderLeft: { display: 'flex', alignItems: 'center', gap: '12px', flex: 1 },
   reminderEmoji: { fontSize: '22px', flexShrink: 0 },
-  reminderTitle: { fontSize: '13px', fontWeight: 700, color: '#1A1A1A', lineHeight: 1.3 },
-  reminderSub: { fontFamily: SERIF, fontSize: '10px', color: '#BBB', marginTop: '1px' },
-  chevron: { fontSize: '14px', color: '#BBB', flexShrink: 0 },
+  reminderTitle: { fontSize: '13px', fontWeight: 700, lineHeight: 1.3 },
+  reminderSub: { fontFamily: SERIF, fontSize: '10px', marginTop: '1px' },
+  chevron: { fontSize: '14px', flexShrink: 0 },
 
   expandedContent: {
     padding: '0 16px 14px',
-    borderTop: '1px solid rgba(0,0,0,0.05)',  // overridden by border in cards
+    borderTop: '1px solid rgba(0,0,0,0.05)',
     marginTop: '-2px',
   },
   subRow: {
     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
     padding: '8px 0 4px', gap: '8px',
   },
-  subLabel: { fontFamily: SERIF, fontSize: '12px', color: '#666', flex: 1 },  // color overridden inline
+  subLabel: { fontFamily: SERIF, fontSize: '12px', flex: 1 },  // color overridden inline
 
   // Smart alarm rows
   alarmRow: {
@@ -779,6 +777,6 @@ const styles = {
   // About
   divider: { height: '1px', background: 'rgba(0,0,0,0.06)', margin: '0 16px' },
   aboutRow: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 16px' },
-  aboutLabel: { fontFamily: SERIF, fontSize: '12px', color: '#999' },
-  aboutValue: { fontSize: '12px', fontWeight: 600, color: '#1A1A1A' },
+  aboutLabel: { fontFamily: SERIF, fontSize: '12px' },
+  aboutValue: { fontSize: '12px', fontWeight: 600 },
 };

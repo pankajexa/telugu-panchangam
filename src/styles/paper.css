@@ -191,168 +191,18 @@
   z-index: 1;
 }
 
-/* ═══ NUCLEAR DARK MODE — Override EVERYTHING ═══ */
-/* React inline styles use JS property names which render as HTML style attributes.
-   The only reliable way to override them is to target ALL elements broadly. */
+/* ═══ CLEAN DARK MODE ═══ */
+/* No nuclear overrides. Components use ThemeContext colors.
+   CSS only handles: body color inheritance + overlay backgrounds. */
 
-/* Force ALL div/section/main backgrounds dark — this is the sledgehammer */
-[data-theme="night"] div,
-[data-theme="night"] section,
-[data-theme="night"] main,
-[data-theme="night"] article,
-[data-theme="night"] aside,
-[data-theme="night"] header,
-[data-theme="night"] footer,
-[data-theme="night"] nav {
-  background-color: transparent !important;
-  border-color: rgba(255,255,255,0.05) !important;
+/* Root text color — all text inherits this unless overridden by inline styles */
+[data-theme="night"] body {
+  color: #D0C8BC;
 }
 
-/* Cards — any div with border-radius (our card pattern) gets glass treatment */
-[data-theme="night"] div[style*="border-radius"],
-[data-theme="night"] div[style*="borderRadius"] {
-  background: rgba(8, 12, 25, 0.35) !important;
-  backdrop-filter: blur(8px) !important;
-  -webkit-backdrop-filter: blur(8px) !important;
-  border-color: rgba(255,255,255,0.05) !important;
-}
-
-/* Don't touch the moon visualization, bars, or their children */
-[data-theme="night"] [data-moon] *,
-[data-theme="night"] [data-moon],
-[data-theme="night"] [data-bar],
-[data-theme="night"] [data-bar] *,
-[data-theme="night"] [data-bar] button,
-[data-theme="night"] [data-bar] svg,
-[data-theme="night"] [data-bar] span {
-  background: revert !important;
-  backdrop-filter: revert !important;
-  -webkit-backdrop-filter: revert !important;
-  border-color: revert !important;
-  /* Keep filter: revert (not none!) so moon brightness/contrast filters work */
-  filter: revert !important;
-  color: revert !important;
-}
-
-/* But don't glass-ify tiny elements like dots, badges, chips that use border-radius */
-[data-theme="night"] div[style*="border-radius"][style*="width: 6"],
-[data-theme="night"] div[style*="border-radius"][style*="width: 8"],
-[data-theme="night"] div[style*="border-radius"][style*="width: 10"],
-[data-theme="night"] div[style*="borderRadius"][style*="height: 6"],
-[data-theme="night"] div[style*="borderRadius"][style*="height: 8"],
-[data-theme="night"] span[style*="border-radius"] {
-  background: revert !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-}
-
-/* Calendar day cells with warm backgrounds — darken for night */
-[data-theme="night"] div[style*="background: #F5E"] {
-  background: rgba(20, 25, 40, 0.5) !important;
-}
-[data-theme="night"] div[style*="background: #EDE"] {
-  background: rgba(20, 25, 40, 0.4) !important;
-}
-[data-theme="night"] div[style*="background: #FCE"] {
-  background: rgba(20, 25, 40, 0.5) !important;
-}
-
-/* Images should never be tinted by text color override */
-[data-theme="night"] img {
-  color: revert !important;
-  filter: revert !important;
-}
-
-/* Pictures/source inside moon should be untouched */
-[data-theme="night"] picture {
-  background: transparent !important;
-  border-color: transparent !important;
-}
-
-/* Buttons — transparent glass */
-[data-theme="night"] button {
-  background-color: transparent !important;
-  color: #E8E4DC !important;
-  border-color: rgba(255,255,255,0.08) !important;
-}
-
-/* Keep accent buttons (red) visible */
-[data-theme="night"] button[style*="background: #E63B2E"],
-[data-theme="night"] button[style*="background: rgb(230, 59, 46"] {
-  background: #E63B2E !important;
-  color: white !important;
-}
-
-/* Keep the Share/Devotion center circle button */
-[data-theme="night"] button[style*="background: #1A1A1A"],
-[data-theme="night"] button[style*="background: rgb(26, 26, 26"] {
-  background: #1A1A1A !important;
-}
-
-/* Toggle buttons that should show active state */
-[data-theme="night"] button[style*="background: rgba(230"] {
-  background: rgba(230, 59, 46, 0.15) !important;
-}
-
-/* Overlay/modal backgrounds — solid dark */
+/* Overlay/modal backdrops */
 [data-theme="night"] div[style*="position: fixed"][style*="inset"] {
   background: rgba(2, 4, 10, 0.85) !important;
-}
-[data-theme="night"] div[style*="position: fixed"] > div[style*="border-radius"] {
-  background: rgba(8, 12, 22, 0.92) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
-}
-
-/* ═══ TEXT — Force ALL text light ═══ */
-[data-theme="night"] h1,
-[data-theme="night"] h2,
-[data-theme="night"] h3,
-[data-theme="night"] h4,
-[data-theme="night"] h5,
-[data-theme="night"] h6 {
-  color: #E8E4DC !important;
-}
-
-[data-theme="night"] p,
-[data-theme="night"] span,
-[data-theme="night"] div,
-[data-theme="night"] label,
-[data-theme="night"] li {
-  color: #D0C8BC !important;
-}
-
-/* Muted/secondary text — still light but softer */
-[data-theme="night"] [style*="color: #999"],
-[data-theme="night"] [style*="color: #888"],
-[data-theme="night"] [style*="color: #777"],
-[data-theme="night"] [style*="color: #666"],
-[data-theme="night"] [style*="color: #AAA"],
-[data-theme="night"] [style*="color: rgb(153"],
-[data-theme="night"] [style*="color: rgb(136"],
-[data-theme="night"] [style*="color: rgb(119"],
-[data-theme="night"] [style*="color: rgb(102"],
-[data-theme="night"] [style*="color: rgb(170"] {
-  color: #8A8274 !important;
-}
-
-/* Keep accent colors (red, gold, green) */
-[data-theme="night"] [style*="color: #E63B2E"],
-[data-theme="night"] [style*="color: #C49B2A"],
-[data-theme="night"] [style*="color: #2D8A39"],
-[data-theme="night"] [style*="color: rgb(230, 59"],
-[data-theme="night"] [style*="color: rgb(196, 155"] {
-  color: inherit !important;
-}
-
-/* SVG icons in night — lighten stroke/fill */
-[data-theme="night"] svg {
-  filter: brightness(1.3) !important;
-}
-/* But not the moon or decorative images */
-[data-theme="night"] svg[width="24"],
-[data-theme="night"] svg[viewBox*="0 0 24"] {
-  filter: brightness(1.5) !important;
 }
 
 /* Calendar cells need special handling — visible but dark */
