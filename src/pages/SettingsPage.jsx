@@ -149,6 +149,7 @@ export default function SettingsPage() {
   const { prefs, updatePref, requestPermission } = useReminders();
   const { prefs: pPrefs, updatePref: updatePPref } = usePanchangamPrefs();
   const [expandedSection, setExpandedSection] = useState(null);
+  const [sampradaya, setSampradaya] = useState(() => localStorage.getItem('sampradaya') || 'smartha');
 
   const toggleSection = useCallback((section) => {
     setExpandedSection(prev => prev === section ? null : section);
@@ -205,6 +206,55 @@ export default function SettingsPage() {
       <div style={styles.section}>
         <div style={styles.sectionTitleRow}><PinIcon size={18} color="#E63B2E" /><span style={{ ...styles.sectionTitle, fontFamily: font }}>{t('settings.location')}</span></div>
         <div style={styles.card}><LocationPicker /></div>
+      </div>
+
+      {/* ═══ Sampradaya (Tradition) ═══ */}
+      <div style={styles.section}>
+        <div style={styles.sectionTitleRow}>
+          <NamasteIcon size={18} color="#E63B2E" />
+          <span style={{ ...styles.sectionTitle, fontFamily: font }}>{pick('సంప్రదాయం', 'Tradition')}</span>
+        </div>
+        <div style={styles.card}>
+          <div style={{ fontSize: 13, color: '#888', fontFamily: SERIF, marginBottom: 10, lineHeight: 1.5 }}>
+            {pick(
+              'ఏకాదశి వ్రతం ఆచరించే విధానం మీ సంప్రదాయం ప్రకారం మారుతుంది.',
+              'Ekadashi observance date differs based on your tradition.'
+            )}
+          </div>
+          <div style={{ display: 'flex', gap: 10 }}>
+            {[
+              { key: 'smartha', te: 'స్మార్త', en: 'Smartha' },
+              { key: 'vaishnava', te: 'వైష్ణవ', en: 'Vaishnava' },
+            ].map(opt => {
+              const active = sampradaya === opt.key;
+              return (
+                <button
+                  key={opt.key}
+                  onClick={() => { setSampradaya(opt.key); localStorage.setItem('sampradaya', opt.key); }}
+                  style={{
+                    ...langStyles.pill,
+                    ...(active ? langStyles.pillActive : {}),
+                    flex: 1, justifyContent: 'center',
+                  }}
+                >
+                  {active && <span style={langStyles.check}>✓</span>}
+                  {pick(opt.te, opt.en)}
+                </button>
+              );
+            })}
+          </div>
+          <div style={{ fontSize: 11, color: '#AAA', fontFamily: SERIF, marginTop: 8, lineHeight: 1.5 }}>
+            {sampradaya === 'smartha'
+              ? pick(
+                  'స్మార్త: సూర్యోదయం సమయంలో ఏకాదశి తిథి ఉంటే ఆచరించాలి.',
+                  'Smartha: Observe Ekadashi if the tithi is present at sunrise.'
+                )
+              : pick(
+                  'వైష్ణవ: అరుణోదయం (సూర్యోదయానికి 96 ని. ముందు) కు ముందే దశమి తిథి ముగియాలి.',
+                  'Vaishnava: Dashami must end before Arunodaya (96 min before sunrise).'
+                )}
+          </div>
+        </div>
       </div>
 
       {/* ═══ Reminders ═══ */}
