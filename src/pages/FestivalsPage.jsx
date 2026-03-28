@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { useLocation } from '../context/LocationContext';
+import { useReminders } from '../context/ReminderContext';
 import { getAllFestivals } from '../data/festivalList';
 import { getPractices, FESTIVAL_PRACTICES, VRATA_PRACTICES } from '../data/festivalPractices';
 import { DiyaIcon, MalaIcon } from '../components/icons/HinduIcons';
@@ -30,6 +31,7 @@ const MONTH_NAMES_EN = ['January', 'February', 'March', 'April', 'May', 'June', 
 export default function FestivalsPage() {
   const { t, pick, font, language } = useLanguage();
   const { location } = useLocation();
+  const { setFestivalData, setVrathamData } = useReminders();
   const [filter, setFilter] = useState('all');
   const [allFestivals, setAllFestivals] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -48,8 +50,15 @@ export default function FestivalsPage() {
     setLoading(true);
     // setTimeout(0) truly yields to the browser — lets the loading UI paint first
     const t = setTimeout(() => {
-      setAllFestivals(getAllFestivals(location));
+      const fests = getAllFestivals(location);
+      setAllFestivals(fests);
       setLoading(false);
+
+      // Feed festival/vratham data to ReminderContext for notification scheduling
+      const festivals = fests.filter(f => f.type === 'festival');
+      const vrathams = fests.filter(f => f.type === 'vrat');
+      if (festivals.length) setFestivalData(festivals);
+      if (vrathams.length) setVrathamData(vrathams);
     }, 0);
     return () => clearTimeout(t);
   }, [location]);

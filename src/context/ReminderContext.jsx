@@ -1,5 +1,13 @@
-import { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import { scheduleDailyShare, cancelDailyShare, setupNotificationListener, scheduleAllSmartAlarms, cancelAllSmartAlarms } from '../utils/notifications';
+import { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
+import {
+  scheduleDailyShare, cancelDailyShare,
+  setupNotificationListener,
+  scheduleAllSmartAlarms, cancelAllSmartAlarms,
+  schedulePujaReminder, cancelPujaReminder,
+  scheduleSunReminders, cancelSunReminders,
+  scheduleFestivalReminders, cancelFestivalReminders,
+  scheduleVrathamReminders, cancelVrathamReminders,
+} from '../utils/notifications';
 
 const ReminderContext = createContext(null);
 const STORAGE_KEY = 'manacalendar-reminders';
@@ -59,6 +67,10 @@ function savePrefs(prefs) {
 
 export function ReminderProvider({ children }) {
   const [prefs, setPrefsState] = useState(() => loadPrefs());
+  const sunDataRef = useRef(null);  // { sunrise: "HH:MM", sunset: "HH:MM" }
+  const alarmTimesRef = useRef(null);  // from getAlarmTimes()
+  const festivalsRef = useRef(null);
+  const vrathamsRef = useRef(null);
 
   const updatePref = useCallback((key, value) => {
     setPrefsState(prev => {
@@ -89,26 +101,66 @@ export function ReminderProvider({ children }) {
     return false;
   }, [updatePref]);
 
-  // Check permission on mount + set up notification listener
+  // Auto-request permission on native platform on first mount
   useEffect(() => {
     setupNotificationListener();
-    if (window.Capacitor?.isNativePlatform?.()) return;
-    if ('Notification' in window && Notification.permission === 'granted') {
+
+    if (window.Capacitor?.isNativePlatform?.()) {
+      // On Android, always try to get permission status
+      (async () => {
+        try {
+          const { LocalNotifications } = await import('@capacitor/local-notifications');
+          const perms = await LocalNotifications.checkPermissions();
+          if (perms.display === 'granted') {
+            updatePref('permissionGranted', true);
+          } else {
+            // Request permission proactively
+            const result = await LocalNotifications.requestPermissions();
+            updatePref('permissionGranted', result.display === 'granted');
+          }
+        } catch {}
+      })();
+    } else if ('Notification' in window && Notification.permission === 'granted') {
       updatePref('permissionGranted', true);
     }
   }, []);
 
-  // Schedule/cancel daily share notification when prefs change
+  // ─── Schedule daily share ─────────────────────────
   useEffect(() => {
-    if (prefs.dailyShare && prefs.permissionGranted) {
+    if (!prefs.permissionGranted) return;
+    if (prefs.dailyShare) {
       scheduleDailyShare(prefs.dailyShareTime);
     } else {
       cancelDailyShare();
     }
   }, [prefs.dailyShare, prefs.dailyShareTime, prefs.permissionGranted]);
 
-  // Schedule smart alarms — call from CalendarPad when sunrise/sunset data is available
-  const scheduleAlarms = useCallback(async (alarmTimes, lang = 'te') => {
+  // ─── Schedule puja reminder ───────────────────────
+  useEffect(() => {
+    if (!prefs.permissionGranted) return;
+    if (prefs.puja) {
+      schedulePujaReminder(prefs.pujaTime);
+    } else {
+      cancelPujaReminder();
+    }
+  }, [prefs.puja, prefs.pujaTime, prefs.permissionGranted]);
+
+  // ─── Schedule sunrise/sunset reminders ────────────
+  useEffect(() => {
+    if (!prefs.permissionGranted) return;
+    if ((prefs.sunrise || prefs.sunset) && sunDataRef.current) {
+      scheduleSunReminders(
+        sunDataRef.current.sunrise,
+        sunDataRef.current.sunset,
+        { sunrise: prefs.sunrise, sunriseOffset: prefs.sunriseOffset, sunset: prefs.sunset, sunsetOffset: prefs.sunsetOffset }
+      );
+    } else {
+      cancelSunReminders();
+    }
+  }, [prefs.sunrise, prefs.sunset, prefs.sunriseOffset, prefs.sunsetOffset, prefs.permissionGranted]);
+
+  // ─── Schedule smart alarms ────────────────────────
+  useEffect(() => {
     if (!prefs.permissionGranted) return;
     const alarmPrefs = {
       brahmaMuhurta: prefs.alarmBrahmaMuhurta,
@@ -117,15 +169,84 @@ export function ReminderProvider({ children }) {
       sayamSandhya: prefs.alarmSayamSandhya,
     };
     const anyEnabled = Object.values(alarmPrefs).some(Boolean);
-    if (anyEnabled) {
-      await scheduleAllSmartAlarms(alarmPrefs, alarmTimes, lang);
+    if (anyEnabled && alarmTimesRef.current) {
+      scheduleAllSmartAlarms(alarmPrefs, alarmTimesRef.current);
+    } else if (!anyEnabled) {
+      cancelAllSmartAlarms();
+    }
+  }, [prefs.alarmBrahmaMuhurta, prefs.alarmPratahSandhya, prefs.alarmMadhyahnaSandhya, prefs.alarmSayamSandhya, prefs.permissionGranted]);
+
+  // ─── Schedule festival reminders ──────────────────
+  useEffect(() => {
+    if (!prefs.permissionGranted) return;
+    if (prefs.festivals && festivalsRef.current?.length) {
+      scheduleFestivalReminders(festivalsRef.current, prefs.festivalTime);
     } else {
-      await cancelAllSmartAlarms();
+      cancelFestivalReminders();
+    }
+  }, [prefs.festivals, prefs.festivalTime, prefs.permissionGranted]);
+
+  // ─── Schedule vratham reminders ───────────────────
+  useEffect(() => {
+    if (!prefs.permissionGranted) return;
+    const anyVrat = prefs.vrathams && (prefs.vrathamEkadashi || prefs.vrathamPradosham || prefs.vrathamSankashti || prefs.vrathamShivaratri || prefs.vrathamPurnima || prefs.vrathamAmavasya);
+    if (anyVrat && vrathamsRef.current?.length) {
+      scheduleVrathamReminders(vrathamsRef.current, prefs.vrathamTime);
+    } else {
+      cancelVrathamReminders();
+    }
+  }, [prefs.vrathams, prefs.vrathamEkadashi, prefs.vrathamPradosham, prefs.vrathamSankashti, prefs.vrathamShivaratri, prefs.vrathamPurnima, prefs.vrathamAmavasya, prefs.vrathamTime, prefs.permissionGranted]);
+
+  /**
+   * Provide sun/alarm data from TodayPage (which has panchangam data).
+   * Called once on app load and whenever location changes.
+   */
+  const setSunData = useCallback((sunrise, sunset) => {
+    sunDataRef.current = { sunrise, sunset };
+    // Re-trigger sun reminders
+    if (prefs.permissionGranted && (prefs.sunrise || prefs.sunset)) {
+      scheduleSunReminders(sunrise, sunset, {
+        sunrise: prefs.sunrise, sunriseOffset: prefs.sunriseOffset,
+        sunset: prefs.sunset, sunsetOffset: prefs.sunsetOffset,
+      });
+    }
+  }, [prefs.permissionGranted, prefs.sunrise, prefs.sunset, prefs.sunriseOffset, prefs.sunsetOffset]);
+
+  const setAlarmTimes = useCallback((times) => {
+    alarmTimesRef.current = times;
+    // Re-trigger smart alarms
+    if (prefs.permissionGranted) {
+      const alarmPrefs = {
+        brahmaMuhurta: prefs.alarmBrahmaMuhurta,
+        pratahSandhya: prefs.alarmPratahSandhya,
+        madhyahnaSandhya: prefs.alarmMadhyahnaSandhya,
+        sayamSandhya: prefs.alarmSayamSandhya,
+      };
+      if (Object.values(alarmPrefs).some(Boolean)) {
+        scheduleAllSmartAlarms(alarmPrefs, times);
+      }
     }
   }, [prefs.permissionGranted, prefs.alarmBrahmaMuhurta, prefs.alarmPratahSandhya, prefs.alarmMadhyahnaSandhya, prefs.alarmSayamSandhya]);
 
+  const setFestivalData = useCallback((festivals) => {
+    festivalsRef.current = festivals;
+    if (prefs.permissionGranted && prefs.festivals) {
+      scheduleFestivalReminders(festivals, prefs.festivalTime);
+    }
+  }, [prefs.permissionGranted, prefs.festivals, prefs.festivalTime]);
+
+  const setVrathamData = useCallback((vrathams) => {
+    vrathamsRef.current = vrathams;
+    if (prefs.permissionGranted && prefs.vrathams) {
+      scheduleVrathamReminders(vrathams, prefs.vrathamTime);
+    }
+  }, [prefs.permissionGranted, prefs.vrathams, prefs.vrathamTime]);
+
   return (
-    <ReminderContext.Provider value={{ prefs, updatePref, requestPermission, scheduleAlarms }}>
+    <ReminderContext.Provider value={{
+      prefs, updatePref, requestPermission,
+      setSunData, setAlarmTimes, setFestivalData, setVrathamData,
+    }}>
       {children}
     </ReminderContext.Provider>
   );
