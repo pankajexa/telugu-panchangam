@@ -68,55 +68,60 @@
   --moonrise-bg: linear-gradient(135deg, #F0F0FF, #E8E8FF);
 }
 
-/* ═══ Night Sky Theme ═══ */
+/* ═══ Night Sky Theme — Immersive Starfield ═══ */
 [data-theme="night"] {
-  --bg: #0B0F19;
-  --card-bg: rgba(20, 28, 45, 0.85);
-  --card-shadow: 0 1px 4px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
-  --card-shadow-hover: 0 4px 16px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.3);
-  --card-border: 1px solid rgba(255,255,255,0.06);
+  --bg: transparent;
+  --card-bg: rgba(10, 15, 30, 0.45);
+  --card-shadow: 0 1px 8px rgba(0,0,0,0.3), inset 0 0.5px 0 rgba(255,255,255,0.04);
+  --card-shadow-hover: 0 4px 20px rgba(0,0,0,0.5);
+  --card-border: 1px solid rgba(255,255,255,0.05);
 
-  --text-primary: #E8E0D4;
-  --text-secondary: #A0987E;
-  --text-muted: #7A7060;
-  --text-faint: #554D40;
-  --text-label: #443C30;
+  --text-primary: #E8E4DC;
+  --text-secondary: #B8B0A0;
+  --text-muted: #8A8070;
+  --text-faint: #605848;
+  --text-label: #504838;
 
-  --border-subtle: rgba(255,255,255,0.06);
-  --divider: rgba(255,255,255,0.06);
+  --border-subtle: rgba(255,255,255,0.04);
+  --divider: rgba(255,255,255,0.04);
 
-  --cell-bg: linear-gradient(145deg, #151C2E, #111828);
-  --cell-border: rgba(100,120,180,0.15);
-  --cell-selected-bg: linear-gradient(145deg, #1E2840, #1A2238);
+  --cell-bg: rgba(12, 18, 35, 0.5);
+  --cell-border: rgba(100,120,180,0.1);
+  --cell-selected-bg: rgba(20, 30, 55, 0.6);
   --cell-selected-border: #C49B2A;
 
-  --tithi-icon-bg: linear-gradient(135deg, #1E1520, #2A1A28);
-  --nakshatra-icon-bg: linear-gradient(135deg, #1E1E10, #2A2818);
-  --yoga-icon-bg: linear-gradient(135deg, #1E1518, #2A1A20);
-  --karana-icon-bg: linear-gradient(135deg, #1E1A10, #2A2218);
+  --tithi-icon-bg: linear-gradient(135deg, rgba(30,21,32,0.6), rgba(42,26,40,0.4));
+  --nakshatra-icon-bg: linear-gradient(135deg, rgba(30,30,16,0.6), rgba(42,40,24,0.4));
+  --yoga-icon-bg: linear-gradient(135deg, rgba(30,21,24,0.6), rgba(42,26,32,0.4));
+  --karana-icon-bg: linear-gradient(135deg, rgba(30,26,16,0.6), rgba(42,34,24,0.4));
 
-  --sunrise-bg: linear-gradient(135deg, #1E1E10, #2A2818);
-  --sunset-bg: linear-gradient(135deg, #1E1518, #2A1A20);
-  --moonrise-bg: linear-gradient(135deg, #12142A, #181C38);
+  --sunrise-bg: linear-gradient(135deg, rgba(30,30,16,0.5), rgba(42,40,24,0.3));
+  --sunset-bg: linear-gradient(135deg, rgba(30,21,24,0.5), rgba(42,26,32,0.3));
+  --moonrise-bg: linear-gradient(135deg, rgba(18,20,42,0.5), rgba(24,28,56,0.3));
 
-  --color-shubh: #4ADE80;
-  --color-shubh-bg: rgba(45,138,57,0.12);
-  --color-shubh-border: rgba(45,138,57,0.2);
+  --color-shubh: #5AEE90;
+  --color-shubh-bg: rgba(45,138,57,0.1);
+  --color-shubh-border: rgba(45,138,57,0.15);
   --color-avoid: #F87171;
-  --color-avoid-bg: rgba(204,51,51,0.12);
-  --color-avoid-border: rgba(204,51,51,0.2);
+  --color-avoid-bg: rgba(204,51,51,0.1);
+  --color-avoid-border: rgba(204,51,51,0.15);
   --color-good: #E8C840;
-  --color-good-bg: rgba(232,168,23,0.1);
-  --color-good-border: rgba(232,168,23,0.2);
+  --color-good-bg: rgba(232,168,23,0.08);
+  --color-good-border: rgba(232,168,23,0.15);
 }
 
+/* Deep space background — dark gradient with depth */
 [data-theme="night"] body {
-  background: #0B0F19;
-  background-image: radial-gradient(ellipse at 50% 0%, #111828 0%, #0B0F19 50%, #060A12 100%);
-  background-attachment: fixed;
+  background: #050810 !important;
+  background-image:
+    radial-gradient(ellipse at 30% 20%, rgba(15, 20, 45, 0.8) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 60%, rgba(10, 15, 35, 0.6) 0%, transparent 40%),
+    radial-gradient(ellipse at 50% 100%, rgba(8, 10, 25, 1) 0%, transparent 50%),
+    linear-gradient(to bottom, #080C18 0%, #050810 30%, #030508 100%) !important;
+  background-attachment: fixed !important;
 }
 
-/* Stars overlay — tiny dots scattered across the night sky */
+/* Stars layer 1 — fixed bright stars */
 [data-theme="night"] body::before {
   content: '';
   position: fixed;
@@ -124,54 +129,84 @@
   pointer-events: none;
   z-index: 0;
   background-image:
-    radial-gradient(1px 1px at 10% 15%, rgba(255,255,255,0.4), transparent),
-    radial-gradient(1px 1px at 25% 8%, rgba(255,255,255,0.3), transparent),
-    radial-gradient(1.5px 1.5px at 40% 22%, rgba(255,255,255,0.5), transparent),
-    radial-gradient(1px 1px at 55% 5%, rgba(255,255,255,0.3), transparent),
-    radial-gradient(1px 1px at 70% 18%, rgba(255,255,255,0.4), transparent),
-    radial-gradient(1.5px 1.5px at 85% 12%, rgba(255,255,255,0.35), transparent),
-    radial-gradient(1px 1px at 95% 25%, rgba(255,255,255,0.3), transparent),
-    radial-gradient(1px 1px at 15% 45%, rgba(255,255,255,0.25), transparent),
-    radial-gradient(1.5px 1.5px at 35% 55%, rgba(255,255,255,0.4), transparent),
-    radial-gradient(1px 1px at 60% 40%, rgba(255,255,255,0.3), transparent),
-    radial-gradient(1px 1px at 80% 50%, rgba(255,255,255,0.35), transparent),
-    radial-gradient(1px 1px at 5% 70%, rgba(255,255,255,0.3), transparent),
-    radial-gradient(1.5px 1.5px at 22% 80%, rgba(255,255,255,0.4), transparent),
-    radial-gradient(1px 1px at 48% 75%, rgba(255,255,255,0.25), transparent),
-    radial-gradient(1px 1px at 72% 82%, rgba(255,255,255,0.35), transparent),
-    radial-gradient(1px 1px at 90% 70%, rgba(255,255,255,0.3), transparent),
-    radial-gradient(1.5px 1.5px at 50% 92%, rgba(255,255,255,0.4), transparent),
-    radial-gradient(1px 1px at 30% 95%, rgba(255,255,255,0.3), transparent);
+    /* Bright stars */
+    radial-gradient(1.5px 1.5px at 8% 12%, rgba(255,255,255,0.7), transparent),
+    radial-gradient(2px 2px at 23% 6%, rgba(255,248,220,0.8), transparent),
+    radial-gradient(1.5px 1.5px at 42% 18%, rgba(255,255,255,0.6), transparent),
+    radial-gradient(2px 2px at 67% 8%, rgba(255,248,220,0.7), transparent),
+    radial-gradient(1.5px 1.5px at 88% 15%, rgba(255,255,255,0.6), transparent),
+    /* Medium stars */
+    radial-gradient(1px 1px at 15% 32%, rgba(255,255,255,0.5), transparent),
+    radial-gradient(1px 1px at 35% 45%, rgba(255,255,255,0.4), transparent),
+    radial-gradient(1.5px 1.5px at 52% 38%, rgba(255,248,220,0.55), transparent),
+    radial-gradient(1px 1px at 78% 42%, rgba(255,255,255,0.45), transparent),
+    radial-gradient(1px 1px at 92% 35%, rgba(255,255,255,0.4), transparent),
+    /* Dim stars scattered */
+    radial-gradient(1px 1px at 5% 58%, rgba(255,255,255,0.3), transparent),
+    radial-gradient(1px 1px at 18% 72%, rgba(255,255,255,0.35), transparent),
+    radial-gradient(1.5px 1.5px at 30% 65%, rgba(255,248,220,0.4), transparent),
+    radial-gradient(1px 1px at 48% 78%, rgba(255,255,255,0.3), transparent),
+    radial-gradient(1px 1px at 62% 55%, rgba(255,255,255,0.35), transparent),
+    radial-gradient(1px 1px at 75% 68%, rgba(255,255,255,0.3), transparent),
+    radial-gradient(1.5px 1.5px at 85% 75%, rgba(255,248,220,0.4), transparent),
+    radial-gradient(1px 1px at 95% 62%, rgba(255,255,255,0.3), transparent),
+    /* Bottom scattered */
+    radial-gradient(1px 1px at 10% 88%, rgba(255,255,255,0.35), transparent),
+    radial-gradient(1.5px 1.5px at 28% 92%, rgba(255,248,220,0.45), transparent),
+    radial-gradient(1px 1px at 45% 85%, rgba(255,255,255,0.3), transparent),
+    radial-gradient(1px 1px at 58% 95%, rgba(255,255,255,0.35), transparent),
+    radial-gradient(1.5px 1.5px at 72% 88%, rgba(255,248,220,0.4), transparent),
+    radial-gradient(1px 1px at 90% 92%, rgba(255,255,255,0.3), transparent);
   background-size: 100% 100%;
-  animation: starsTwinkle 8s ease-in-out infinite alternate;
+}
+
+/* Stars layer 2 — slow twinkle overlay */
+[data-theme="night"] body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    radial-gradient(2px 2px at 12% 25%, rgba(255,250,200,0.6), transparent),
+    radial-gradient(1.5px 1.5px at 38% 10%, rgba(200,220,255,0.5), transparent),
+    radial-gradient(2px 2px at 55% 48%, rgba(255,250,200,0.5), transparent),
+    radial-gradient(1.5px 1.5px at 82% 30%, rgba(200,220,255,0.55), transparent),
+    radial-gradient(2px 2px at 20% 80%, rgba(255,250,200,0.45), transparent),
+    radial-gradient(1.5px 1.5px at 65% 72%, rgba(200,220,255,0.5), transparent),
+    radial-gradient(2px 2px at 45% 60%, rgba(255,250,200,0.4), transparent),
+    radial-gradient(1.5px 1.5px at 90% 55%, rgba(200,220,255,0.45), transparent);
+  background-size: 100% 100%;
+  animation: starsTwinkle 6s ease-in-out infinite alternate;
 }
 
 @keyframes starsTwinkle {
-  0% { opacity: 0.7; }
+  0% { opacity: 0.4; }
   100% { opacity: 1; }
 }
 
-/* Ensure page content is above stars */
+/* Content above stars */
 [data-theme="night"] #root {
   position: relative;
   z-index: 1;
 }
 
-/* ═══ Night override for hardcoded inline styles ═══ */
-/* These use specificity tricks to override React inline styles */
+/* ═══ Nuclear overrides — force ALL hardcoded colors to night ═══ */
 
-/* Force all white/light backgrounds on divs to dark */
+/* ALL white/light backgrounds → glass panels */
 [data-theme="night"] div[style*="background: white"],
 [data-theme="night"] div[style*="background: #FFF"],
 [data-theme="night"] div[style*="background: rgb(255"],
 [data-theme="night"] div[style*="background-color: white"],
 [data-theme="night"] div[style*="background-color: #FFF"],
 [data-theme="night"] div[style*="background: #FAFAF"] {
-  background: rgba(20, 28, 45, 0.85) !important;
-  border-color: rgba(255,255,255,0.06) !important;
+  background: rgba(8, 12, 25, 0.4) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  border-color: rgba(255,255,255,0.04) !important;
 }
 
-/* Light cream/warm backgrounds → dark warm */
+/* Cream/warm backgrounds → subtle glass */
 [data-theme="night"] div[style*="background: #FFF9"],
 [data-theme="night"] div[style*="background: #FDF"],
 [data-theme="night"] div[style*="background: #F5F3"],
@@ -180,26 +215,94 @@
 [data-theme="night"] div[style*="background: #FFF3"],
 [data-theme="night"] div[style*="background: #FFF8"],
 [data-theme="night"] div[style*="background: #FFF6"] {
-  background: rgba(30, 35, 50, 0.6) !important;
+  background: rgba(12, 18, 35, 0.35) !important;
+  backdrop-filter: blur(6px) !important;
+  -webkit-backdrop-filter: blur(6px) !important;
 }
 
-/* Force page-level containers to transparent */
+/* Green success/food sections → dark glass */
+[data-theme="night"] div[style*="background: #E0FFE0"],
+[data-theme="night"] div[style*="background: #F0FFF0"],
+[data-theme="night"] div[style*="background: rgb(224, 255"],
+[data-theme="night"] div[style*="background: linear-gradient(135deg, #F0FFF0"] {
+  background: rgba(20, 50, 30, 0.25) !important;
+  border-color: rgba(74,222,128,0.12) !important;
+}
+
+/* Yellow/warning sections → dark glass */
+[data-theme="night"] div[style*="background: #FFF8E1"],
+[data-theme="night"] div[style*="background: #FFFCF0"],
+[data-theme="night"] div[style*="background: linear-gradient(135deg, #FFFCF0"] {
+  background: rgba(50, 40, 15, 0.25) !important;
+  border-color: rgba(232,200,64,0.12) !important;
+}
+
+/* Red/pink sections → dark glass */
+[data-theme="night"] div[style*="background: #FFE0E0"],
+[data-theme="night"] div[style*="background: #FFF1F0"],
+[data-theme="night"] div[style*="background: #FFF0F0"] {
+  background: rgba(50, 15, 15, 0.25) !important;
+  border-color: rgba(248,113,113,0.12) !important;
+}
+
+/* Page containers → fully transparent */
 [data-theme="night"] div[style*="max-width: 480px"],
-[data-theme="night"] div[style*="maxWidth: 480"] {
+[data-theme="night"] div[style*="maxWidth: 480"],
+[data-theme="night"] div[style*="max-width: '480px'"] {
   background: transparent !important;
 }
 
-/* Buttons with white/light backgrounds */
+/* Buttons → glass */
 [data-theme="night"] button[style*="background: #FFF"],
 [data-theme="night"] button[style*="background: white"] {
-  background: rgba(20, 28, 45, 0.85) !important;
-  border-color: rgba(255,255,255,0.08) !important;
-  color: #E8E0D4 !important;
+  background: rgba(10, 15, 30, 0.4) !important;
+  backdrop-filter: blur(6px) !important;
+  -webkit-backdrop-filter: blur(6px) !important;
+  border-color: rgba(255,255,255,0.06) !important;
+  color: #E8E4DC !important;
 }
 
-/* Overlay sheets */
+/* Overlay sheets → deep dark */
 [data-theme="night"] div[style*="background: #FAFAF8"] {
-  background: #0F1520 !important;
+  background: rgba(5, 8, 16, 0.95) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+}
+
+/* ALL text colors → light for readability */
+[data-theme="night"] div[style*="color: #1A1A1A"],
+[data-theme="night"] span[style*="color: #1A1A1A"],
+[data-theme="night"] h1[style*="color: #1A1A1A"],
+[data-theme="night"] h2[style*="color: #1A1A1A"],
+[data-theme="night"] p[style*="color: #1A1A1A"] {
+  color: #E8E4DC !important;
+}
+
+[data-theme="night"] div[style*="color: #333"],
+[data-theme="night"] span[style*="color: #333"],
+[data-theme="night"] div[style*="color: #444"],
+[data-theme="night"] span[style*="color: #444"] {
+  color: #C8C0B4 !important;
+}
+
+[data-theme="night"] div[style*="color: #666"],
+[data-theme="night"] span[style*="color: #666"],
+[data-theme="night"] div[style*="color: #777"],
+[data-theme="night"] span[style*="color: #777"] {
+  color: #9A9284 !important;
+}
+
+[data-theme="night"] div[style*="color: #888"],
+[data-theme="night"] span[style*="color: #888"],
+[data-theme="night"] div[style*="color: #999"],
+[data-theme="night"] span[style*="color: #999"] {
+  color: #7A7264 !important;
+}
+
+/* Section headers */
+[data-theme="night"] div[style*="color: #AAA"],
+[data-theme="night"] span[style*="color: #AAA"] {
+  color: #605848 !important;
 }
 
 * {
