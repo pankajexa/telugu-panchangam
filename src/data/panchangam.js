@@ -395,9 +395,11 @@ export function getPanchangamForDate(date, location) {
   // Handle Adhika masa
   const masaPrefix = p.masa?.isAdhika ? 'అధిక ' : '';
 
-  // Sunrise/sunset as HH:MM strings
+  // Sunrise/sunset/moonrise/moonset as HH:MM strings
   const sunrise = formatTime24(p.sunrise, tz);
   const sunset = formatTime24(p.sunset, tz);
+  const moonrise = p.moonrise ? formatTime24(p.moonrise, tz) : '--';
+  const moonset = p.moonset ? formatTime24(p.moonset, tz) : '--';
 
   // Reference date for same-day checks (sunrise in local tz)
   const refDate = p.sunrise || utcDate;
@@ -466,6 +468,8 @@ export function getPanchangamForDate(date, location) {
     karanam: { name: karanaName, nameEn: karanaNameEn },
     sunrise,
     sunset,
+    moonrise,
+    moonset,
     rahuKalam,
     yamagandam,
     varjyam,
