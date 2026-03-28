@@ -1,6 +1,7 @@
 /**
- * Festival audio hook — plays devotional chanting on festival days.
- * Auto-plays when a festival with audio is detected. User can toggle via TopBar icon.
+ * Devotional audio hook — plays meditative chanting/music.
+ * Always available via TopBar icon. Muted by default.
+ * On festival days, plays festival-specific audio instead of default tanpura.
  * Audio persists across tab navigation (hook lives at App level).
  */
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
@@ -17,37 +18,49 @@ const FESTIVAL_AUDIO = {
   // 'Vinayaka Chavithi': { file: '/assets/sounds/ganesh_chant.mp3', label: '...' },
 };
 
-const MUTE_KEY = 'festivalChantMuted';
+// Default daily meditation audio
+const DEFAULT_AUDIO = {
+  file: '/assets/sounds/sri_rama_chant.mp3',
+  label: 'ధ్యాన సంగీతం',
+  labelEn: 'Meditation Music',
+};
+
+const MUTE_KEY = 'devotionalAudioMuted';
 
 export default function useFestivalAudio(location) {
   const audioRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(() => {
-    try { return localStorage.getItem(MUTE_KEY) === 'true'; } catch { return false; }
+    try {
+      const saved = localStorage.getItem(MUTE_KEY);
+      // Default to muted if never set
+      return saved === null ? true : saved === 'true';
+    } catch { return true; }
   });
 
-  // Detect today's festival
-  const festivalAudio = useMemo(() => {
+  // Detect today's festival, fall back to default audio
+  const activeAudio = useMemo(() => {
     try {
       const today = new Date();
       const data = getPanchangamForDate(today, location);
       const festivalName = data?.festival?.english;
       if (festivalName && FESTIVAL_AUDIO[festivalName]) {
-        return FESTIVAL_AUDIO[festivalName];
+        return { ...FESTIVAL_AUDIO[festivalName], isFestival: true };
       }
     } catch (_) {}
-    return null;
+    return { ...DEFAULT_AUDIO, isFestival: false };
   }, [location]);
 
-  const festivalHasAudio = !!festivalAudio;
+  // Always available
+  const festivalHasAudio = true;
 
   // Initialize audio element
   useEffect(() => {
-    if (!festivalAudio) return;
+    if (!activeAudio) return;
 
-    const audio = new Audio(festivalAudio.file);
+    const audio = new Audio(activeAudio.file);
     audio.loop = true;
-    audio.volume = 0.4; // Gentle volume
+    audio.volume = 0.35; // Gentle volume
     audio.preload = 'auto';
     audioRef.current = audio;
 
@@ -60,11 +73,11 @@ export default function useFestivalAudio(location) {
       audio.src = '';
       audioRef.current = null;
     };
-  }, [festivalAudio]);
+  }, [activeAudio]);
 
-  // Auto-play when not muted (handles browser autoplay policy)
+  // Only auto-play if user has previously unmuted (respects default muted state)
   useEffect(() => {
-    if (!festivalAudio || !audioRef.current || isMuted) return;
+    if (!activeAudio || !audioRef.current || isMuted) return;
 
     const audio = audioRef.current;
 
@@ -84,7 +97,7 @@ export default function useFestivalAudio(location) {
     };
 
     tryPlay();
-  }, [festivalAudio, isMuted]);
+  }, [activeAudio, isMuted]);
 
   // Toggle mute/unmute
   const toggle = useCallback(() => {
@@ -103,5 +116,5 @@ export default function useFestivalAudio(location) {
     });
   }, []);
 
-  return { isPlaying, isMuted, toggle, festivalHasAudio, festivalAudio };
+  return { isPlaying, isMuted, toggle, festivalHasAudio, festivalAudio: activeAudio };
 }

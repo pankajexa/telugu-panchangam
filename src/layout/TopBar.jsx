@@ -17,7 +17,7 @@ export default function TopBar({ audioPlaying, audioMuted, onToggleAudio, hasAud
         </span>
       </div>
       <div style={styles.rightWrap}>
-        {/* Festival chant toggle — only visible on festival days with audio */}
+        {/* Devotional audio toggle — always visible, muted by default */}
         {hasAudio && (
           <button
             style={styles.audioBtn}
