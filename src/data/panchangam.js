@@ -144,16 +144,46 @@ const EKADASHI_TELUGU = {
   'Papmochani Ekadashi': 'పాపమోచని ఏకాదశి',
 };
 
-function resolveVrathams(libraryFestivals, tithiIndex, masaIndex, vara) {
+/**
+ * Check if Dashami contaminates Ekadashi for Vaishnava observance.
+ * Vaishnava rule: Dashami must end before Arunodaya (96 min before sunrise).
+ * If Dashami is still present at Arunodaya, Vaishnava skips Ekadashi to Dwadashi.
+ *
+ * @param {object[]} tithiTransitions - raw transitions from library (have .start Date objects)
+ * @param {Date} sunrise - sunrise Date object for this day
+ * @returns {boolean} true if Ekadashi is contaminated (Vaishnava should skip)
+ */
+function isEkadashiContaminated(tithiTransitions, sunrise) {
+  if (!tithiTransitions?.length || !sunrise) return false;
+
+  // Arunodaya = 96 minutes before sunrise
+  const arunodayaMs = sunrise.getTime() - 96 * 60 * 1000;
+
+  // The first transition on Ekadashi day should be Ekadashi itself.
+  // Its .start is when Dashami ended (= Ekadashi began).
+  // If that start is AFTER Arunodaya, Dashami was present at Arunodaya → contaminated.
+  const ekadashiTr = tithiTransitions[0];
+  if (ekadashiTr?.start && ekadashiTr.start.getTime() > arunodayaMs) {
+    return true; // Dashami extended past Arunodaya
+  }
+  return false;
+}
+
+function resolveVrathams(libraryFestivals, tithiIndex, masaIndex, vara, tithiTransitions, sunrise) {
   const vrathams = [];
 
   // 1. Collect library-detected recurring events
   if (libraryFestivals) {
     for (const f of libraryFestivals) {
-      // Named Ekadashis
+      // Named Ekadashis — with Smartha/Vaishnava contamination check
       if (f.name.endsWith('Ekadashi')) {
         const te = EKADASHI_TELUGU[f.name] || f.name;
-        vrathams.push({ telugu: te, english: f.name, type: 'ekadashi' });
+        const contaminated = isEkadashiContaminated(tithiTransitions, sunrise);
+        vrathams.push({
+          telugu: te, english: f.name, type: 'ekadashi',
+          smartha: true,  // Always observable for Smartha (tithi at sunrise)
+          vaishnava: !contaminated,  // Vaishnava only if not contaminated
+        });
       }
       // Pradosham
       if (f.name.startsWith('Pradosham')) {
@@ -436,7 +466,7 @@ export function getPanchangamForDate(date, location) {
 
   // Vrathams / recurring observances
   const masaIndex = p.masa?.index ?? -1;
-  const vrathams = resolveVrathams(p.festivals, p.tithi, masaIndex, date.getDay());
+  const vrathams = resolveVrathams(p.festivals, p.tithi, masaIndex, date.getDay(), p.tithiTransitions, p.sunrise);
 
   // Gulika Kalam
   const gulikaKalam = formatTimeRange(p.gulikaKalam?.start, p.gulikaKalam?.end, tz);

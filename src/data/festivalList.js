@@ -30,7 +30,12 @@ export function getAllFestivals(location) {
 
     // Vrathams (Ekadashi, Pradosham, etc.)
     if (data.vrathams && data.vrathams.length > 0) {
+      const sampradaya = typeof localStorage !== 'undefined' ? localStorage.getItem('sampradaya') || 'smartha' : 'smartha';
       for (const v of data.vrathams) {
+        // Filter Ekadashi based on Sampradaya preference
+        if (v.type === 'ekadashi' && sampradaya === 'vaishnava' && v.vaishnava === false) {
+          continue; // Skip contaminated Ekadashi for Vaishnava
+        }
         results.push({
           date,
           english: v.english || v.name || '',
