@@ -156,7 +156,7 @@ export default function DevotionPage() {
                   <div style={{ ...S.festShlokaTelugu, fontFamily: "'Noto Sans Telugu', sans-serif", color: colors.iconColor }}>
                     {shloka.teluguTransliteration.split('\n')[0]}
                   </div>
-                  <div style={S.festShlokaMeaning}>
+                  <div style={{ ...S.festShlokaMeaning, color: colors.textMuted }}>
                     {shloka.englishMeaning.length > 100 ? shloka.englishMeaning.slice(0, 100) + '…' : shloka.englishMeaning}
                   </div>
                   <div style={{ ...S.festShlokaFooter, borderTop: `1px solid ${colors.border}` }}>
@@ -191,7 +191,7 @@ export default function DevotionPage() {
           <h1 style={{ ...S.headerTitle, fontFamily: font, color: colors.text }}>
             {pick('భక్తి', 'Devotion')}
           </h1>
-          <p style={{ ...S.headerSubtitle, color: colors.textMuted }}>
+          <p style={{ ...S.headerSubtitle, color: colors.textMuted, margin: '4px 0 0' }}>
             {pick('నిత్య సాధన • శ్లోకాలు • పంచాంగం', 'Daily Practice • Shlokas • Panchangam')}
           </p>
         </div>
@@ -265,7 +265,7 @@ export default function DevotionPage() {
 
           {/* Section: Browse All Shlokas */}
           <div style={{ ...S.sectionLabel, marginTop: 24 }}>{t('share.browseShlokas')}</div>
-          <div style={S.sectionSub}>{SHLOKAS.length} {pick('శ్లోకాలు • వాల్మీకి రామాయణం', 'Shlokas • Valmiki Ramayana')}</div>
+          <div style={{ ...S.sectionSub, color: colors.textMuted }}>{SHLOKAS.length} {pick('శ్లోకాలు • వాల్మీకి రామాయణం', 'Shlokas • Valmiki Ramayana')}</div>
           <div style={S.chipScroll}>
             {categoryKeys.map(key => {
               const label = CATEGORY_LABELS[key] ? pick(CATEGORY_LABELS[key].te, CATEGORY_LABELS[key].en) : key;
@@ -301,13 +301,12 @@ const S = {
 
   // ── Hub Header ──
   header: { padding: '12px 20px 16px', textAlign: 'center' },
-  headerTitle: { fontSize: 26, fontWeight: 700, color: '#1A1A1A', margin: 0, lineHeight: 1.3 },
-  headerSubtitle: { fontSize: 13, color: '#999', marginTop: 4, fontFamily: "'Plus Jakarta Sans', sans-serif", margin: '4px 0 0' },
+  headerTitle: { fontSize: 26, fontWeight: 700, margin: 0, lineHeight: 1.3 },
+  headerSubtitle: { fontSize: 13, marginTop: 4, fontFamily: "'Plus Jakarta Sans', sans-serif", margin: '4px 0 0' },
 
   // ── Widget Cards ──
   widgetGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, padding: '0 20px', marginBottom: 24 },
   widgetCard: {
-    background: '#FFFFFF',
     borderRadius: 14,
     padding: 16,
     border: 'none',
@@ -332,8 +331,8 @@ const S = {
     fontFamily: "'Plus Jakarta Sans', sans-serif",
     letterSpacing: '0.02em',
   },
-  widgetTitle: { fontSize: 15, fontWeight: 700, color: '#1A1A1A', marginBottom: 2, fontFamily: "'Plus Jakarta Sans', sans-serif" },
-  widgetSubtitle: { fontSize: 12, color: '#999', lineHeight: 1.4, fontFamily: "'Plus Jakarta Sans', sans-serif", flex: 1 },
+  widgetTitle: { fontSize: 15, fontWeight: 700, marginBottom: 2, fontFamily: "'Plus Jakarta Sans', sans-serif" },
+  widgetSubtitle: { fontSize: 12, lineHeight: 1.4, fontFamily: "'Plus Jakarta Sans', sans-serif", flex: 1 },
   widgetChevron: { alignSelf: 'flex-end', marginTop: 8 },
 
   // ── Festival hero ──
@@ -348,18 +347,18 @@ const S = {
   festHeroSub: { fontSize: 12, color: 'rgba(255,255,255,0.6)', marginTop: 6, fontFamily: "'Plus Jakarta Sans', sans-serif" },
 
   // ── Festival wishes card ──
-  festWishCard: { margin: '0 20px 16px', background: 'white', borderRadius: 16, padding: '16px 18px', border: '1px solid rgba(0,0,0,0.05)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' },
+  festWishCard: { margin: '0 20px 16px', borderRadius: 16, padding: '16px 18px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' },
   festWishHeader: { marginBottom: 10 },
-  festWishName: { fontSize: 15, fontWeight: 700, color: '#1A1A1A' },
+  festWishName: { fontSize: 15, fontWeight: 700 },
 
   // ── Festival shloka cards ──
   festShlokaGrid: { display: 'flex', flexDirection: 'column', gap: 14, padding: '0 20px' },
-  festShlokaCard: { background: 'white', borderRadius: 16, padding: '18px 20px', border: '1px solid rgba(0,0,0,0.05)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' },
-  festShlokaDevanagari: { fontSize: 16, fontWeight: 600, color: '#1A1A1A', lineHeight: 1.6, marginBottom: 6 },
-  festShlokaTelugu: { fontSize: 13, color: '#666', lineHeight: 1.5, marginBottom: 8 },
-  festShlokaMeaning: { fontSize: 13, color: '#888', lineHeight: 1.5, fontStyle: 'italic', marginBottom: 14, fontFamily: "'Plus Jakarta Sans', sans-serif" },
-  festShlokaFooter: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid rgba(0,0,0,0.05)', paddingTop: 12 },
-  festShlokaSource: { fontSize: 11, color: '#BBB', fontFamily: "'Plus Jakarta Sans', sans-serif", flex: 1 },
+  festShlokaCard: { borderRadius: 16, padding: '18px 20px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' },
+  festShlokaDevanagari: { fontSize: 16, fontWeight: 600, lineHeight: 1.6, marginBottom: 6 },
+  festShlokaTelugu: { fontSize: 13, lineHeight: 1.5, marginBottom: 8 },
+  festShlokaMeaning: { fontSize: 13, lineHeight: 1.5, fontStyle: 'italic', marginBottom: 14, fontFamily: "'Plus Jakarta Sans', sans-serif" },
+  festShlokaFooter: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 12 },
+  festShlokaSource: { fontSize: 11, fontFamily: "'Plus Jakarta Sans', sans-serif", flex: 1 },
   festShlokaBtns: { display: 'flex', gap: 8 },
   festReadBtn: { fontSize: 12, fontWeight: 600, color: '#E63B2E', background: 'rgba(230,59,46,0.06)', border: '1px solid rgba(230,59,46,0.15)', borderRadius: 10, padding: '6px 14px', cursor: 'pointer', fontFamily: "'Plus Jakarta Sans', sans-serif", WebkitTapHighlightColor: 'transparent' },
   festShareBtn: { fontSize: 12, fontWeight: 600, color: 'white', background: '#E63B2E', border: 'none', borderRadius: 10, padding: '6px 14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5, fontFamily: "'Plus Jakarta Sans', sans-serif", WebkitTapHighlightColor: 'transparent' },
@@ -367,21 +366,21 @@ const S = {
   divider: { height: 1, background: 'rgba(0,0,0,0.06)', margin: '24px 20px 20px' },
 
   // ── Section labels ──
-  sectionLabel: { fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#BBB', marginBottom: 12, padding: '0 20px', fontFamily: "'Plus Jakarta Sans', sans-serif" },
-  sectionSub: { fontSize: 12, color: '#999', marginBottom: 14, marginTop: -6, padding: '0 20px', fontFamily: "'Plus Jakarta Sans', sans-serif" },
+  sectionLabel: { fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12, padding: '0 20px', fontFamily: "'Plus Jakarta Sans', sans-serif" },
+  sectionSub: { fontSize: 12, marginBottom: 14, marginTop: -6, padding: '0 20px', fontFamily: "'Plus Jakarta Sans', sans-serif" },
 
   // ── Panchangam card ──
-  panchangCard: { background: 'white', borderRadius: 16, padding: '18px 20px', border: '1px solid rgba(0,0,0,0.05)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', marginBottom: 22, marginLeft: 20, marginRight: 20 },
+  panchangCard: { borderRadius: 16, padding: '18px 20px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', marginBottom: 22, marginLeft: 20, marginRight: 20 },
   panchangHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
-  panchangDate: { fontSize: 18, fontWeight: 700, color: '#1A1A1A' },
-  panchangDay: { fontSize: 13, color: '#777', marginTop: 2 },
+  panchangDate: { fontSize: 18, fontWeight: 700 },
+  panchangDay: { fontSize: 13, marginTop: 2 },
   panchangTithi: { display: 'flex', alignItems: 'center', gap: 6, background: 'linear-gradient(135deg, #FFFCF0, #FFF8E6)', padding: '6px 12px', borderRadius: 10, border: '1px solid rgba(232,168,23,0.12)' },
-  panchangTithiText: { fontSize: 12, fontWeight: 600, color: '#1A1A1A' },
-  quickRow: { display: 'flex', alignItems: 'center', padding: '10px 0', borderTop: '1px solid rgba(0,0,0,0.04)', borderBottom: '1px solid rgba(0,0,0,0.04)', marginBottom: 12 },
+  panchangTithiText: { fontSize: 12, fontWeight: 600 },
+  quickRow: { display: 'flex', alignItems: 'center', padding: '10px 0', marginBottom: 12 },
   quickItem: { flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 },
   quickDivider: { width: 1, height: 20, background: 'rgba(0,0,0,0.06)', flexShrink: 0 },
-  quickTime: { fontSize: 13, fontWeight: 700, color: '#1A1A1A', fontFamily: "'Plus Jakarta Sans', sans-serif" },
-  quickLabel: { fontSize: 12, fontWeight: 600, color: '#1A1A1A' },
+  quickTime: { fontSize: 13, fontWeight: 700, fontFamily: "'Plus Jakarta Sans', sans-serif" },
+  quickLabel: { fontSize: 12, fontWeight: 600 },
   panchangFest: { fontSize: 13, fontWeight: 600, color: '#E63B2E', marginBottom: 12 },
   shareButtonWrap: { marginTop: 4 },
 

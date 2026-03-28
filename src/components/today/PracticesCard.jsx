@@ -33,7 +33,7 @@ const PracticesCard = memo(function PracticesCard({ practices }) {
             {practices.steps.map((step, i) => (
               <div key={i} style={styles.stepRow}>
                 <div style={styles.stepNum}>{i + 1}</div>
-                <div style={{ ...styles.stepText, fontFamily: font, color: colors.textSecondary }}>
+                <div style={{ ...styles.stepText, fontFamily: font, color: colors.text }}>
                   {pick(step.te, step.en)}
                 </div>
               </div>
@@ -43,7 +43,7 @@ const PracticesCard = memo(function PracticesCard({ practices }) {
           {/* Mantra */}
           {practices.mantra && (
             <div style={styles.mantraBox}>
-              <div style={{ ...styles.sectionLabel, color: colors.textMuted }}>
+              <div style={{ ...styles.sectionLabel, color: colors.textMuted, marginBottom: 8 }}>
                 <Music size={13} color="#E63B2E" strokeWidth={2} />
                 <span>{pick('మంత్రం', 'Mantra')}</span>
               </div>
@@ -51,7 +51,7 @@ const PracticesCard = memo(function PracticesCard({ practices }) {
                 {practices.mantra.text}
               </div>
               {practices.mantra.text_en && (
-                <div style={styles.mantraEn}>{practices.mantra.text_en}</div>
+                <div style={{ ...styles.mantraEn, color: colors.textMuted }}>{practices.mantra.text_en}</div>
               )}
             </div>
           )}
@@ -59,7 +59,7 @@ const PracticesCard = memo(function PracticesCard({ practices }) {
           {/* Food */}
           {practices.food && (
             <div style={styles.foodBox}>
-              <div style={styles.sectionLabel}>
+              <div style={{ ...styles.sectionLabel, color: colors.textMuted }}>
                 <UtensilsCrossed size={13} color="#2D8A39" strokeWidth={2} />
                 <span>{pick('ఆహారం', 'Food')}</span>
               </div>
@@ -85,7 +85,7 @@ const PracticesCard = memo(function PracticesCard({ practices }) {
           {/* Timing */}
           {practices.timing && (
             <div style={styles.timingBox}>
-              <div style={styles.sectionLabel}>
+              <div style={{ ...styles.sectionLabel, color: colors.textMuted }}>
                 <Clock size={13} color="#B8860B" strokeWidth={2} />
                 <span>{pick('సమయం', 'Timing')}</span>
               </div>
@@ -104,9 +104,7 @@ export default PracticesCard;
 
 const styles = {
   card: {
-    background: 'white',
     borderRadius: 16,
-    border: '1px solid rgba(0,0,0,0.05)',
     boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
     overflow: 'hidden',
     marginBottom: 22,
@@ -130,7 +128,6 @@ const styles = {
   title: {
     fontSize: 15,
     fontWeight: 700,
-    color: '#1A1A1A',
   },
   body: {
     padding: '0 18px 18px',
@@ -162,7 +159,6 @@ const styles = {
   stepText: {
     fontSize: 13,
     lineHeight: 1.55,
-    color: '#333',
     flex: 1,
   },
   // Mantra section
@@ -179,7 +175,6 @@ const styles = {
     gap: 6,
     fontSize: 11,
     fontWeight: 700,
-    color: '#999',
     textTransform: 'uppercase',
     letterSpacing: '0.08em',
     marginBottom: 8,
@@ -193,7 +188,6 @@ const styles = {
   },
   mantraEn: {
     fontSize: 12,
-    color: '#999',
     marginTop: 4,
     fontStyle: 'italic',
     fontFamily: "'Plus Jakarta Sans', sans-serif",

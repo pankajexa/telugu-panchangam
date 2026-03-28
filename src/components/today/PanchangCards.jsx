@@ -37,11 +37,12 @@ const TRANSITION_KEYS = {
  * e.g., **Mar 28** 8:46 AM
  */
 function DateTimeLabel({ dt, isActive }) {
+  const { colors } = useTheme();
   if (!dt || typeof dt === 'string') return <span>{dt || '--'}</span>;
   if (dt.time === '--') return <span>--</span>;
   return (
     <span>
-      <span style={{ fontWeight: 700, color: isActive ? '#C42E23' : '#555' }}>{dt.date}</span>
+      <span style={{ fontWeight: 700, color: isActive ? '#C42E23' : colors.textMuted }}>{dt.date}</span>
       {' '}
       <span style={{ fontWeight: 400 }}>{dt.time}</span>
     </span>
@@ -207,7 +208,6 @@ const styles = {
     fontWeight: 700,
     textTransform: 'uppercase',
     letterSpacing: '0.12em',
-    color: '#BBB',
     marginBottom: 12,
     fontFamily: "'Plus Jakarta Sans', sans-serif",
   },
@@ -217,10 +217,8 @@ const styles = {
     gap: 10,
   },
   card: {
-    background: 'white',
     borderRadius: 14,
     boxShadow: '0 1px 4px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03)',
-    border: '1px solid rgba(0,0,0,0.05)',
     overflow: 'hidden',
   },
   cardMain: {
@@ -249,18 +247,15 @@ const styles = {
     fontWeight: 600,
     textTransform: 'uppercase',
     letterSpacing: '0.08em',
-    color: '#999',
     marginBottom: 3,
     fontFamily: "'Plus Jakarta Sans', sans-serif",
   },
   cardName: {
     fontSize: 17,
     fontWeight: 600,
-    color: '#1A1A1A',
   },
   cardTime: {
     fontSize: 13,
-    color: '#999',
     marginTop: 2,
     fontFamily: "'Plus Jakarta Sans', sans-serif",
   },
@@ -287,7 +282,6 @@ const styles = {
     height: 22,
     borderRadius: 11,
     background: 'rgba(0,0,0,0.04)',
-    color: '#999',
     fontSize: 11,
     fontWeight: 700,
     display: 'flex',
@@ -303,11 +297,9 @@ const styles = {
   transitionName: {
     fontSize: 14,
     fontWeight: 600,
-    color: '#1A1A1A',
   },
   transitionTime: {
     fontSize: 12,
-    color: '#888',
     marginTop: 2,
   },
   // Active transition highlighting

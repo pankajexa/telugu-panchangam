@@ -113,7 +113,7 @@ export default function FestivalsPage() {
         {loading && (
           <div style={styles.loadingBox}>
             <div style={styles.spinner} />
-            <div style={{ fontSize: 14, color: '#999', marginTop: 12, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+            <div style={{ fontSize: 14, color: colors.textMuted, marginTop: 12, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
               {language === 'te' ? 'పండుగలు లోడ్ అవుతున్నాయి...' : 'Loading festivals...'}
             </div>
           </div>
@@ -171,11 +171,11 @@ export default function FestivalsPage() {
 
         {!loading && grouped.length === 0 && (
           <div style={styles.empty}>
-            <div style={{ fontSize: 14, color: '#999' }}>{language === 'te' ? 'పండుగలు లేవు' : 'No festivals found'}</div>
+            <div style={{ fontSize: 14, color: colors.textMuted }}>{language === 'te' ? 'పండుగలు లేవు' : 'No festivals found'}</div>
           </div>
         )}
         {!loading && filtered.length === 0 && (
-          <div style={styles.empty}>{t('festivals.noFestival')}</div>
+          <div style={{ ...styles.empty, color: colors.textMuted }}>{t('festivals.noFestival')}</div>
         )}
       </div>
 
@@ -214,12 +214,10 @@ const styles = {
     fontFamily: "'Playfair Display', serif",
     fontSize: 26,
     fontWeight: 700,
-    color: '#1A1A1A',
     margin: '0 0 4px',
   },
   subtitle: {
     fontSize: 13,
-    color: '#999',
     marginBottom: 24,
     fontFamily: "'Plus Jakarta Sans', sans-serif",
   },
@@ -244,7 +242,6 @@ const styles = {
   monthHeader: {
     fontSize: 12,
     fontWeight: 700,
-    color: '#BBB',
     textTransform: 'uppercase',
     letterSpacing: '0.1em',
     marginBottom: 12,
@@ -256,13 +253,11 @@ const styles = {
     gap: 12,
   },
   card: {
-    background: 'white',
     borderRadius: 16,
     padding: '16px 18px',
     display: 'flex',
     alignItems: 'center',
     gap: 14,
-    border: '1px solid rgba(0,0,0,0.04)',
     boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
   },
   iconBox: {
@@ -282,7 +277,6 @@ const styles = {
   name: {
     fontSize: 15,
     fontWeight: 600,
-    color: '#1A1A1A',
   },
   meta: {
     display: 'flex',
@@ -304,7 +298,6 @@ const styles = {
   },
   empty: {
     textAlign: 'center',
-    color: '#BBB',
     fontSize: 14,
     marginTop: 60,
     fontFamily: "'Plus Jakarta Sans', sans-serif",
@@ -322,7 +315,6 @@ const styles = {
     justifyContent: 'center',
   },
   overlaySheet: {
-    background: '#FAFAF8',
     borderRadius: '20px 20px 0 0',
     width: '100%',
     maxWidth: 480,
@@ -341,7 +333,6 @@ const styles = {
   overlayTitle: {
     fontSize: 18,
     fontWeight: 700,
-    color: '#1A1A1A',
   },
   overlayClose: {
     background: 'none',
