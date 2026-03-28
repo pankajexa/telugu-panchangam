@@ -1,8 +1,10 @@
 import { memo, useState, useRef, useEffect } from 'react';
 import { ChevronDown, BookOpen, UtensilsCrossed, Clock, Music } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
+import { useTheme } from '../../context/ThemeContext';
 
 const FestivalBanner = memo(function FestivalBanner({ festival, font, pick, t, practices }) {
+  const { isNight, colors } = useTheme();
   const name = pick(festival.telugu, festival.english) || festival.english || '';
   const [expanded, setExpanded] = useState(false);
   const contentRef = useRef(null);
@@ -61,6 +63,7 @@ const FestivalBanner = memo(function FestivalBanner({ festival, font, pick, t, p
       {hasPractices && (
         <div style={{
           ...styles.practicesWrap,
+          background: colors.cardBg,
           maxHeight: expanded ? contentHeight + 40 : 0,
           opacity: expanded ? 1 : 0,
           padding: expanded ? '18px 18px 20px' : '0 18px',
@@ -71,7 +74,7 @@ const FestivalBanner = memo(function FestivalBanner({ festival, font, pick, t, p
               {practices.steps.map((step, i) => (
                 <div key={i} style={styles.stepRow}>
                   <div style={styles.stepNum}>{i + 1}</div>
-                  <div style={{ ...styles.stepText, fontFamily: font }}>
+                  <div style={{ ...styles.stepText, fontFamily: font, color: colors.textSecondary }}>
                     {pick(step.te, step.en)}
                   </div>
                 </div>
@@ -81,7 +84,7 @@ const FestivalBanner = memo(function FestivalBanner({ festival, font, pick, t, p
             {/* Mantra */}
             {practices.mantra && (
               <div style={styles.mantraBox}>
-                <div style={styles.sectionLabel}>
+                <div style={{ ...styles.sectionLabel, color: colors.textMuted }}>
                   <Music size={13} color="#E63B2E" strokeWidth={2} />
                   <span>{pick('మంత్రం', 'Mantra')}</span>
                 </div>

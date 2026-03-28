@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useLanguage } from '../context/LanguageContext';
+import { useTheme } from '../context/ThemeContext';
 import { useLocation } from '../context/LocationContext';
 import { getPanchangamForDate } from '../data/panchangam';
 import { getSavedBirthData } from '../data/personalMuhurtha';
@@ -120,11 +121,11 @@ function buildTimeline(data) {
   return segments;
 }
 
-function WidgetCard({ icon, title, subtitle, active, onClick }) {
+function WidgetCard({ icon, title, subtitle, active, onClick, colors, isNight }) {
   return (
     <button onClick={onClick} style={{
-      flex: 1, padding: '16px 14px', background: active ? 'rgba(230,59,46,0.06)' : '#FFF',
-      border: active ? '1.5px solid rgba(230,59,46,0.2)' : '1px solid rgba(0,0,0,0.06)',
+      flex: 1, padding: '16px 14px', background: active ? 'rgba(230,59,46,0.06)' : colors.cardBg,
+      border: active ? '1.5px solid rgba(230,59,46,0.2)' : `1px solid ${colors.border}`,
       borderRadius: 16, cursor: 'pointer', textAlign: 'left',
       boxShadow: '0 1px 4px rgba(0,0,0,0.03)',
       display: 'flex', flexDirection: 'column', gap: 8,
@@ -138,13 +139,14 @@ function WidgetCard({ icon, title, subtitle, active, onClick }) {
         }}>{icon}</div>
         <ChevronRight size={14} color="#CCC" />
       </div>
-      <div style={{ fontSize: 14, fontWeight: 700, color: active ? '#E63B2E' : '#1A1A1A', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{title}</div>
-      <div style={{ fontSize: 11, color: '#999', fontFamily: "'Plus Jakarta Sans', sans-serif", lineHeight: 1.4 }}>{subtitle}</div>
+      <div style={{ fontSize: 14, fontWeight: 700, color: active ? '#E63B2E' : colors.text, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{title}</div>
+      <div style={{ fontSize: 11, color: colors.textMuted, fontFamily: "'Plus Jakarta Sans', sans-serif", lineHeight: 1.4 }}>{subtitle}</div>
     </button>
   );
 }
 
 function GeneralMuhurthaSection({ data, t, font }) {
+  const { isNight, colors } = useTheme();
   const segments = useMemo(() => data ? buildTimeline(data) : [], [data]);
 
   if (!data) return null;
@@ -173,7 +175,7 @@ function GeneralMuhurthaSection({ data, t, font }) {
   return (
     <>
       {/* Timeline bar */}
-      <div style={styles.timelineCard}>
+      <div style={{ ...styles.timelineCard, background: colors.cardBg, border: `1px solid ${colors.border}` }}>
         <div style={styles.timelineLabel}>{t('muhurta.overview')}</div>
         <div style={styles.timelineBar}>
           {segments.map((seg, i) => (
@@ -206,10 +208,10 @@ function GeneralMuhurthaSection({ data, t, font }) {
           </div>
           <div style={styles.list}>
             {auspicious.map((m, i) => (
-              <div key={i} style={styles.card}>
+              <div key={i} style={{ ...styles.card, background: colors.cardBg, border: `1px solid ${colors.border}` }}>
                 <div>
-                  <div style={{ ...styles.name, fontFamily: font }}>{m.name}</div>
-                  <div style={styles.time}>{m.time}</div>
+                  <div style={{ ...styles.name, fontFamily: font, color: colors.text }}>{m.name}</div>
+                  <div style={{ ...styles.time, color: colors.textMuted }}>{m.time}</div>
                 </div>
                 <QualityBadge quality={m.quality} t={t} />
               </div>
@@ -226,10 +228,10 @@ function GeneralMuhurthaSection({ data, t, font }) {
           </div>
           <div style={styles.list}>
             {inauspicious.map((m, i) => (
-              <div key={i} style={styles.card}>
+              <div key={i} style={{ ...styles.card, background: colors.cardBg, border: `1px solid ${colors.border}` }}>
                 <div>
-                  <div style={{ ...styles.name, fontFamily: font }}>{m.name}</div>
-                  <div style={styles.time}>{m.time}</div>
+                  <div style={{ ...styles.name, fontFamily: font, color: colors.text }}>{m.name}</div>
+                  <div style={{ ...styles.time, color: colors.textMuted }}>{m.time}</div>
                 </div>
                 <QualityBadge quality={m.quality} t={t} />
               </div>
@@ -243,6 +245,7 @@ function GeneralMuhurthaSection({ data, t, font }) {
 
 export default function MuhurtaPage() {
   const { t, pick, font } = useLanguage();
+  const { isNight, colors } = useTheme();
   const { location } = useLocation();
 
   const today = useMemo(() => new Date(), []);
@@ -268,24 +271,26 @@ export default function MuhurtaPage() {
   return (
     <div style={styles.page}>
       <div style={styles.content}>
-        <h1 style={styles.title}>{t('muhurta.title')}</h1>
-        <div style={styles.subtitle}>{t('muhurta.subtitle')}</div>
+        <h1 style={{ ...styles.title, color: colors.text }}>{t('muhurta.title')}</h1>
+        <div style={{ ...styles.subtitle, color: colors.textMuted }}>{t('muhurta.subtitle')}</div>
 
         {/* Widget Cards */}
         <div style={{ display: 'flex', gap: 12, marginBottom: 24 }}>
           <WidgetCard
-            icon={<Clock size={20} color={activeSection === 'general' ? '#E63B2E' : '#999'} strokeWidth={1.8} />}
+            icon={<Clock size={20} color={activeSection === 'general' ? '#E63B2E' : colors.textMuted} strokeWidth={1.8} />}
             title={pick('సాధారణ ముహూర్తం', 'General Muhurtha')}
             subtitle={pick('శుభ & అశుభ సమయాలు', 'Auspicious & inauspicious times')}
             active={activeSection === 'general'}
             onClick={() => toggleSection('general')}
+            colors={colors} isNight={isNight}
           />
           <WidgetCard
-            icon={<Star size={20} color={activeSection === 'personal' ? '#E63B2E' : '#999'} fill={activeSection === 'personal' ? 'rgba(230,59,46,0.15)' : 'none'} strokeWidth={1.8} />}
+            icon={<Star size={20} color={activeSection === 'personal' ? '#E63B2E' : colors.textMuted} fill={activeSection === 'personal' ? 'rgba(230,59,46,0.15)' : 'none'} strokeWidth={1.8} />}
             title={pick('వ్యక్తిగత ముహూర్తం', 'Personal Muhurtha')}
             subtitle={pick('మీ జన్మ నక్షత్రం ఆధారంగా', 'Based on your birth star')}
             active={activeSection === 'personal'}
             onClick={() => toggleSection('personal')}
+            colors={colors} isNight={isNight}
           />
         </div>
 

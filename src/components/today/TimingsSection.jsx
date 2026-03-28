@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import { useTheme } from '../../context/ThemeContext';
 
 const QualityBadge = ({ quality, t }) => {
   const config = {
@@ -17,6 +18,7 @@ const QualityBadge = ({ quality, t }) => {
 };
 
 const TimingsSection = memo(function TimingsSection({ data, t, font }) {
+  const { isNight, colors } = useTheme();
   const auspicious = [
     { name: t('muhurta.abhijit'), time: data.abhijitMuhurta, quality: 'excellent' },
     { name: t('muhurta.amrit'), time: data.amritKalam, quality: 'excellent' },
@@ -51,10 +53,10 @@ const TimingsSection = memo(function TimingsSection({ data, t, font }) {
           </div>
           <div style={styles.list}>
             {auspicious.map((m, i) => (
-              <div key={i} style={styles.card}>
+              <div key={i} style={{ ...styles.card, background: colors.cardBg, border: `1px solid ${colors.border}` }}>
                 <div style={styles.info}>
-                  <div style={{ ...styles.name, fontFamily: font }}>{m.name}</div>
-                  <div style={styles.time}>{m.time}</div>
+                  <div style={{ ...styles.name, fontFamily: font, color: colors.text }}>{m.name}</div>
+                  <div style={{ ...styles.time, color: colors.textMuted }}>{m.time}</div>
                 </div>
                 <QualityBadge quality={m.quality} t={t} />
               </div>
@@ -72,10 +74,10 @@ const TimingsSection = memo(function TimingsSection({ data, t, font }) {
           </div>
           <div style={styles.list}>
             {inauspicious.map((m, i) => (
-              <div key={i} style={styles.card}>
+              <div key={i} style={{ ...styles.card, background: colors.cardBg, border: `1px solid ${colors.border}` }}>
                 <div style={styles.info}>
-                  <div style={{ ...styles.name, fontFamily: font }}>{m.name}</div>
-                  <div style={styles.time}>{m.time}</div>
+                  <div style={{ ...styles.name, fontFamily: font, color: colors.text }}>{m.name}</div>
+                  <div style={{ ...styles.time, color: colors.textMuted }}>{m.time}</div>
                 </div>
                 <QualityBadge quality={m.quality} t={t} />
               </div>

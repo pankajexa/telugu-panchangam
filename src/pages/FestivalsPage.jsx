@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useLanguage } from '../context/LanguageContext';
+import { useTheme } from '../context/ThemeContext';
 import { useLocation } from '../context/LocationContext';
 import { useReminders } from '../context/ReminderContext';
 import { getAllFestivals } from '../data/festivalList';
@@ -30,6 +31,7 @@ const MONTH_NAMES_EN = ['January', 'February', 'March', 'April', 'May', 'June', 
 
 export default function FestivalsPage() {
   const { t, pick, font, language } = useLanguage();
+  const { isNight, colors } = useTheme();
   const { location } = useLocation();
   const { setFestivalData, setVrathamData } = useReminders();
   const [filter, setFilter] = useState('all');
@@ -83,8 +85,8 @@ export default function FestivalsPage() {
     <div style={styles.page}>
       <div style={styles.content}>
         {/* Header */}
-        <h1 style={styles.title}>{t('festivals.title')}</h1>
-        <div style={styles.subtitle}>{language === 'te' ? 'పండుగలు & వ్రతాలు' : 'Festivals & Vratas'}</div>
+        <h1 style={{ ...styles.title, color: colors.text }}>{t('festivals.title')}</h1>
+        <div style={{ ...styles.subtitle, color: colors.textMuted }}>{language === 'te' ? 'పండుగలు & వ్రతాలు' : 'Festivals & Vratas'}</div>
 
         {/* Filter chips */}
         <div style={styles.chipRow}>
@@ -95,9 +97,9 @@ export default function FestivalsPage() {
                 key={f}
                 style={{
                   ...styles.chip,
-                  background: active ? '#1A1A1A' : 'white',
-                  color: active ? 'white' : '#999',
-                  border: active ? 'none' : '1px solid rgba(0,0,0,0.08)',
+                  background: active ? colors.text : colors.cardBg,
+                  color: active ? (isNight ? '#0B0F19' : 'white') : colors.textMuted,
+                  border: active ? 'none' : `1px solid ${colors.chipBorder}`,
                 }}
                 onClick={() => setFilter(f)}
               >
@@ -120,7 +122,7 @@ export default function FestivalsPage() {
         {/* Festival list */}
         {!loading && grouped.map((group, gi) => (
           <div key={gi} style={styles.group}>
-            <div style={styles.monthHeader}>{group.label}</div>
+            <div style={{ ...styles.monthHeader, color: colors.textFaint }}>{group.label}</div>
             <div style={styles.list}>
               {group.items.map((f, i) => {
                 const color = TYPE_COLORS[f.type] || '#E8A817';
@@ -137,7 +139,7 @@ export default function FestivalsPage() {
                   : (FESTIVAL_PRACTICES[f.english] ? true : false);
 
                 return (
-                  <div key={i} style={{ ...styles.card, borderLeft: `4px solid ${color}`, cursor: 'pointer' }}
+                  <div key={i} style={{ ...styles.card, background: colors.cardBg, border: `1px solid ${colors.border}`, borderLeft: `4px solid ${color}`, cursor: 'pointer' }}
                     onClick={() => {
                       const p = f.type === 'vrat'
                         ? getPractices(null, [{ type: f.english?.toLowerCase().includes('ekadashi') ? 'ekadashi' : f.english?.toLowerCase().includes('pradosh') ? 'pradosham' : f.english?.toLowerCase().includes('chaturthi') ? 'chaturthi' : f.english?.toLowerCase().includes('shivaratri') ? 'shivaratri' : f.english?.toLowerCase().includes('purnima') ? 'purnima' : f.english?.toLowerCase().includes('amavasya') ? 'amavasya' : 'ekadashi' }])
@@ -149,17 +151,17 @@ export default function FestivalsPage() {
                       <IconComp size={24} color={color} />
                     </div>
                     <div style={styles.info}>
-                      <div style={{ ...styles.name, fontFamily: font }}>{name}</div>
+                      <div style={{ ...styles.name, fontFamily: font, color: colors.text }}>{name}</div>
                       <div style={styles.meta}>
                         <span style={{
                           ...styles.badge,
                           background: f.type === 'vrat' ? '#FFF1F0' : '#FFF9E6',
                           color: f.type === 'vrat' ? '#E63B2E' : '#B8860B',
                         }}>{typeLabel}</span>
-                        <span style={styles.date}>{dateStr}</span>
+                        <span style={{ ...styles.date, color: colors.textFaint }}>{dateStr}</span>
                       </div>
                     </div>
-                    <ChevronRight size={16} color="#CCC" strokeWidth={1.8} />
+                    <ChevronRight size={16} color={colors.textFaint} strokeWidth={1.8} />
                   </div>
                 );
               })}
@@ -180,13 +182,13 @@ export default function FestivalsPage() {
       {/* Practices detail overlay */}
       {selectedFestival?.practices && (
         <div style={styles.overlay} onClick={() => setSelectedFestival(null)}>
-          <div style={styles.overlaySheet} onClick={e => e.stopPropagation()}>
-            <div style={styles.overlayHeader}>
-              <div style={{ ...styles.overlayTitle, fontFamily: font }}>
+          <div style={{ ...styles.overlaySheet, background: colors.pageBg }} onClick={e => e.stopPropagation()}>
+            <div style={{ ...styles.overlayHeader, borderBottom: `1px solid ${colors.border}` }}>
+              <div style={{ ...styles.overlayTitle, fontFamily: font, color: colors.text }}>
                 {pick(selectedFestival.telugu, selectedFestival.english)}
               </div>
               <button style={styles.overlayClose} onClick={() => setSelectedFestival(null)}>
-                <X size={20} color="#666" />
+                <X size={20} color={colors.iconColor} />
               </button>
             </div>
             <div style={styles.overlayScroll}>

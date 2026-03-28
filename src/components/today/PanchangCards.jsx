@@ -1,6 +1,7 @@
 import { memo, useState, useCallback } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { CrescentIcon, NakshatraIcon, ChakraIcon, VajraIcon } from '../icons/HinduIcons';
+import { useTheme } from '../../context/ThemeContext';
 
 const ICON_COMPONENTS = {
   tithi: CrescentIcon,
@@ -67,6 +68,7 @@ function timeRange(start, end) {
  * Single expandable panchang card.
  */
 function PanchangCardItem({ cardKey, label, name, time, transitions, iconBg, font, pick }) {
+  const { isNight, colors } = useTheme();
   const [expanded, setExpanded] = useState(false);
   const IC = ICON_COMPONENTS[cardKey];
   const accentColor = ACCENT_COLORS[cardKey];
@@ -77,22 +79,22 @@ function PanchangCardItem({ cardKey, label, name, time, transitions, iconBg, fon
   }, [hasTransitions]);
 
   return (
-    <div style={styles.card}>
+    <div style={{ ...styles.card, background: colors.cardBg, border: `1px solid ${colors.border}` }}>
       {/* Main row — always visible */}
       <div style={styles.cardMain} onClick={toggle}>
         <div style={{ ...styles.iconBox, background: iconBg }}>
           <IC size={22} color={accentColor} />
         </div>
         <div style={styles.info}>
-          <div style={styles.cardLabel}>{label}</div>
-          <div style={{ ...styles.cardName, fontFamily: font }}>{name}</div>
-          {time && <div style={styles.cardTime}>{time}</div>}
+          <div style={{ ...styles.cardLabel, color: colors.textMuted }}>{label}</div>
+          <div style={{ ...styles.cardName, fontFamily: font, color: colors.text }}>{name}</div>
+          {time && <div style={{ ...styles.cardTime, color: colors.textMuted }}>{time}</div>}
         </div>
         {hasTransitions && (
           <div style={styles.chevron}>
             {expanded
-              ? <ChevronUp size={20} color="#999" strokeWidth={2} />
-              : <ChevronDown size={20} color="#999" strokeWidth={2} />
+              ? <ChevronUp size={20} color={colors.textMuted} strokeWidth={2} />
+              : <ChevronDown size={20} color={colors.textMuted} strokeWidth={2} />
             }
           </div>
         )}
@@ -100,7 +102,7 @@ function PanchangCardItem({ cardKey, label, name, time, transitions, iconBg, fon
 
       {/* Expanded transition details */}
       {expanded && hasTransitions && (
-        <div style={styles.transitions}>
+        <div style={{ ...styles.transitions, borderTop: `1px solid ${colors.border}` }}>
           {transitions.map((tr, i) => {
             const trName = pick(tr.telugu, tr.english);
             // Check if this transition is currently active
@@ -109,17 +111,19 @@ function PanchangCardItem({ cardKey, label, name, time, transitions, iconBg, fon
             return (
               <div key={i} style={{
                 ...styles.transitionRow,
-                borderTop: i > 0 ? '1px solid rgba(0,0,0,0.04)' : 'none',
+                borderTop: i > 0 ? `1px solid ${colors.border}` : 'none',
                 ...(isActive ? styles.transitionRowActive : {}),
               }}>
                 <div style={{
                   ...styles.transitionNum,
+                  color: colors.textMuted,
                   ...(isActive ? styles.transitionNumActive : {}),
                 }}>{i + 1}</div>
                 <div style={styles.transitionInfo}>
                   <div style={{
                     ...styles.transitionName,
                     fontFamily: font,
+                    color: colors.text,
                     ...(isActive ? styles.transitionNameActive : {}),
                   }}>{trName}</div>
                   <div style={{
@@ -142,6 +146,7 @@ function PanchangCardItem({ cardKey, label, name, time, transitions, iconBg, fon
 }
 
 const PanchangCards = memo(function PanchangCards({ data, detailed, font, pick, t }) {
+  const { colors } = useTheme();
   const cards = [
     {
       key: 'tithi',
@@ -171,7 +176,7 @@ const PanchangCards = memo(function PanchangCards({ data, detailed, font, pick, 
 
   return (
     <div style={styles.section}>
-      <div style={styles.sectionLabel}>{t('today.panchang')}</div>
+      <div style={{ ...styles.sectionLabel, color: colors.textFaint }}>{t('today.panchang')}</div>
       <div style={styles.grid}>
         {cards.map((card) => (
           <PanchangCardItem

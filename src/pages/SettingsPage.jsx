@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import LocationPicker from '../components/LocationPicker';
 import { useLanguage } from '../context/LanguageContext';
+import { useTheme } from '../context/ThemeContext';
 import { useReminders } from '../context/ReminderContext';
 import { usePanchangamPrefs } from '../context/PanchangamPrefsContext';
 import { Globe, MapPin, Bell, Sun, Info, ArrowLeft } from 'lucide-react';
@@ -146,6 +147,7 @@ const advStyles = {
 
 export default function SettingsPage() {
   const { t, font, language, setLanguage } = useLanguage();
+  const { isNight, colors } = useTheme();
   const { prefs, updatePref, requestPermission } = useReminders();
   const { prefs: pPrefs, updatePref: updatePPref } = usePanchangamPrefs();
   const [expandedSection, setExpandedSection] = useState(null);
@@ -171,20 +173,20 @@ export default function SettingsPage() {
   return (
     <div style={styles.container}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
-        <button onClick={() => navigate(-1)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '8px 4px', display: 'flex', alignItems: 'center' }}><ArrowLeft size={20} color="#666" strokeWidth={1.8} /></button>
-        <h1 style={{ ...styles.title, fontFamily: font, margin: 0 }}>{t('settings.title')}</h1>
+        <button onClick={() => navigate(-1)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '8px 4px', display: 'flex', alignItems: 'center' }}><ArrowLeft size={20} color={colors.iconColor} strokeWidth={1.8} /></button>
+        <h1 style={{ ...styles.title, fontFamily: font, margin: 0, color: colors.text }}>{t('settings.title')}</h1>
       </div>
 
       {/* ═══ Language ═══ */}
       <div style={styles.section}>
         <div style={styles.sectionTitleRow}><GlobeIcon size={18} color="#E63B2E" /><span style={{ ...styles.sectionTitle, fontFamily: font }}>{t('settings.language')}</span></div>
-        <div style={styles.card}>
+        <div style={{ ...styles.card, background: colors.cardBg, border: `1px solid ${colors.border}` }}>
           <div style={styles.langRow}>
             <button
               style={{ ...styles.langBtn, ...(language === 'te' ? styles.langBtnActive : {}) }}
               onClick={() => setLanguage('te')}
             >
-              <span style={{ fontFamily: TELUGU, fontWeight: 700, fontSize: '14px', color: language === 'te' ? '#E63B2E' : '#999' }}>
+              <span style={{ fontFamily: TELUGU, fontWeight: 700, fontSize: '14px', color: language === 'te' ? '#E63B2E' : colors.textMuted }}>
                 తెలుగు
               </span>
               {language === 'te' && <span style={styles.langCheck}>✓</span>}
@@ -193,7 +195,7 @@ export default function SettingsPage() {
               style={{ ...styles.langBtn, ...(language === 'en' ? styles.langBtnActive : {}) }}
               onClick={() => setLanguage('en')}
             >
-              <span style={{ fontFamily: SERIF, fontWeight: 700, fontSize: '14px', color: language === 'en' ? '#E63B2E' : '#999' }}>
+              <span style={{ fontFamily: SERIF, fontWeight: 700, fontSize: '14px', color: language === 'en' ? '#E63B2E' : colors.textMuted }}>
                 English
               </span>
               {language === 'en' && <span style={styles.langCheck}>✓</span>}
@@ -205,7 +207,7 @@ export default function SettingsPage() {
       {/* ═══ Location ═══ */}
       <div style={styles.section}>
         <div style={styles.sectionTitleRow}><PinIcon size={18} color="#E63B2E" /><span style={{ ...styles.sectionTitle, fontFamily: font }}>{t('settings.location')}</span></div>
-        <div style={styles.card}><LocationPicker /></div>
+        <div style={{ ...styles.card, background: colors.cardBg, border: `1px solid ${colors.border}` }}><LocationPicker /></div>
       </div>
 
       {/* ═══ Sampradaya (Tradition) ═══ */}
@@ -214,7 +216,7 @@ export default function SettingsPage() {
           <NamasteIcon size={18} color="#E63B2E" />
           <span style={{ ...styles.sectionTitle, fontFamily: font }}>{pick('సంప్రదాయం', 'Tradition')}</span>
         </div>
-        <div style={styles.card}>
+        <div style={{ ...styles.card, background: colors.cardBg, border: `1px solid ${colors.border}` }}>
           <div style={{ fontSize: 13, color: '#888', fontFamily: SERIF, marginBottom: 10, lineHeight: 1.5 }}>
             {pick(
               'ఏకాదశి వ్రతం ఆచరించే విధానం మీ సంప్రదాయం ప్రకారం మారుతుంది.',
@@ -265,17 +267,17 @@ export default function SettingsPage() {
         </div>
 
         {/* Daily Panchangam Share */}
-        <div style={styles.card}>
+        <div style={{ ...styles.card, background: colors.cardBg, border: `1px solid ${colors.border}` }}>
           <div style={styles.reminderHeader} onClick={() => toggleSection('dailyShare')}>
             <div style={styles.reminderHeaderLeft}>
               <span style={styles.reminderEmoji}>
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" fill="#E63B2E"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.034L.789 23.492a.75.75 0 00.917.918l4.462-1.494A11.94 11.94 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-2.24 0-4.31-.726-5.993-1.957l-.418-.306-2.65.887.886-2.648-.335-.433A9.96 9.96 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z" fill="#E63B2E" opacity="0.7"/></svg>
               </span>
               <div>
-                <div style={{ ...styles.reminderTitle, fontFamily: font }}>
+                <div style={{ ...styles.reminderTitle, fontFamily: font, color: colors.text }}>
                   {pick('రోజూ పంచాంగం షేర్', 'Daily Panchangam Share')}
                 </div>
-                <div style={styles.reminderSub}>
+                <div style={{ ...styles.reminderSub, color: colors.textFaint }}>
                   {prefs.dailyShare
                     ? `${pick('ఆన్', 'On')} — ${formatTime(prefs.dailyShareTime)} ${pick('కు గుర్తు', 'reminder')}`
                     : pick('నోటిఫికేషన్ వచ్చినప్పుడు ట్యాప్ చేసి షేర్ చేయండి', 'Tap notification to share panchangam')}
@@ -307,15 +309,15 @@ export default function SettingsPage() {
         </div>
 
         {/* Festival Reminders */}
-        <div style={{ ...styles.card, marginTop: '8px' }}>
+        <div style={{ ...styles.card, marginTop: '8px', background: colors.cardBg, border: `1px solid ${colors.border}` }}>
           <div style={styles.reminderHeader} onClick={() => toggleSection('festivals')}>
             <div style={styles.reminderHeaderLeft}>
               <span style={styles.reminderEmoji}><DiyaIcon size={22} color="#E63B2E" /></span>
               <div>
-                <div style={{ ...styles.reminderTitle, fontFamily: font }}>
+                <div style={{ ...styles.reminderTitle, fontFamily: font, color: colors.text }}>
                   {pick('పండుగ రిమైండర్లు', 'Festival Reminders')}
                 </div>
-                <div style={styles.reminderSub}>
+                <div style={{ ...styles.reminderSub, color: colors.textFaint }}>
                   {prefs.festivals
                     ? pick('ఆన్', 'On') + ' — ' + (prefs.festivalDays || [0, 1]).map(d =>
                         d === 0 ? pick('అదే రోజు', 'same day')
@@ -343,15 +345,15 @@ export default function SettingsPage() {
         </div>
 
         {/* Vratham Reminders */}
-        <div style={{ ...styles.card, marginTop: '8px' }}>
+        <div style={{ ...styles.card, marginTop: '8px', background: colors.cardBg, border: `1px solid ${colors.border}` }}>
           <div style={styles.reminderHeader} onClick={() => toggleSection('vrathams')}>
             <div style={styles.reminderHeaderLeft}>
               <span style={styles.reminderEmoji}><NamasteIcon size={22} color="#E63B2E" /></span>
               <div>
-                <div style={{ ...styles.reminderTitle, fontFamily: font }}>
+                <div style={{ ...styles.reminderTitle, fontFamily: font, color: colors.text }}>
                   {pick('వ్రతం రిమైండర్లు', 'Vratham Reminders')}
                 </div>
-                <div style={styles.reminderSub}>
+                <div style={{ ...styles.reminderSub, color: colors.textFaint }}>
                   {prefs.vrathams
                     ? pick('ఆన్ — ఎంచుకున్నవి', 'On — selected vrathams')
                     : pick('ఆఫ్', 'Off')}
@@ -363,27 +365,27 @@ export default function SettingsPage() {
           {expandedSection === 'vrathams' && prefs.vrathams && (
             <div style={styles.expandedContent}>
               <div style={styles.subRow}>
-                <span style={{ ...styles.subLabel, fontFamily: font }}>{pick('ఏకాదశి', 'Ekadashi')}</span>
+                <span style={{ ...styles.subLabel, fontFamily: font, color: colors.iconColor }}>{pick('ఏకాదశి', 'Ekadashi')}</span>
                 <Toggle on={prefs.vrathamEkadashi} onToggle={() => updatePref('vrathamEkadashi', !prefs.vrathamEkadashi)} />
               </div>
               <div style={styles.subRow}>
-                <span style={{ ...styles.subLabel, fontFamily: font }}>{pick('ప్రదోషం', 'Pradosham')}</span>
+                <span style={{ ...styles.subLabel, fontFamily: font, color: colors.iconColor }}>{pick('ప్రదోషం', 'Pradosham')}</span>
                 <Toggle on={prefs.vrathamPradosham} onToggle={() => updatePref('vrathamPradosham', !prefs.vrathamPradosham)} />
               </div>
               <div style={styles.subRow}>
-                <span style={{ ...styles.subLabel, fontFamily: font }}>{pick('సంకష్టహర చతుర్థి', 'Sankashti Chaturthi')}</span>
+                <span style={{ ...styles.subLabel, fontFamily: font, color: colors.iconColor }}>{pick('సంకష్టహర చతుర్థి', 'Sankashti Chaturthi')}</span>
                 <Toggle on={prefs.vrathamSankashti} onToggle={() => updatePref('vrathamSankashti', !prefs.vrathamSankashti)} />
               </div>
               <div style={styles.subRow}>
-                <span style={{ ...styles.subLabel, fontFamily: font }}>{pick('మాస శివరాత్రి', 'Masik Shivaratri')}</span>
+                <span style={{ ...styles.subLabel, fontFamily: font, color: colors.iconColor }}>{pick('మాస శివరాత్రి', 'Masik Shivaratri')}</span>
                 <Toggle on={prefs.vrathamShivaratri} onToggle={() => updatePref('vrathamShivaratri', !prefs.vrathamShivaratri)} />
               </div>
               <div style={styles.subRow}>
-                <span style={{ ...styles.subLabel, fontFamily: font }}>{pick('పూర్ణిమ', 'Purnima')}</span>
+                <span style={{ ...styles.subLabel, fontFamily: font, color: colors.iconColor }}>{pick('పూర్ణిమ', 'Purnima')}</span>
                 <Toggle on={prefs.vrathamPurnima} onToggle={() => updatePref('vrathamPurnima', !prefs.vrathamPurnima)} />
               </div>
               <div style={styles.subRow}>
-                <span style={{ ...styles.subLabel, fontFamily: font }}>{pick('అమావాస్య', 'Amavasya')}</span>
+                <span style={{ ...styles.subLabel, fontFamily: font, color: colors.iconColor }}>{pick('అమావాస్య', 'Amavasya')}</span>
                 <Toggle on={prefs.vrathamAmavasya} onToggle={() => updatePref('vrathamAmavasya', !prefs.vrathamAmavasya)} />
               </div>
               <div style={{ ...styles.subRow, borderTop: '1px solid rgba(0,0,0,0.06)', paddingTop: '8px', marginTop: '4px' }}>
@@ -399,15 +401,15 @@ export default function SettingsPage() {
         </div>
 
         {/* Puja Reminder */}
-        <div style={{ ...styles.card, marginTop: '8px' }}>
+        <div style={{ ...styles.card, marginTop: '8px', background: colors.cardBg, border: `1px solid ${colors.border}` }}>
           <div style={styles.reminderHeader} onClick={() => toggleSection('puja')}>
             <div style={styles.reminderHeaderLeft}>
               <span style={styles.reminderEmoji}><TrishulIcon size={22} color="#E63B2E" /></span>
               <div>
-                <div style={{ ...styles.reminderTitle, fontFamily: font }}>
+                <div style={{ ...styles.reminderTitle, fontFamily: font, color: colors.text }}>
                   {pick('ఉదయ పూజ గుర్తు', 'Morning Puja Reminder')}
                 </div>
-                <div style={styles.reminderSub}>
+                <div style={{ ...styles.reminderSub, color: colors.textFaint }}>
                   {prefs.puja
                     ? `${pick('ఆన్', 'On')} — ${formatTime(prefs.pujaTime)}`
                     : pick('ఆఫ్', 'Off')}
@@ -427,15 +429,15 @@ export default function SettingsPage() {
         </div>
 
         {/* Sunrise/Sunset */}
-        <div style={{ ...styles.card, marginTop: '8px' }}>
+        <div style={{ ...styles.card, marginTop: '8px', background: colors.cardBg, border: `1px solid ${colors.border}` }}>
           <div style={styles.reminderHeader} onClick={() => toggleSection('sun')}>
             <div style={styles.reminderHeaderLeft}>
               <span style={styles.reminderEmoji}><SunIcon size={22} color="#E63B2E" /></span>
               <div>
-                <div style={{ ...styles.reminderTitle, fontFamily: font }}>
+                <div style={{ ...styles.reminderTitle, fontFamily: font, color: colors.text }}>
                   {pick('సూర్యోదయ / అస్తమయం', 'Sunrise / Sunset')}
                 </div>
-                <div style={styles.reminderSub}>
+                <div style={{ ...styles.reminderSub, color: colors.textFaint }}>
                   {(prefs.sunrise || prefs.sunset)
                     ? pick('ఆన్', 'On')
                     : pick('ఆఫ్', 'Off')}
@@ -447,7 +449,7 @@ export default function SettingsPage() {
           {expandedSection === 'sun' && (
             <div style={styles.expandedContent}>
               <div style={styles.subRow}>
-                <span style={{ ...styles.subLabel, fontFamily: font }}>{pick('సూర్యోదయం', 'Sunrise')}</span>
+                <span style={{ ...styles.subLabel, fontFamily: font, color: colors.iconColor }}>{pick('సూర్యోదయం', 'Sunrise')}</span>
                 <Toggle on={prefs.sunrise} onToggle={() => {
                   updatePref('sunrise', !prefs.sunrise);
                   if (!prefs.sunrise && !prefs.permissionGranted) requestPermission().catch(() => {});
@@ -460,7 +462,7 @@ export default function SettingsPage() {
                 </div>
               )}
               <div style={styles.subRow}>
-                <span style={{ ...styles.subLabel, fontFamily: font }}>{pick('సూర్యాస్తమయం', 'Sunset')}</span>
+                <span style={{ ...styles.subLabel, fontFamily: font, color: colors.iconColor }}>{pick('సూర్యాస్తమయం', 'Sunset')}</span>
                 <Toggle on={prefs.sunset} onToggle={() => {
                   updatePref('sunset', !prefs.sunset);
                   if (!prefs.sunset && !prefs.permissionGranted) requestPermission().catch(() => {});
@@ -489,7 +491,7 @@ export default function SettingsPage() {
             'Changes daily based on sunrise/sunset at your location'
           )}
         </div>
-        <div style={styles.card}>
+        <div style={{ ...styles.card, background: colors.cardBg, border: `1px solid ${colors.border}` }}>
           {[
             { key: 'alarmBrahmaMuhurta', te: 'బ్రహ్మ ముహూర్తం', en: 'Brahma Muhurta', desc: pick('సూర్యోదయానికి 96-48 ని. ముందు', '96-48 min before sunrise') },
             { key: 'alarmPratahSandhya', te: 'ప్రాతః సంధ్య', en: 'Pratah Sandhya', desc: pick('సూర్యోదయ సమయంలో', 'Around sunrise') },
@@ -498,7 +500,7 @@ export default function SettingsPage() {
           ].map((alarm, i) => (
             <div key={alarm.key} style={{ ...styles.alarmRow, borderTop: i > 0 ? '1px solid rgba(0,0,0,0.05)' : 'none' }}>
               <div style={styles.alarmInfo}>
-                <div style={{ ...styles.reminderTitle, fontFamily: font, fontSize: '13px' }}>
+                <div style={{ ...styles.reminderTitle, fontFamily: font, fontSize: '13px', color: colors.text }}>
                   {pick(alarm.te, alarm.en)}
                 </div>
                 <div style={{ ...styles.reminderSub, fontSize: '10px' }}>{alarm.desc}</div>
@@ -520,127 +522,127 @@ export default function SettingsPage() {
         </div>
 
         {/* Shubha Muhurtham */}
-        <div style={styles.card}>
+        <div style={{ ...styles.card, background: colors.cardBg, border: `1px solid ${colors.border}` }}>
           <div style={styles.reminderHeader} onClick={() => toggleSection('panch-shubha')}>
             <div style={styles.reminderHeaderLeft}>
               <div>
-                <div style={{ ...styles.reminderTitle, fontFamily: font }}>{t('detailed.shubha')}</div>
-                <div style={styles.reminderSub}>{pick('అభిజిత్, అమృతకాలం, బ్రహ్మ ముహూ.', 'Abhijit, Amrit, Brahma')}</div>
+                <div style={{ ...styles.reminderTitle, fontFamily: font, color: colors.text }}>{t('detailed.shubha')}</div>
+                <div style={{ ...styles.reminderSub, color: colors.textFaint }}>{pick('అభిజిత్, అమృతకాలం, బ్రహ్మ ముహూ.', 'Abhijit, Amrit, Brahma')}</div>
               </div>
             </div>
             <Toggle on={pPrefs.shubha} onToggle={() => updatePPref('shubha', !pPrefs.shubha)} />
           </div>
           {expandedSection === 'panch-shubha' && pPrefs.shubha && (
             <div style={styles.expandedContent}>
-              <div style={styles.subRow}><span style={{ ...styles.subLabel, fontFamily: font }}>{t('field.abhijit')}</span><Toggle on={pPrefs.shubha_abhijit} onToggle={() => updatePPref('shubha_abhijit', !pPrefs.shubha_abhijit)} /></div>
-              <div style={styles.subRow}><span style={{ ...styles.subLabel, fontFamily: font }}>{t('field.amritKalam')}</span><Toggle on={pPrefs.shubha_amritKalam} onToggle={() => updatePPref('shubha_amritKalam', !pPrefs.shubha_amritKalam)} /></div>
-              <div style={styles.subRow}><span style={{ ...styles.subLabel, fontFamily: font }}>{t('field.brahmaMuhurta')}</span><Toggle on={pPrefs.shubha_brahmaMuhurta} onToggle={() => updatePPref('shubha_brahmaMuhurta', !pPrefs.shubha_brahmaMuhurta)} /></div>
+              <div style={styles.subRow}><span style={{ ...styles.subLabel, fontFamily: font, color: colors.iconColor }}>{t('field.abhijit')}</span><Toggle on={pPrefs.shubha_abhijit} onToggle={() => updatePPref('shubha_abhijit', !pPrefs.shubha_abhijit)} /></div>
+              <div style={styles.subRow}><span style={{ ...styles.subLabel, fontFamily: font, color: colors.iconColor }}>{t('field.amritKalam')}</span><Toggle on={pPrefs.shubha_amritKalam} onToggle={() => updatePPref('shubha_amritKalam', !pPrefs.shubha_amritKalam)} /></div>
+              <div style={styles.subRow}><span style={{ ...styles.subLabel, fontFamily: font, color: colors.iconColor }}>{t('field.brahmaMuhurta')}</span><Toggle on={pPrefs.shubha_brahmaMuhurta} onToggle={() => updatePPref('shubha_brahmaMuhurta', !pPrefs.shubha_brahmaMuhurta)} /></div>
             </div>
           )}
         </div>
 
         {/* Ashubha Muhurtham */}
-        <div style={{ ...styles.card, marginTop: '8px' }}>
+        <div style={{ ...styles.card, marginTop: '8px', background: colors.cardBg, border: `1px solid ${colors.border}` }}>
           <div style={styles.reminderHeader} onClick={() => toggleSection('panch-ashubha')}>
             <div style={styles.reminderHeaderLeft}>
               <div>
-                <div style={{ ...styles.reminderTitle, fontFamily: font }}>{t('detailed.ashubha')}</div>
-                <div style={styles.reminderSub}>{pick('యమగండం, గుళిక కాలం', 'Yamaganda, Gulika')}</div>
+                <div style={{ ...styles.reminderTitle, fontFamily: font, color: colors.text }}>{t('detailed.ashubha')}</div>
+                <div style={{ ...styles.reminderSub, color: colors.textFaint }}>{pick('యమగండం, గుళిక కాలం', 'Yamaganda, Gulika')}</div>
               </div>
             </div>
             <Toggle on={pPrefs.ashubha} onToggle={() => updatePPref('ashubha', !pPrefs.ashubha)} />
           </div>
           {expandedSection === 'panch-ashubha' && pPrefs.ashubha && (
             <div style={styles.expandedContent}>
-              <div style={styles.subRow}><span style={{ ...styles.subLabel, fontFamily: font }}>{t('field.yamaganda')}</span><Toggle on={pPrefs.ashubha_yamaganda} onToggle={() => updatePPref('ashubha_yamaganda', !pPrefs.ashubha_yamaganda)} /></div>
-              <div style={styles.subRow}><span style={{ ...styles.subLabel, fontFamily: font }}>{t('field.gulika')}</span><Toggle on={pPrefs.ashubha_gulika} onToggle={() => updatePPref('ashubha_gulika', !pPrefs.ashubha_gulika)} /></div>
+              <div style={styles.subRow}><span style={{ ...styles.subLabel, fontFamily: font, color: colors.iconColor }}>{t('field.yamaganda')}</span><Toggle on={pPrefs.ashubha_yamaganda} onToggle={() => updatePPref('ashubha_yamaganda', !pPrefs.ashubha_yamaganda)} /></div>
+              <div style={styles.subRow}><span style={{ ...styles.subLabel, fontFamily: font, color: colors.iconColor }}>{t('field.gulika')}</span><Toggle on={pPrefs.ashubha_gulika} onToggle={() => updatePPref('ashubha_gulika', !pPrefs.ashubha_gulika)} /></div>
             </div>
           )}
         </div>
 
         {/* Calendar Systems */}
-        <div style={{ ...styles.card, marginTop: '8px' }}>
+        <div style={{ ...styles.card, marginTop: '8px', background: colors.cardBg, border: `1px solid ${colors.border}` }}>
           <div style={styles.reminderHeader} onClick={() => toggleSection('panch-cal')}>
             <div style={styles.reminderHeaderLeft}>
               <div>
-                <div style={{ ...styles.reminderTitle, fontFamily: font }}>{t('detailed.calendar')}</div>
-                <div style={styles.reminderSub}>{pick('విక్రమ, శక, ఋతువు, అయనం', 'Vikram, Shaka, Ritu, Ayana')}</div>
+                <div style={{ ...styles.reminderTitle, fontFamily: font, color: colors.text }}>{t('detailed.calendar')}</div>
+                <div style={{ ...styles.reminderSub, color: colors.textFaint }}>{pick('విక్రమ, శక, ఋతువు, అయనం', 'Vikram, Shaka, Ritu, Ayana')}</div>
               </div>
             </div>
             <Toggle on={pPrefs.calendar} onToggle={() => updatePPref('calendar', !pPrefs.calendar)} />
           </div>
           {expandedSection === 'panch-cal' && pPrefs.calendar && (
             <div style={styles.expandedContent}>
-              <div style={styles.subRow}><span style={{ ...styles.subLabel, fontFamily: font }}>{t('field.vikramSamvat')}</span><Toggle on={pPrefs.cal_vikramSamvat} onToggle={() => updatePPref('cal_vikramSamvat', !pPrefs.cal_vikramSamvat)} /></div>
-              <div style={styles.subRow}><span style={{ ...styles.subLabel, fontFamily: font }}>{t('field.shakaSamvat')}</span><Toggle on={pPrefs.cal_shakaSamvat} onToggle={() => updatePPref('cal_shakaSamvat', !pPrefs.cal_shakaSamvat)} /></div>
-              <div style={styles.subRow}><span style={{ ...styles.subLabel, fontFamily: font }}>{t('field.samvatsara')}</span><Toggle on={pPrefs.cal_samvatsaraName} onToggle={() => updatePPref('cal_samvatsaraName', !pPrefs.cal_samvatsaraName)} /></div>
-              <div style={styles.subRow}><span style={{ ...styles.subLabel, fontFamily: font }}>{t('field.amantaPurnimanta')}</span><Toggle on={pPrefs.cal_amantaPurnimanta} onToggle={() => updatePPref('cal_amantaPurnimanta', !pPrefs.cal_amantaPurnimanta)} /></div>
-              <div style={styles.subRow}><span style={{ ...styles.subLabel, fontFamily: font }}>{t('field.ritu')}</span><Toggle on={pPrefs.cal_ritu} onToggle={() => updatePPref('cal_ritu', !pPrefs.cal_ritu)} /></div>
-              <div style={styles.subRow}><span style={{ ...styles.subLabel, fontFamily: font }}>{t('field.ayana')}</span><Toggle on={pPrefs.cal_ayana} onToggle={() => updatePPref('cal_ayana', !pPrefs.cal_ayana)} /></div>
+              <div style={styles.subRow}><span style={{ ...styles.subLabel, fontFamily: font, color: colors.iconColor }}>{t('field.vikramSamvat')}</span><Toggle on={pPrefs.cal_vikramSamvat} onToggle={() => updatePPref('cal_vikramSamvat', !pPrefs.cal_vikramSamvat)} /></div>
+              <div style={styles.subRow}><span style={{ ...styles.subLabel, fontFamily: font, color: colors.iconColor }}>{t('field.shakaSamvat')}</span><Toggle on={pPrefs.cal_shakaSamvat} onToggle={() => updatePPref('cal_shakaSamvat', !pPrefs.cal_shakaSamvat)} /></div>
+              <div style={styles.subRow}><span style={{ ...styles.subLabel, fontFamily: font, color: colors.iconColor }}>{t('field.samvatsara')}</span><Toggle on={pPrefs.cal_samvatsaraName} onToggle={() => updatePPref('cal_samvatsaraName', !pPrefs.cal_samvatsaraName)} /></div>
+              <div style={styles.subRow}><span style={{ ...styles.subLabel, fontFamily: font, color: colors.iconColor }}>{t('field.amantaPurnimanta')}</span><Toggle on={pPrefs.cal_amantaPurnimanta} onToggle={() => updatePPref('cal_amantaPurnimanta', !pPrefs.cal_amantaPurnimanta)} /></div>
+              <div style={styles.subRow}><span style={{ ...styles.subLabel, fontFamily: font, color: colors.iconColor }}>{t('field.ritu')}</span><Toggle on={pPrefs.cal_ritu} onToggle={() => updatePPref('cal_ritu', !pPrefs.cal_ritu)} /></div>
+              <div style={styles.subRow}><span style={{ ...styles.subLabel, fontFamily: font, color: colors.iconColor }}>{t('field.ayana')}</span><Toggle on={pPrefs.cal_ayana} onToggle={() => updatePPref('cal_ayana', !pPrefs.cal_ayana)} /></div>
             </div>
           )}
         </div>
 
         {/* Detailed Timings */}
-        <div style={{ ...styles.card, marginTop: '8px' }}>
+        <div style={{ ...styles.card, marginTop: '8px', background: colors.cardBg, border: `1px solid ${colors.border}` }}>
           <div style={styles.reminderHeader} onClick={() => toggleSection('panch-timings')}>
             <div style={styles.reminderHeaderLeft}>
               <div>
-                <div style={{ ...styles.reminderTitle, fontFamily: font }}>{t('detailed.timings')}</div>
-                <div style={styles.reminderSub}>{pick('తిథి, నక్షత్ర, యోగ, కరణ మార్పులు', 'Tithi, Nakshatra, Yoga transitions')}</div>
+                <div style={{ ...styles.reminderTitle, fontFamily: font, color: colors.text }}>{t('detailed.timings')}</div>
+                <div style={{ ...styles.reminderSub, color: colors.textFaint }}>{pick('తిథి, నక్షత్ర, యోగ, కరణ మార్పులు', 'Tithi, Nakshatra, Yoga transitions')}</div>
               </div>
             </div>
             <Toggle on={pPrefs.timings} onToggle={() => updatePPref('timings', !pPrefs.timings)} />
           </div>
           {expandedSection === 'panch-timings' && pPrefs.timings && (
             <div style={styles.expandedContent}>
-              <div style={styles.subRow}><span style={{ ...styles.subLabel, fontFamily: font }}>{t('field.tithiTransitions')}</span><Toggle on={pPrefs.dt_tithiTransitions} onToggle={() => updatePPref('dt_tithiTransitions', !pPrefs.dt_tithiTransitions)} /></div>
-              <div style={styles.subRow}><span style={{ ...styles.subLabel, fontFamily: font }}>{t('field.nakshatraTransitions')}</span><Toggle on={pPrefs.dt_nakshatraTransitions} onToggle={() => updatePPref('dt_nakshatraTransitions', !pPrefs.dt_nakshatraTransitions)} /></div>
-              <div style={styles.subRow}><span style={{ ...styles.subLabel, fontFamily: font }}>{t('field.yogaTransitions')}</span><Toggle on={pPrefs.dt_yogaTransitions} onToggle={() => updatePPref('dt_yogaTransitions', !pPrefs.dt_yogaTransitions)} /></div>
-              <div style={styles.subRow}><span style={{ ...styles.subLabel, fontFamily: font }}>{t('field.karanaTransitions')}</span><Toggle on={pPrefs.dt_karanaTransitions} onToggle={() => updatePPref('dt_karanaTransitions', !pPrefs.dt_karanaTransitions)} /></div>
-              <div style={styles.subRow}><span style={{ ...styles.subLabel, fontFamily: font }}>{t('field.moonrise')}</span><Toggle on={pPrefs.dt_moonrise} onToggle={() => updatePPref('dt_moonrise', !pPrefs.dt_moonrise)} /></div>
-              <div style={styles.subRow}><span style={{ ...styles.subLabel, fontFamily: font }}>{t('field.moonset')}</span><Toggle on={pPrefs.dt_moonset} onToggle={() => updatePPref('dt_moonset', !pPrefs.dt_moonset)} /></div>
+              <div style={styles.subRow}><span style={{ ...styles.subLabel, fontFamily: font, color: colors.iconColor }}>{t('field.tithiTransitions')}</span><Toggle on={pPrefs.dt_tithiTransitions} onToggle={() => updatePPref('dt_tithiTransitions', !pPrefs.dt_tithiTransitions)} /></div>
+              <div style={styles.subRow}><span style={{ ...styles.subLabel, fontFamily: font, color: colors.iconColor }}>{t('field.nakshatraTransitions')}</span><Toggle on={pPrefs.dt_nakshatraTransitions} onToggle={() => updatePPref('dt_nakshatraTransitions', !pPrefs.dt_nakshatraTransitions)} /></div>
+              <div style={styles.subRow}><span style={{ ...styles.subLabel, fontFamily: font, color: colors.iconColor }}>{t('field.yogaTransitions')}</span><Toggle on={pPrefs.dt_yogaTransitions} onToggle={() => updatePPref('dt_yogaTransitions', !pPrefs.dt_yogaTransitions)} /></div>
+              <div style={styles.subRow}><span style={{ ...styles.subLabel, fontFamily: font, color: colors.iconColor }}>{t('field.karanaTransitions')}</span><Toggle on={pPrefs.dt_karanaTransitions} onToggle={() => updatePPref('dt_karanaTransitions', !pPrefs.dt_karanaTransitions)} /></div>
+              <div style={styles.subRow}><span style={{ ...styles.subLabel, fontFamily: font, color: colors.iconColor }}>{t('field.moonrise')}</span><Toggle on={pPrefs.dt_moonrise} onToggle={() => updatePPref('dt_moonrise', !pPrefs.dt_moonrise)} /></div>
+              <div style={styles.subRow}><span style={{ ...styles.subLabel, fontFamily: font, color: colors.iconColor }}>{t('field.moonset')}</span><Toggle on={pPrefs.dt_moonset} onToggle={() => updatePPref('dt_moonset', !pPrefs.dt_moonset)} /></div>
             </div>
           )}
         </div>
 
         {/* Rashi & Graha */}
-        <div style={{ ...styles.card, marginTop: '8px' }}>
+        <div style={{ ...styles.card, marginTop: '8px', background: colors.cardBg, border: `1px solid ${colors.border}` }}>
           <div style={styles.reminderHeader} onClick={() => toggleSection('panch-rashi')}>
             <div style={styles.reminderHeaderLeft}>
               <div>
-                <div style={{ ...styles.reminderTitle, fontFamily: font }}>{t('detailed.rashi')}</div>
-                <div style={styles.reminderSub}>{pick('సూర్య, చంద్ర రాశి, దిశా శూల', 'Sun, Moon Rashi, Disha Shoola')}</div>
+                <div style={{ ...styles.reminderTitle, fontFamily: font, color: colors.text }}>{t('detailed.rashi')}</div>
+                <div style={{ ...styles.reminderSub, color: colors.textFaint }}>{pick('సూర్య, చంద్ర రాశి, దిశా శూల', 'Sun, Moon Rashi, Disha Shoola')}</div>
               </div>
             </div>
             <Toggle on={pPrefs.rashi} onToggle={() => updatePPref('rashi', !pPrefs.rashi)} />
           </div>
           {expandedSection === 'panch-rashi' && pPrefs.rashi && (
             <div style={styles.expandedContent}>
-              <div style={styles.subRow}><span style={{ ...styles.subLabel, fontFamily: font }}>{t('field.sunRashi')}</span><Toggle on={pPrefs.rg_sunRashi} onToggle={() => updatePPref('rg_sunRashi', !pPrefs.rg_sunRashi)} /></div>
-              <div style={styles.subRow}><span style={{ ...styles.subLabel, fontFamily: font }}>{t('field.moonRashi')}</span><Toggle on={pPrefs.rg_moonRashi} onToggle={() => updatePPref('rg_moonRashi', !pPrefs.rg_moonRashi)} /></div>
-              <div style={styles.subRow}><span style={{ ...styles.subLabel, fontFamily: font }}>{t('field.moonRashiTransition')}</span><Toggle on={pPrefs.rg_moonRashiTransition} onToggle={() => updatePPref('rg_moonRashiTransition', !pPrefs.rg_moonRashiTransition)} /></div>
-              <div style={styles.subRow}><span style={{ ...styles.subLabel, fontFamily: font }}>{t('field.dishaShoola')}</span><Toggle on={pPrefs.rg_dishaShoola} onToggle={() => updatePPref('rg_dishaShoola', !pPrefs.rg_dishaShoola)} /></div>
+              <div style={styles.subRow}><span style={{ ...styles.subLabel, fontFamily: font, color: colors.iconColor }}>{t('field.sunRashi')}</span><Toggle on={pPrefs.rg_sunRashi} onToggle={() => updatePPref('rg_sunRashi', !pPrefs.rg_sunRashi)} /></div>
+              <div style={styles.subRow}><span style={{ ...styles.subLabel, fontFamily: font, color: colors.iconColor }}>{t('field.moonRashi')}</span><Toggle on={pPrefs.rg_moonRashi} onToggle={() => updatePPref('rg_moonRashi', !pPrefs.rg_moonRashi)} /></div>
+              <div style={styles.subRow}><span style={{ ...styles.subLabel, fontFamily: font, color: colors.iconColor }}>{t('field.moonRashiTransition')}</span><Toggle on={pPrefs.rg_moonRashiTransition} onToggle={() => updatePPref('rg_moonRashiTransition', !pPrefs.rg_moonRashiTransition)} /></div>
+              <div style={styles.subRow}><span style={{ ...styles.subLabel, fontFamily: font, color: colors.iconColor }}>{t('field.dishaShoola')}</span><Toggle on={pPrefs.rg_dishaShoola} onToggle={() => updatePPref('rg_dishaShoola', !pPrefs.rg_dishaShoola)} /></div>
             </div>
           )}
         </div>
 
         {/* Special Yogas */}
-        <div style={{ ...styles.card, marginTop: '8px' }}>
+        <div style={{ ...styles.card, marginTop: '8px', background: colors.cardBg, border: `1px solid ${colors.border}` }}>
           <div style={styles.reminderHeader} onClick={() => toggleSection('panch-yogas')}>
             <div style={styles.reminderHeaderLeft}>
               <div>
-                <div style={{ ...styles.reminderTitle, fontFamily: font }}>{t('detailed.yogas')}</div>
-                <div style={styles.reminderSub}>{pick('ఆనందాది యోగం, గండమూల', 'Anandadi Yoga, Gandamool')}</div>
+                <div style={{ ...styles.reminderTitle, fontFamily: font, color: colors.text }}>{t('detailed.yogas')}</div>
+                <div style={{ ...styles.reminderSub, color: colors.textFaint }}>{pick('ఆనందాది యోగం, గండమూల', 'Anandadi Yoga, Gandamool')}</div>
               </div>
             </div>
             <Toggle on={pPrefs.yogas} onToggle={() => updatePPref('yogas', !pPrefs.yogas)} />
           </div>
           {expandedSection === 'panch-yogas' && pPrefs.yogas && (
             <div style={styles.expandedContent}>
-              <div style={styles.subRow}><span style={{ ...styles.subLabel, fontFamily: font }}>{t('field.anandadiYoga')}</span><Toggle on={pPrefs.sy_anandadiYoga} onToggle={() => updatePPref('sy_anandadiYoga', !pPrefs.sy_anandadiYoga)} /></div>
-              <div style={styles.subRow}><span style={{ ...styles.subLabel, fontFamily: font }}>{t('field.gandamool')}</span><Toggle on={pPrefs.sy_gandamool} onToggle={() => updatePPref('sy_gandamool', !pPrefs.sy_gandamool)} /></div>
-              <div style={styles.subRow}><span style={{ ...styles.subLabel, fontFamily: font }}>{t('field.specialYogas')}</span><Toggle on={pPrefs.sy_specialYogas} onToggle={() => updatePPref('sy_specialYogas', !pPrefs.sy_specialYogas)} /></div>
+              <div style={styles.subRow}><span style={{ ...styles.subLabel, fontFamily: font, color: colors.iconColor }}>{t('field.anandadiYoga')}</span><Toggle on={pPrefs.sy_anandadiYoga} onToggle={() => updatePPref('sy_anandadiYoga', !pPrefs.sy_anandadiYoga)} /></div>
+              <div style={styles.subRow}><span style={{ ...styles.subLabel, fontFamily: font, color: colors.iconColor }}>{t('field.gandamool')}</span><Toggle on={pPrefs.sy_gandamool} onToggle={() => updatePPref('sy_gandamool', !pPrefs.sy_gandamool)} /></div>
+              <div style={styles.subRow}><span style={{ ...styles.subLabel, fontFamily: font, color: colors.iconColor }}>{t('field.specialYogas')}</span><Toggle on={pPrefs.sy_specialYogas} onToggle={() => updatePPref('sy_specialYogas', !pPrefs.sy_specialYogas)} /></div>
             </div>
           )}
         </div>
@@ -649,24 +651,24 @@ export default function SettingsPage() {
       {/* ═══ About ═══ */}
       <div style={styles.section}>
         <div style={styles.sectionTitleRow}><InfoIcon size={18} color="#E63B2E" /><span style={{ ...styles.sectionTitle, fontFamily: font }}>{t('settings.about')}</span></div>
-        <div style={styles.card}>
+        <div style={{ ...styles.card, background: colors.cardBg, border: `1px solid ${colors.border}` }}>
           <div style={styles.aboutRow}>
-            <span style={styles.aboutLabel}>Version</span>
-            <span style={styles.aboutValue}>1.0.0</span>
+            <span style={{ ...styles.aboutLabel, color: colors.textMuted }}>Version</span>
+            <span style={{ ...styles.aboutValue, color: colors.text }}>1.0.0</span>
           </div>
           <div style={styles.divider} />
           <div style={styles.aboutRow}>
-            <span style={{ ...styles.aboutLabel, fontFamily: font }}>{t('settings.year')}</span>
-            <span style={{ ...styles.aboutValue, fontFamily: font }}>{t('settings.yearValue')}</span>
+            <span style={{ ...styles.aboutLabel, fontFamily: font, color: colors.textMuted }}>{t('settings.year')}</span>
+            <span style={{ ...styles.aboutValue, fontFamily: font, color: colors.text }}>{t('settings.yearValue')}</span>
           </div>
           <div style={styles.divider} />
           <div style={styles.aboutRow}>
-            <span style={styles.aboutLabel}>Website</span>
-            <span style={styles.aboutValue}>manacalendar.com</span>
+            <span style={{ ...styles.aboutLabel, color: colors.textMuted }}>Website</span>
+            <span style={{ ...styles.aboutValue, color: colors.text }}>manacalendar.com</span>
           </div>
           <div style={styles.divider} />
           <div style={styles.aboutRow} onClick={() => navigate('/privacy')} role="button">
-            <span style={styles.aboutLabel}>{pick('గోప్యతా విధానం', 'Privacy Policy')}</span>
+            <span style={{ ...styles.aboutLabel, color: colors.textMuted }}>{pick('గోప్యతా విధానం', 'Privacy Policy')}</span>
             <span style={{ ...styles.aboutValue, color: '#E63B2E', cursor: 'pointer' }}>→</span>
           </div>
         </div>
@@ -713,14 +715,14 @@ const styles = {
 
   expandedContent: {
     padding: '0 16px 14px',
-    borderTop: '1px solid rgba(0,0,0,0.05)',
+    borderTop: '1px solid rgba(0,0,0,0.05)',  // overridden by border in cards
     marginTop: '-2px',
   },
   subRow: {
     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
     padding: '8px 0 4px', gap: '8px',
   },
-  subLabel: { fontFamily: SERIF, fontSize: '12px', color: '#666', flex: 1 },
+  subLabel: { fontFamily: SERIF, fontSize: '12px', color: '#666', flex: 1 },  // color overridden inline
 
   // Smart alarm rows
   alarmRow: {
