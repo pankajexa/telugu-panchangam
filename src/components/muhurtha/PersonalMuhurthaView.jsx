@@ -1,9 +1,9 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useLocation } from '../../context/LocationContext';
 import { NAKSHATRAS, NAKSHATRAS_EN, RASHIS, RASHIS_EN } from '../../data/constants';
 import {
-  getPersonalMuhurtha, getWeekForecast, clearBirthData, TARA_DATA,
+  getPersonalMuhurtha, getWeekForecast, getMonthForecast, clearBirthData, TARA_DATA,
 } from '../../data/personalMuhurtha';
 import { Star, Edit3, Trash2, AlertTriangle, TrendingUp, Moon } from 'lucide-react';
 
@@ -179,9 +179,18 @@ export default function PersonalMuhurthaView({ birthData, onEdit }) {
     [birthData, today, location]
   );
 
+  const [forecastMode, setForecastMode] = useState('week'); // 'week' or 'month'
+
   const forecast = useMemo(() =>
     getWeekForecast(birthData.janmaNakshatra, birthData.janmaRashi, today, location),
     [birthData, today, location]
+  );
+
+  const monthForecast = useMemo(() =>
+    forecastMode === 'month'
+      ? getMonthForecast(birthData.janmaNakshatra, birthData.janmaRashi, today, location)
+      : [],
+    [birthData, today, location, forecastMode]
   );
 
   const handleClear = () => {
@@ -242,10 +251,90 @@ export default function PersonalMuhurthaView({ birthData, onEdit }) {
         font={font}
       />
 
-      {/* 7-Day Forecast */}
-      {forecast.length > 0 && (
-        <WeekForecast forecast={forecast} pick={pick} font={font} language={language} />
-      )}
+      {/* Forecast Toggle + View */}
+      <div style={S.card}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+          <div style={S.cardHeader}>
+            <TrendingUp size={16} color="#E63B2E" strokeWidth={2} />
+            <span style={{ ...S.cardLabel, fontFamily: SERIF }}>{pick('అంచనా', 'Forecast')}</span>
+          </div>
+          <div style={{ display: 'flex', borderRadius: 8, overflow: 'hidden', border: '1px solid rgba(0,0,0,0.08)' }}>
+            {[
+              { key: 'week', label: pick('7 రోజులు', '7 Days') },
+              { key: 'month', label: pick('30 రోజులు', '30 Days') },
+            ].map(opt => (
+              <button key={opt.key} onClick={() => setForecastMode(opt.key)} style={{
+                padding: '4px 10px', border: 'none', cursor: 'pointer',
+                fontSize: 10, fontWeight: 600, fontFamily: SERIF,
+                background: forecastMode === opt.key ? '#E63B2E' : '#FFF',
+                color: forecastMode === opt.key ? '#FFF' : '#999',
+                WebkitTapHighlightColor: 'transparent',
+              }}>{opt.label}</button>
+            ))}
+          </div>
+        </div>
+
+        {forecastMode === 'week' && forecast.length > 0 && (
+          <div style={{ display: 'flex', gap: 4 }}>
+            {forecast.map((day, i) => {
+              const color = day.score >= 65 ? '#2D8A39' : day.score >= 35 ? '#D4920B' : '#CC3333';
+              const bg = day.score >= 65 ? '#F0FFF0' : day.score >= 35 ? '#FFF9E6' : '#FFF1F0';
+              const isToday = i === 0;
+              const dayIdx = day.date.getDay();
+              return (
+                <div key={i} style={{
+                  flex: 1, display: 'flex', flexDirection: 'column',
+                  alignItems: 'center', gap: 4, padding: '8px 2px',
+                  borderRadius: 10,
+                  background: isToday ? 'rgba(230,59,46,0.06)' : 'transparent',
+                  border: isToday ? '1px solid rgba(230,59,46,0.15)' : '1px solid transparent',
+                }}>
+                  <span style={{ fontSize: 10, fontWeight: 600, color: isToday ? '#E63B2E' : '#999', fontFamily: SERIF }}>
+                    {language === 'te' ? DAYS_TE[dayIdx] : DAYS_EN[dayIdx]}
+                  </span>
+                  <div style={{
+                    width: 28, height: 28, borderRadius: '50%',
+                    background: bg, border: `1.5px solid ${color}`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    <span style={{ fontSize: 11, fontWeight: 800, color, fontFamily: SERIF }}>{day.score}</span>
+                  </div>
+                  {day.isChandrashtama && <span style={{ fontSize: 8, color: '#CC3333', fontWeight: 700 }}>⚠</span>}
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {forecastMode === 'month' && monthForecast.length > 0 && (
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+            {monthForecast.map((day, i) => {
+              const color = day.score >= 65 ? '#2D8A39' : day.score >= 35 ? '#D4920B' : '#CC3333';
+              const bg = day.score >= 65 ? '#F0FFF0' : day.score >= 35 ? '#FFF9E6' : '#FFF1F0';
+              const isToday = i === 0;
+              return (
+                <div key={i} style={{
+                  width: 'calc(14.28% - 4px)', display: 'flex', flexDirection: 'column',
+                  alignItems: 'center', gap: 2, padding: '6px 2px',
+                  borderRadius: 8,
+                  background: isToday ? 'rgba(230,59,46,0.06)' : 'transparent',
+                  border: isToday ? '1px solid rgba(230,59,46,0.15)' : '1px solid transparent',
+                }}>
+                  <span style={{ fontSize: 8, color: '#BBB', fontFamily: SERIF }}>{day.month} {day.dayNum}</span>
+                  <div style={{
+                    width: 24, height: 24, borderRadius: '50%',
+                    background: bg, border: `1px solid ${color}`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    <span style={{ fontSize: 9, fontWeight: 800, color, fontFamily: SERIF }}>{day.score}</span>
+                  </div>
+                  {day.isChandrashtama && <span style={{ fontSize: 7, color: '#CC3333' }}>⚠</span>}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

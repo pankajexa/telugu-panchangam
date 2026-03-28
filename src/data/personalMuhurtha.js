@@ -6,6 +6,10 @@
 
 import { getPanchangamForDate } from './panchangam';
 import { NAKSHATRAS_EN } from './constants';
+import {
+  getPanchangam as libGetPanchangam, Observer, getNakshatraPada,
+} from '@ishubhamx/panchangam-js';
+import { getTimezoneOffsetMinutes } from './locations';
 
 // ── Tara Bala Data (9 Taras) ───────────────────────────────────────────────
 
@@ -231,4 +235,72 @@ export function saveBirthData(data) {
  */
 export function clearBirthData() {
   localStorage.removeItem('personalBirthData');
+}
+
+/**
+ * Compute Janma Nakshatra, Pada, and Rashi from birth date/time/place.
+ * @param {string} dateStr - 'YYYY-MM-DD'
+ * @param {string} timeStr - 'HH:MM' (24h local time)
+ * @param {{ lat, lng, elev, tz }} place - birth location
+ * @returns {{ nakshatra: number, pada: number, rashi: number }} indices
+ */
+export function computeBirthChart(dateStr, timeStr, place) {
+  const [year, month, day] = dateStr.split('-').map(Number);
+  const [hour, min] = timeStr.split(':').map(Number);
+
+  const tz = place.tz || 'Asia/Kolkata';
+  const tzOffset = getTimezoneOffsetMinutes(tz, new Date(year, month - 1, day));
+
+  // Convert local time to UTC
+  const localMinutes = hour * 60 + min;
+  const utcMinutes = localMinutes - tzOffset;
+  const utcHour = Math.floor(utcMinutes / 60);
+  const utcMin = utcMinutes % 60;
+
+  const utcDate = new Date(Date.UTC(year, month - 1, day, utcHour, utcMin, 0));
+  // Handle date rollover
+  if (utcMinutes < 0) utcDate.setUTCDate(utcDate.getUTCDate() - 1);
+
+  const obs = new Observer(place.lat, place.lng, place.elev || 0);
+
+  // Get panchangam at exact birth time
+  const p = libGetPanchangam(utcDate, obs, { timezoneOffset: tzOffset, calendarType: 'amanta' });
+
+  const nakshatra = typeof p.nakshatra === 'number' ? p.nakshatra : 0;
+  const rashi = p.moonRashi?.index ?? NAKSHATRA_TO_RASHI[nakshatra];
+
+  // Get pada
+  let pada = 1;
+  try {
+    pada = getNakshatraPada(utcDate, obs, tz);
+    if (typeof pada !== 'number' || pada < 1 || pada > 4) pada = 1;
+  } catch (_) { /* fallback to 1 */ }
+
+  return { nakshatra, pada, rashi };
+}
+
+/**
+ * Get 30-day forecast starting from a date.
+ */
+export function getMonthForecast(birthNakIndex, birthRashiIndex, startDate, location) {
+  const forecast = [];
+  for (let i = 0; i < 30; i++) {
+    const d = new Date(startDate);
+    d.setDate(d.getDate() + i);
+    const result = getPersonalMuhurtha(birthNakIndex, birthRashiIndex, d, location);
+    if (result) {
+      forecast.push({
+        date: d,
+        dayNum: d.getDate(),
+        day: d.toLocaleDateString('en', { weekday: 'short' }),
+        dayTe: d.toLocaleDateString('te', { weekday: 'short' }),
+        month: d.toLocaleDateString('en', { month: 'short' }),
+        score: result.score,
+        taraBala: result.taraBala,
+        chandraBala: result.chandraBala,
+        isChandrashtama: result.chandraBala.isChandrashtama,
+      });
+    }
+  }
+  return forecast;
 }
