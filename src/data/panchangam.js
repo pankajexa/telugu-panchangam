@@ -493,7 +493,7 @@ export function getPanchangamForDate(date, location) {
     paksha,
     pakshaEn,
     tithi: { name: tithiName, nameEn: tithiNameEn, start: tithiStart, end: tithiEnd },
-    nakshatra: { name: nakshatraName, nameEn: nakshatraNameEn, start: nakshatraStart, end: nakshatraEnd },
+    nakshatra: { index: p.nakshatra, name: nakshatraName, nameEn: nakshatraNameEn, start: nakshatraStart, end: nakshatraEnd },
     yogam: { name: yogamName, nameEn: yogamNameEn, end: yogamEnd },
     karanam: { name: karanaName, nameEn: karanaNameEn },
     sunrise,
