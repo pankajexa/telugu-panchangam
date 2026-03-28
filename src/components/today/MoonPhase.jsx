@@ -105,19 +105,27 @@ function buildPhaseMask(illumination, isWaxing) {
   if (illumination >= 0.98) return 'none';
   if (illumination <= 0.02) return 'linear-gradient(to right, transparent, transparent)';
 
-  // Terminator position (0% = edge, 50% = center)
-  const terminatorPos = (1 - illumination) * 50;
+  // For a circular moon, a linear gradient mask at position X% doesn't
+  // correspond to X% illuminated area. We need to account for circular
+  // geometry: area fraction = (θ - sinθcosθ)/π where θ = arccos(1-2x).
+  // Simplified: to show `illumination` fraction of a circle's area as lit,
+  // the linear terminator position from the dark edge should be:
+  //   pos = 0.5 * (1 - cos(π * illumination))
+  // This maps 0→0%, 0.5→50%, 1→100% but with circular correction.
+  const corrected = 0.5 * (1 - Math.cos(Math.PI * illumination));
+  // Convert to percentage from the dark side
+  const darkPercent = (1 - corrected) * 100;
 
-  // Soft edge (wider gradient = softer terminator = more realistic)
-  const softEdge = 8;
+  const softEdge = 6;
 
   if (isWaxing) {
-    // Right side is lit
-    return `linear-gradient(to right, transparent ${terminatorPos}%, rgba(0,0,0,0.3) ${terminatorPos + softEdge * 0.3}%, black ${terminatorPos + softEdge}%)`;
+    // Right side is lit — dark on left
+    const t = Math.max(0, darkPercent - softEdge);
+    return `linear-gradient(to right, transparent ${t}%, rgba(0,0,0,0.3) ${t + softEdge * 0.4}%, black ${darkPercent}%)`;
   } else {
-    // Left side is lit
-    const pos = 100 - terminatorPos;
-    return `linear-gradient(to right, black ${pos - softEdge}%, rgba(0,0,0,0.3) ${pos - softEdge * 0.3}%, transparent ${pos}%)`;
+    // Left side is lit — dark on right
+    const litEnd = corrected * 100;
+    return `linear-gradient(to right, black ${litEnd}%, rgba(0,0,0,0.3) ${litEnd + softEdge * 0.4}%, transparent ${Math.min(100, litEnd + softEdge)}%)`;
   }
 }
 
