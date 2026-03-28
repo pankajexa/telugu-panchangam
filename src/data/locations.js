@@ -4,10 +4,23 @@
 export const LOCATIONS = [
   // ── India — Telangana & Andhra Pradesh ────────────────
   { id: 'hyderabad', label: 'హైదరాబాద్', labelEn: 'Hyderabad', lat: 17.385, lng: 78.4867, elev: 500, tz: 'Asia/Kolkata', country: 'IN' },
+  { id: 'warangal', label: 'వరంగల్', labelEn: 'Warangal', lat: 17.9784, lng: 79.5941, elev: 300, tz: 'Asia/Kolkata', country: 'IN' },
+  { id: 'karimnagar', label: 'కరీంనగర్', labelEn: 'Karimnagar', lat: 18.4386, lng: 79.1288, elev: 260, tz: 'Asia/Kolkata', country: 'IN' },
+  { id: 'nizamabad', label: 'నిజామాబాద్', labelEn: 'Nizamabad', lat: 18.6725, lng: 78.0940, elev: 380, tz: 'Asia/Kolkata', country: 'IN' },
+  { id: 'khammam', label: 'ఖమ్మం', labelEn: 'Khammam', lat: 17.2473, lng: 80.1514, elev: 130, tz: 'Asia/Kolkata', country: 'IN' },
+  { id: 'nalgonda', label: 'నల్గొండ', labelEn: 'Nalgonda', lat: 17.0575, lng: 79.2690, elev: 320, tz: 'Asia/Kolkata', country: 'IN' },
+  { id: 'mahbubnagar', label: 'మహబూబ్‌నగర్', labelEn: 'Mahbubnagar', lat: 16.7488, lng: 77.9855, elev: 500, tz: 'Asia/Kolkata', country: 'IN' },
+  { id: 'adilabad', label: 'ఆదిలాబాద్', labelEn: 'Adilabad', lat: 19.6641, lng: 78.5320, elev: 260, tz: 'Asia/Kolkata', country: 'IN' },
+  { id: 'siddipet', label: 'సిద్దిపేట', labelEn: 'Siddipet', lat: 18.1019, lng: 78.8520, elev: 430, tz: 'Asia/Kolkata', country: 'IN' },
+  { id: 'suryapet', label: 'సూర్యాపేట', labelEn: 'Suryapet', lat: 17.1421, lng: 79.6210, elev: 220, tz: 'Asia/Kolkata', country: 'IN' },
+  { id: 'mancherial', label: 'మంచిర్యాల', labelEn: 'Mancherial', lat: 18.8687, lng: 79.4436, elev: 170, tz: 'Asia/Kolkata', country: 'IN' },
+  { id: 'bhadrachalam', label: 'భద్రాచలం', labelEn: 'Bhadrachalam', lat: 17.6688, lng: 80.8936, elev: 60, tz: 'Asia/Kolkata', country: 'IN' },
+  { id: 'yadadri', label: 'యాదాద్రి', labelEn: 'Yadadri', lat: 17.5904, lng: 78.9526, elev: 350, tz: 'Asia/Kolkata', country: 'IN' },
+
+  // ── India — Andhra Pradesh ────────────────────────────
   { id: 'vijayawada', label: 'విజయవాడ', labelEn: 'Vijayawada', lat: 16.5062, lng: 80.6480, elev: 12, tz: 'Asia/Kolkata', country: 'IN' },
   { id: 'visakhapatnam', label: 'విశాఖపట్నం', labelEn: 'Visakhapatnam', lat: 17.6868, lng: 83.2185, elev: 18, tz: 'Asia/Kolkata', country: 'IN' },
   { id: 'tirupati', label: 'తిరుపతి', labelEn: 'Tirupati', lat: 13.6288, lng: 79.4192, elev: 150, tz: 'Asia/Kolkata', country: 'IN' },
-  { id: 'warangal', label: 'వరంగల్', labelEn: 'Warangal', lat: 17.9784, lng: 79.5941, elev: 300, tz: 'Asia/Kolkata', country: 'IN' },
   { id: 'rajahmundry', label: 'రాజమహేంద్రవరం', labelEn: 'Rajahmundry', lat: 17.0005, lng: 81.8040, elev: 14, tz: 'Asia/Kolkata', country: 'IN' },
   { id: 'guntur', label: 'గుంటూరు', labelEn: 'Guntur', lat: 16.3067, lng: 80.4365, elev: 30, tz: 'Asia/Kolkata', country: 'IN' },
   { id: 'nellore', label: 'నెల్లూరు', labelEn: 'Nellore', lat: 14.4426, lng: 79.9865, elev: 20, tz: 'Asia/Kolkata', country: 'IN' },
