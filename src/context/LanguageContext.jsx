@@ -7,9 +7,9 @@ const STORAGE_KEY = 'manacalendar-language';
 
 function getSavedLanguage() {
   try {
-    return localStorage.getItem(STORAGE_KEY) || 'te';
+    return localStorage.getItem(STORAGE_KEY) || 'en';
   } catch {
-    return 'te';
+    return 'en';
   }
 }
 
