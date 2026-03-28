@@ -232,12 +232,12 @@ export default function SettingsPage() {
                   key={opt.key}
                   onClick={() => { setSampradaya(opt.key); localStorage.setItem('sampradaya', opt.key); }}
                   style={{
-                    ...langStyles.pill,
-                    ...(active ? langStyles.pillActive : {}),
+                    ...advStyles.pill,
+                    ...(active ? advStyles.pillActive : {}),
                     flex: 1, justifyContent: 'center',
                   }}
                 >
-                  {active && <span style={langStyles.check}>✓</span>}
+                  {active && <span style={advStyles.check}>✓</span>}
                   {pick(opt.te, opt.en)}
                 </button>
               );
