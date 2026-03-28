@@ -16,17 +16,17 @@ import { shareImage } from '../utils/sharingService';
 
 const ASSET_BASE = '/assets/greetings';
 
-function WidgetCard({ icon, title, subtitle, badge, onClick }) {
+function WidgetCard({ icon, title, subtitle, badge, onClick, colors: c }) {
   return (
-    <button style={{ ...S.widgetCard, background: colors.cardBg }} onClick={onClick}>
+    <button style={{ ...S.widgetCard, background: c?.cardBg || '#FFFFFF' }} onClick={onClick}>
       <div style={S.widgetTop}>
         <div style={S.widgetIcon}>{icon}</div>
         {badge && <span style={S.widgetBadge}>{badge}</span>}
       </div>
-      <div style={{ ...S.widgetTitle, color: colors.text }}>{title}</div>
-      <div style={{ ...S.widgetSubtitle, color: colors.textMuted }}>{subtitle}</div>
+      <div style={{ ...S.widgetTitle, color: c?.text || '#1A1A1A' }}>{title}</div>
+      <div style={{ ...S.widgetSubtitle, color: c?.textMuted || '#999' }}>{subtitle}</div>
       <div style={S.widgetChevron}>
-        <ChevronRight size={16} color={colors.textFaint} strokeWidth={2} />
+        <ChevronRight size={16} color={c?.textFaint || '#CCC'} strokeWidth={2} />
       </div>
     </button>
   );
@@ -201,18 +201,21 @@ export default function DevotionPage() {
         {/* ═══════════════════════════════════════════ */}
         <div style={S.widgetGrid}>
           <WidgetCard
+            colors={colors}
             icon={<Share2 size={28} color="#C49B2A" strokeWidth={1.8} />}
             title={pick('షేర్', 'Share')}
             subtitle={pick('పంచాంగం & శ్లోకాలు', 'Panchangam & Shlokas')}
             onClick={() => sharingRef.current?.scrollIntoView({ behavior: 'smooth' })}
           />
           <WidgetCard
+            colors={colors}
             icon={<DiyaIcon size={36} color="#C49B2A" />}
             title={pick('నిత్య పూజ', 'Daily Puja')}
             subtitle={pick('గణపతి పంచోపచార • 7 ని', 'Ganapathi Panchopachara • 7 min')}
             onClick={() => navigate('/devotion/puja')}
           />
           <WidgetCard
+            colors={colors}
             icon={<OmIcon size={28} color="#C49B2A" />}
             title={pick('వాహన పూజ', 'Vahana Puja')}
             subtitle={pick('వాహన రక్షణ • 7 ని', 'Vehicle Blessing • 7 min')}
