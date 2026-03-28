@@ -142,7 +142,7 @@ const promptStyles = {
     position: 'fixed',
     inset: 0,
     zIndex: 1000,
-    background: 'rgba(0,0,0,0.6)',
+    background: 'linear-gradient(160deg, rgba(232,88,74,0.85) 0%, rgba(198,40,80,0.85) 30%, rgba(139,42,110,0.85) 60%, rgba(74,32,128,0.85) 100%)',
     backdropFilter: 'blur(8px)',
     WebkitBackdropFilter: 'blur(8px)',
     display: 'flex',

@@ -150,7 +150,7 @@ const S = {
   },
   spaceBackground: {
     position: 'absolute', inset: 0,
-    background: 'radial-gradient(ellipse at 50% 45%, #111827 0%, #0B0F19 40%, #060A12 100%)',
+    background: 'radial-gradient(ellipse at 50% 40%, #1A2744 0%, #0F1B33 45%, #091428 100%)',
     borderRadius: 20,
   },
   atmosphericHaze: {
