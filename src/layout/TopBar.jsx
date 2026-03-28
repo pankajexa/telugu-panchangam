@@ -1,12 +1,19 @@
+import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLocation as useAppLocation } from '../context/LocationContext';
 import { useLanguage } from '../context/LanguageContext';
-import { MapPin, Settings, Volume2, VolumeX } from 'lucide-react';
+import { MapPin, Settings, Volume2, VolumeX, Globe } from 'lucide-react';
 
 export default function TopBar({ audioPlaying, audioMuted, onToggleAudio, hasAudio }) {
   const navigate = useNavigate();
   const { location } = useAppLocation();
-  const { pick, font } = useLanguage();
+  const { pick, font, language, setLanguage } = useLanguage();
+  const [showLangPicker, setShowLangPicker] = useState(false);
+
+  const handleLangSelect = useCallback((lang) => {
+    setLanguage(lang);
+    setShowLangPicker(false);
+  }, [setLanguage]);
 
   return (
     <div style={styles.bar}>
@@ -43,10 +50,48 @@ export default function TopBar({ audioPlaying, audioMuted, onToggleAudio, hasAud
             {audioPlaying && !audioMuted && <div style={styles.pulse} />}
           </button>
         )}
+        {/* Language toggle */}
+        <button
+          style={styles.langBtn}
+          onClick={() => setShowLangPicker(v => !v)}
+          aria-label="Change language"
+        >
+          <span style={styles.langLabel}>{language === 'te' ? 'తె' : 'EN'}</span>
+        </button>
+
         <button style={styles.gearBtn} onClick={() => navigate('/settings')} aria-label="Settings">
           <Settings size={20} color="#666" strokeWidth={1.8} />
         </button>
       </div>
+
+      {/* Language picker dropdown */}
+      {showLangPicker && (
+        <div style={styles.langBackdrop} onClick={() => setShowLangPicker(false)}>
+          <div style={styles.langDropdown} onClick={e => e.stopPropagation()}>
+            <button
+              style={{
+                ...styles.langOption,
+                ...(language === 'en' ? styles.langOptionActive : {}),
+              }}
+              onClick={() => handleLangSelect('en')}
+            >
+              <span style={styles.langOptionLabel}>English</span>
+              {language === 'en' && <span style={styles.langCheck}>✓</span>}
+            </button>
+            <button
+              style={{
+                ...styles.langOption,
+                ...(language === 'te' ? styles.langOptionActive : {}),
+                fontFamily: "'Noto Sans Telugu', sans-serif",
+              }}
+              onClick={() => handleLangSelect('te')}
+            >
+              <span style={styles.langOptionLabel}>తెలుగు</span>
+              {language === 'te' && <span style={styles.langCheck}>✓</span>}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -131,6 +176,71 @@ const styles = {
     background: 'rgba(230,59,46,0.3)',
     animation: 'audioPulse 2s ease-in-out infinite',
     pointerEvents: 'none',
+  },
+  langBtn: {
+    background: 'rgba(0,0,0,0.04)',
+    border: 'none',
+    cursor: 'pointer',
+    width: 36,
+    height: 36,
+    borderRadius: 12,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    WebkitTapHighlightColor: 'transparent',
+  },
+  langLabel: {
+    fontSize: 13,
+    fontWeight: 800,
+    color: '#555',
+    letterSpacing: '-0.3px',
+    fontFamily: "'Plus Jakarta Sans', sans-serif",
+  },
+  langBackdrop: {
+    position: 'fixed',
+    inset: 0,
+    zIndex: 100,
+    background: 'transparent',
+  },
+  langDropdown: {
+    position: 'absolute',
+    top: 'calc(env(safe-area-inset-top, 0px) + 50px)',
+    right: 58,
+    background: '#fff',
+    borderRadius: 14,
+    boxShadow: '0 8px 32px rgba(0,0,0,0.15), 0 1px 4px rgba(0,0,0,0.08)',
+    overflow: 'hidden',
+    minWidth: 150,
+    border: '1px solid rgba(0,0,0,0.06)',
+  },
+  langOption: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    padding: '14px 18px',
+    background: 'none',
+    border: 'none',
+    cursor: 'pointer',
+    fontFamily: "'Plus Jakarta Sans', sans-serif",
+    fontSize: 15,
+    fontWeight: 600,
+    color: '#333',
+    WebkitTapHighlightColor: 'transparent',
+    borderBottom: '1px solid rgba(0,0,0,0.04)',
+  },
+  langOptionActive: {
+    background: 'rgba(230,59,46,0.05)',
+    color: '#E63B2E',
+  },
+  langOptionLabel: {
+    flex: 1,
+    textAlign: 'left',
+  },
+  langCheck: {
+    color: '#E63B2E',
+    fontWeight: 700,
+    fontSize: 16,
   },
   gearBtn: {
     background: 'none',
