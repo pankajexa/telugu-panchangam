@@ -583,39 +583,119 @@ export function getDetailedPanchangam(date, location, prefs) {
   }
 
   // ── Group 4: Detailed Timings ──
+  // To show actual start times (even if tithi started yesterday),
+  // we compute previous day's panchangam and check for carry-over transitions.
   if (prefs.timings) {
     const dt = {};
+
+    // Get previous day's raw data for carry-over transition detection
+    const prevDate = new Date(date);
+    prevDate.setDate(prevDate.getDate() - 1);
+    const prevKey = `${formatDateStr(prevDate)}-${location.id}`;
+    if (!_rawCache.has(prevKey)) {
+      try { getPanchangamForDate(prevDate, location); } catch {}
+    }
+    const prevCached = _rawCache.get(prevKey);
+    const prevP = prevCached?.p;
+
+    /**
+     * Build complete transition list for a panchang element.
+     * If today's first transition started AFTER sunrise, there's a gap —
+     * the previous day's last transition carries over. We find it and prepend.
+     */
+    function buildTransitions(todayTransitions, prevTransitions, nameMap, nameMapEn, karanaMode) {
+      if (!todayTransitions?.length) return [];
+
+      const sunrise = p.sunrise;
+      const result = [];
+
+      // Check if previous day's last transition extends into today
+      if (prevTransitions?.length && sunrise) {
+        const lastPrev = prevTransitions[prevTransitions.length - 1];
+        // If yesterday's last transition ends AFTER today's sunrise, it carries over
+        // Note: endTime may be a Date or ISO string depending on library version
+        const prevEnd = lastPrev.endTime instanceof Date ? lastPrev.endTime : new Date(lastPrev.endTime);
+        const sunriseDate = sunrise instanceof Date ? sunrise : new Date(sunrise);
+        if (lastPrev.endTime && prevEnd >= sunriseDate) {
+          const teName = karanaMode
+            ? (nameMap[lastPrev.name] || lastPrev.name)
+            : (nameMap[lastPrev.index] || lastPrev.name);
+          const enName = karanaMode
+            ? lastPrev.name
+            : (nameMapEn[lastPrev.index] || lastPrev.name);
+
+          // Use today's first transition's endTime if it's the same element
+          // (yesterday's endTime is capped at next sunrise, but the actual
+          // transition may end later in the morning)
+          const firstToday = todayTransitions[0];
+          const firstTodayName = karanaMode
+            ? (nameMap[firstToday?.name] || firstToday?.name)
+            : (nameMap[firstToday?.index] || firstToday?.name);
+          const actualEnd = (firstTodayName === teName && firstToday?.endTime)
+            ? firstToday.endTime
+            : lastPrev.endTime;
+
+          result.push({
+            telugu: teName,
+            english: enName,
+            start: fmtDT(lastPrev.startTime),
+            end: fmtDT(actualEnd),
+          });
+        }
+      }
+
+      // Add today's transitions, skipping the first one if it's the same
+      // element that carried over from yesterday (to avoid showing it twice)
+      for (let i = 0; i < todayTransitions.length; i++) {
+        const t = todayTransitions[i];
+        const teName = karanaMode
+          ? (nameMap[t.name] || t.name)
+          : (nameMap[t.index] || t.name);
+        const enName = karanaMode
+          ? t.name
+          : (nameMapEn[t.index] || t.name);
+
+        // Skip the first transition if it's a duplicate of the carry-over
+        // (same name, meaning the library's "start" is just sunrise — we already
+        // have the real start from yesterday's data)
+        if (i === 0 && result.length > 0 && result[0].telugu === teName) {
+          continue;
+        }
+
+        result.push({
+          telugu: teName,
+          english: enName,
+          start: fmtDT(t.startTime),
+          end: fmtDT(t.endTime),
+        });
+      }
+
+      return result;
+    }
+
     if (prefs.dt_tithiTransitions && p.tithiTransitions?.length) {
-      dt.tithiTransitions = p.tithiTransitions.map(t => ({
-        telugu: TITHIS[t.index] || t.name,
-        english: TITHIS_EN[t.index] || t.name,
-        start: fmtDT(t.startTime),
-        end: fmtDT(t.endTime),
-      }));
+      dt.tithiTransitions = buildTransitions(
+        p.tithiTransitions, prevP?.tithiTransitions,
+        TITHIS, TITHIS_EN, false
+      );
     }
     if (prefs.dt_nakshatraTransitions && p.nakshatraTransitions?.length) {
-      dt.nakshatraTransitions = p.nakshatraTransitions.map(t => ({
-        telugu: NAKSHATRAS[t.index] || t.name,
-        english: NAKSHATRAS_EN[t.index] || t.name,
-        start: fmtDT(t.startTime),
-        end: fmtDT(t.endTime),
-      }));
+      dt.nakshatraTransitions = buildTransitions(
+        p.nakshatraTransitions, prevP?.nakshatraTransitions,
+        NAKSHATRAS, NAKSHATRAS_EN, false
+      );
     }
     if (prefs.dt_yogaTransitions && p.yogaTransitions?.length) {
-      dt.yogaTransitions = p.yogaTransitions.map(t => ({
-        telugu: YOGAMS[t.index] || t.name,
-        english: YOGAMS_EN[t.index] || t.name,
-        start: fmtDT(t.startTime),
-        end: fmtDT(t.endTime),
-      }));
+      dt.yogaTransitions = buildTransitions(
+        p.yogaTransitions, prevP?.yogaTransitions,
+        YOGAMS, YOGAMS_EN, false
+      );
     }
     if (prefs.dt_karanaTransitions && p.karanaTransitions?.length) {
-      dt.karanaTransitions = p.karanaTransitions.map(t => ({
-        telugu: TELUGU_KARANA[t.name] || t.name,
-        english: t.name,
-        start: fmtDT(t.startTime),
-        end: fmtDT(t.endTime),
-      }));
+      dt.karanaTransitions = buildTransitions(
+        p.karanaTransitions, prevP?.karanaTransitions,
+        TELUGU_KARANA, {}, true
+      );
     }
     if (prefs.dt_moonrise) {
       dt.moonrise = fmtDT(p.moonrise);
