@@ -6,7 +6,7 @@ import { ChevronDown, ChevronUp, BookOpen, UtensilsCrossed, Clock, Music } from 
 const PracticesCard = memo(function PracticesCard({ practices }) {
   const { pick, font } = useLanguage();
   const { isNight, colors } = useTheme();
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(false);
 
   if (!practices) return null;
 

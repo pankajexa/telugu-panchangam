@@ -103,15 +103,25 @@ const MoonPhase = memo(function MoonPhase({ tithiIndex = 0, paksha, pakshaEn, ti
 function buildPhaseMask(illumination, isWaxing) {
   if (illumination >= 0.98) return 'none';
   if (illumination <= 0.02) return 'linear-gradient(to right, transparent, transparent)';
-  const corrected = 0.5 * (1 - Math.cos(Math.PI * illumination));
-  const darkPercent = (1 - corrected) * 100;
-  const softEdge = 6;
+
+  // Simple linear mapping — the circle shape naturally creates the crescent.
+  // 73% illumination = 27% of the width is dark on the unlit side.
+  const darkPct = (1 - illumination) * 100;
+  const softEdge = 8; // Soft terminator for realism
+
   if (isWaxing) {
-    const t = Math.max(0, darkPercent - softEdge);
-    return `linear-gradient(to right, transparent ${t}%, rgba(0,0,0,0.3) ${t + softEdge * 0.4}%, black ${darkPercent}%)`;
+    // Waxing: right side lit, left side dark
+    // mask: transparent = hidden, black = visible
+    // So: transparent on the LEFT (hidden = dark), black on the RIGHT (visible = lit)
+    const edgeStart = Math.max(0, darkPct - softEdge / 2);
+    const edgeEnd = Math.min(100, darkPct + softEdge / 2);
+    return `linear-gradient(to right, transparent ${edgeStart}%, black ${edgeEnd}%)`;
   } else {
-    const litEnd = corrected * 100;
-    return `linear-gradient(to right, black ${litEnd}%, rgba(0,0,0,0.3) ${litEnd + softEdge * 0.4}%, transparent ${Math.min(100, litEnd + softEdge)}%)`;
+    // Waning: left side lit, right side dark
+    const litPct = illumination * 100;
+    const edgeStart = Math.max(0, litPct - softEdge / 2);
+    const edgeEnd = Math.min(100, litPct + softEdge / 2);
+    return `linear-gradient(to right, black ${edgeStart}%, transparent ${edgeEnd}%)`;
   }
 }
 
