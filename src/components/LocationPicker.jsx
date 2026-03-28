@@ -34,8 +34,9 @@ export default function LocationPicker() {
   // Group by country
   const india = LOCATIONS.filter(l => l.country === 'IN');
   const us = LOCATIONS.filter(l => l.country === 'US');
+  const others = LOCATIONS.filter(l => !['IN', 'US'].includes(l.country));
 
-  const { t, font } = useLanguage();
+  const { t, font, pick } = useLanguage();
 
   return (
     <>
@@ -52,9 +53,11 @@ export default function LocationPicker() {
 
             {/* India */}
             <div style={{ ...styles.groupLabel, fontFamily: font }}>{t('loc.india')}</div>
-            {india.map(l => (
-              <CityRow key={l.id} loc={l} active={location.id === l.id} onSelect={handleSelect} />
-            ))}
+            <div style={styles.usGrid}>
+              {india.map(l => (
+                <CityRow key={l.id} loc={l} active={location.id === l.id} onSelect={handleSelect} compact />
+              ))}
+            </div>
 
             {/* US */}
             <div style={{ ...styles.groupLabel, fontFamily: font }}>{t('loc.usa')}</div>
@@ -63,6 +66,18 @@ export default function LocationPicker() {
                 <CityRow key={l.id} loc={l} active={location.id === l.id} onSelect={handleSelect} compact />
               ))}
             </div>
+
+            {/* Other Countries */}
+            {others.length > 0 && (
+              <>
+                <div style={{ ...styles.groupLabel, fontFamily: font }}>{pick('ఇతర దేశాలు', 'Other Countries')}</div>
+                <div style={styles.usGrid}>
+                  {others.map(l => (
+                    <CityRow key={l.id} loc={l} active={location.id === l.id} onSelect={handleSelect} compact />
+                  ))}
+                </div>
+              </>
+            )}
 
             {/* Geolocation */}
             <button style={{ ...styles.geoBtn, fontFamily: font }} onClick={handleGeolocate} disabled={geoLoading}>
