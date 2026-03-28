@@ -14,6 +14,7 @@ export const LOCATIONS = [
   { id: 'siddipet', label: 'సిద్దిపేట', labelEn: 'Siddipet', lat: 18.1019, lng: 78.8520, elev: 430, tz: 'Asia/Kolkata', country: 'IN' },
   { id: 'suryapet', label: 'సూర్యాపేట', labelEn: 'Suryapet', lat: 17.1421, lng: 79.6210, elev: 220, tz: 'Asia/Kolkata', country: 'IN' },
   { id: 'mancherial', label: 'మంచిర్యాల', labelEn: 'Mancherial', lat: 18.8687, lng: 79.4436, elev: 170, tz: 'Asia/Kolkata', country: 'IN' },
+  { id: 'jagtial', label: 'జగిత్యాల', labelEn: 'Jagtial', lat: 18.7947, lng: 78.9137, elev: 250, tz: 'Asia/Kolkata', country: 'IN' },
   { id: 'bhadrachalam', label: 'భద్రాచలం', labelEn: 'Bhadrachalam', lat: 17.6688, lng: 80.8936, elev: 60, tz: 'Asia/Kolkata', country: 'IN' },
   { id: 'yadadri', label: 'యాదాద్రి', labelEn: 'Yadadri', lat: 17.5904, lng: 78.9526, elev: 350, tz: 'Asia/Kolkata', country: 'IN' },
 
