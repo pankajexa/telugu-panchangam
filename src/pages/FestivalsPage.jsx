@@ -1,12 +1,12 @@
-import { useState, useMemo, useEffect, useCallback } from 'react';
+import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
 import { useLocation } from '../context/LocationContext';
 import { useReminders } from '../context/ReminderContext';
-import { getAllFestivals } from '../data/festivalList';
+import { loadFestivalsProgressively } from '../data/festivalList';
 import { getPractices, FESTIVAL_PRACTICES, VRATA_PRACTICES } from '../data/festivalPractices';
 import { DiyaIcon, MalaIcon } from '../components/icons/HinduIcons';
-import { ChevronRight, X } from 'lucide-react';
+import { ChevronDown, ChevronRight } from 'lucide-react';
 import PracticesCard from '../components/today/PracticesCard';
 
 const FILTERS = ['all', 'festivals', 'vrats'];
@@ -37,37 +37,37 @@ export default function FestivalsPage() {
   const [filter, setFilter] = useState('all');
   const [allFestivals, setAllFestivals] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedFestival, setSelectedFestival] = useState(null);
+  const [done, setDone] = useState(false);
+  const [expandedIdx, setExpandedIdx] = useState(null);
+  const cancelRef = useRef(null);
 
-  // Lock body scroll when overlay is open (prevents background scroll stealing touch)
-  useEffect(() => {
-    if (selectedFestival?.practices) {
-      document.body.style.overflow = 'hidden';
-      return () => { document.body.style.overflow = ''; };
-    }
-  }, [selectedFestival]);
-
-  // Compute festival list AFTER first paint so the tab switches instantly
+  // Progressive loading — festivals stream in month-by-month
   useEffect(() => {
     setLoading(true);
-    // setTimeout(0) truly yields to the browser — lets the loading UI paint first
-    const t = setTimeout(() => {
-      const fests = getAllFestivals(location);
-      setAllFestivals(fests);
-      setLoading(false);
+    setDone(false);
+    setAllFestivals([]);
+    setExpandedIdx(null);
 
-      // Feed festival/vratham data to ReminderContext for notification scheduling
-      const festivals = fests.filter(f => f.type === 'festival');
-      const vrathams = fests.filter(f => f.type === 'vrat');
-      if (festivals.length) setFestivalData(festivals);
-      if (vrathams.length) setVrathamData(vrathams);
-    }, 0);
-    return () => clearTimeout(t);
+    cancelRef.current = loadFestivalsProgressively(
+      location,
+      (partial) => {
+        setAllFestivals(partial);
+        setLoading(false); // Hide spinner as soon as first chunk arrives
+      },
+      (final) => {
+        setDone(true);
+        const festivals = final.filter(f => f.type === 'festival');
+        const vrathams = final.filter(f => f.type === 'vrat');
+        if (festivals.length) setFestivalData(festivals);
+        if (vrathams.length) setVrathamData(vrathams);
+      },
+    );
+    return () => { if (cancelRef.current) cancelRef.current(); };
   }, [location]);
 
   const filtered = useMemo(() => {
     if (filter === 'all') return allFestivals;
-    return allFestivals.filter(f => f.type === filter.replace(/s$/, '')); // 'festivals' → 'festival'
+    return allFestivals.filter(f => f.type === filter.replace(/s$/, ''));
   }, [allFestivals, filter]);
 
   // Group by month
@@ -80,6 +80,35 @@ export default function FestivalsPage() {
     }
     return Object.values(groups);
   }, [filtered]);
+
+  // Build a global flat index for expand tracking
+  const flatItems = useMemo(() => {
+    const arr = [];
+    for (const g of grouped) for (const item of g.items) arr.push(item);
+    return arr;
+  }, [grouped]);
+
+  const handleToggle = useCallback((globalIdx) => {
+    setExpandedIdx(prev => prev === globalIdx ? null : globalIdx);
+  }, []);
+
+  // Get practices for a festival/vrat
+  const getPracticesFor = useCallback((f) => {
+    if (f.type === 'vrat') {
+      const en = (f.english || '').toLowerCase();
+      const vrataType = en.includes('ekadashi') ? 'ekadashi'
+        : en.includes('pradosh') ? 'pradosham'
+        : en.includes('chaturthi') ? 'chaturthi'
+        : en.includes('shivaratri') ? 'shivaratri'
+        : en.includes('purnima') ? 'purnima'
+        : en.includes('amavasya') ? 'amavasya'
+        : 'ekadashi';
+      return getPractices(null, [{ type: vrataType }]);
+    }
+    return getPractices({ english: f.english }, null);
+  }, []);
+
+  let globalIdx = 0;
 
   return (
     <div style={styles.page}>
@@ -109,7 +138,7 @@ export default function FestivalsPage() {
           })}
         </div>
 
-        {/* Loading state */}
+        {/* Loading state — only shown until first chunk */}
         {loading && (
           <div style={styles.loadingBox}>
             <div style={styles.spinner} />
@@ -119,12 +148,14 @@ export default function FestivalsPage() {
           </div>
         )}
 
-        {/* Festival list */}
+        {/* Festival list — renders progressively */}
         {!loading && grouped.map((group, gi) => (
           <div key={gi} style={styles.group}>
             <div style={{ ...styles.monthHeader, color: colors.textFaint }}>{group.label}</div>
             <div style={styles.list}>
               {group.items.map((f, i) => {
+                const idx = globalIdx++;
+                const isExpanded = expandedIdx === idx;
                 const color = TYPE_COLORS[f.type] || '#E8A817';
                 const IconComp = TYPE_ICON_COMPONENT[f.type] || DiyaIcon;
                 const name = pick(f.telugu, f.english) || f.english;
@@ -132,36 +163,58 @@ export default function FestivalsPage() {
                 const typeLabel = language === 'te'
                   ? (f.type === 'vrat' ? 'వ్రతం' : 'పండుగ')
                   : (f.type === 'vrat' ? 'Vrat' : 'Festival');
-
-                // Check if this festival/vrat has practices
-                const practicesData = f.type === 'vrat'
-                  ? (VRATA_PRACTICES[f.type === 'vrat' ? 'ekadashi' : f.type] ? true : false)
-                  : (FESTIVAL_PRACTICES[f.english] ? true : false);
+                const hasPractices = f.type === 'vrat'
+                  ? !!VRATA_PRACTICES[(f.english || '').toLowerCase().includes('ekadashi') ? 'ekadashi' : (f.english || '').toLowerCase().includes('pradosh') ? 'pradosham' : (f.english || '').toLowerCase().includes('chaturthi') ? 'chaturthi' : (f.english || '').toLowerCase().includes('shivaratri') ? 'shivaratri' : (f.english || '').toLowerCase().includes('purnima') ? 'purnima' : (f.english || '').toLowerCase().includes('amavasya') ? 'amavasya' : 'ekadashi']
+                  : !!FESTIVAL_PRACTICES[f.english];
 
                 return (
-                  <div key={i} style={{ ...styles.card, background: colors.cardBg, border: `1px solid ${colors.border}`, borderLeft: `4px solid ${color}`, cursor: 'pointer' }}
-                    onClick={() => {
-                      const p = f.type === 'vrat'
-                        ? getPractices(null, [{ type: f.english?.toLowerCase().includes('ekadashi') ? 'ekadashi' : f.english?.toLowerCase().includes('pradosh') ? 'pradosham' : f.english?.toLowerCase().includes('chaturthi') ? 'chaturthi' : f.english?.toLowerCase().includes('shivaratri') ? 'shivaratri' : f.english?.toLowerCase().includes('purnima') ? 'purnima' : f.english?.toLowerCase().includes('amavasya') ? 'amavasya' : 'ekadashi' }])
-                        : getPractices({ english: f.english }, null);
-                      if (p) setSelectedFestival({ ...f, practices: p });
-                    }}
-                  >
-                    <div style={{ ...styles.iconBox, background: f.type === 'vrat' ? 'var(--tithi-icon-bg)' : 'var(--nakshatra-icon-bg)' }}>
-                      <IconComp size={24} color={color} />
-                    </div>
-                    <div style={styles.info}>
-                      <div style={{ ...styles.name, fontFamily: font, color: colors.text }}>{name}</div>
-                      <div style={styles.meta}>
-                        <span style={{
-                          ...styles.badge,
-                          background: f.type === 'vrat' ? '#FFF1F0' : '#FFF9E6',
-                          color: f.type === 'vrat' ? '#E63B2E' : '#B8860B',
-                        }}>{typeLabel}</span>
-                        <span style={{ ...styles.date, color: colors.textFaint }}>{dateStr}</span>
+                  <div key={i}>
+                    <div
+                      style={{
+                        ...styles.card,
+                        background: colors.cardBg,
+                        border: `1px solid ${colors.border}`,
+                        borderLeft: `4px solid ${color}`,
+                        cursor: hasPractices ? 'pointer' : 'default',
+                        borderBottomLeftRadius: isExpanded ? 0 : 16,
+                        borderBottomRightRadius: isExpanded ? 0 : 16,
+                        borderBottom: isExpanded ? 'none' : `1px solid ${colors.border}`,
+                      }}
+                      onClick={() => hasPractices && handleToggle(idx)}
+                    >
+                      <div style={{ ...styles.iconBox, background: f.type === 'vrat' ? 'var(--tithi-icon-bg)' : 'var(--nakshatra-icon-bg)' }}>
+                        <IconComp size={24} color={color} />
                       </div>
+                      <div style={styles.info}>
+                        <div style={{ ...styles.name, fontFamily: font, color: colors.text }}>{name}</div>
+                        <div style={styles.meta}>
+                          <span style={{
+                            ...styles.badge,
+                            background: f.type === 'vrat' ? '#FFF1F0' : '#FFF9E6',
+                            color: f.type === 'vrat' ? '#E63B2E' : '#B8860B',
+                          }}>{typeLabel}</span>
+                          <span style={{ ...styles.date, color: colors.textFaint }}>{dateStr}</span>
+                        </div>
+                      </div>
+                      {hasPractices && (
+                        isExpanded
+                          ? <ChevronDown size={16} color={colors.textFaint} strokeWidth={1.8} />
+                          : <ChevronRight size={16} color={colors.textFaint} strokeWidth={1.8} />
+                      )}
                     </div>
-                    <ChevronRight size={16} color={colors.textFaint} strokeWidth={1.8} />
+                    {/* Inline-expanded practices */}
+                    {isExpanded && (
+                      <div style={{
+                        background: colors.cardBg,
+                        border: `1px solid ${colors.border}`,
+                        borderTop: 'none',
+                        borderLeft: `4px solid ${color}`,
+                        borderRadius: '0 0 16px 16px',
+                        padding: '4px 16px 16px',
+                      }}>
+                        <PracticesCard practices={getPracticesFor(f)} defaultExpanded />
+                      </div>
+                    )}
                   </div>
                 );
               })}
@@ -169,34 +222,20 @@ export default function FestivalsPage() {
           </div>
         ))}
 
-        {!loading && grouped.length === 0 && (
-          <div style={styles.empty}>
-            <div style={{ fontSize: 14, color: colors.textMuted }}>{language === 'te' ? 'పండుగలు లేవు' : 'No festivals found'}</div>
+        {/* Still loading indicator at bottom */}
+        {!loading && !done && (
+          <div style={{ textAlign: 'center', padding: '16px 0 8px' }}>
+            <div style={{ ...styles.spinner, width: 18, height: 18, borderWidth: 2, display: 'inline-block' }} />
+            <span style={{ fontSize: 12, color: colors.textFaint, marginLeft: 8, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              {language === 'te' ? 'మరిన్ని లోడ్ అవుతున్నాయి...' : 'Loading more...'}
+            </span>
           </div>
         )}
-        {!loading && filtered.length === 0 && (
+
+        {!loading && done && filtered.length === 0 && (
           <div style={{ ...styles.empty, color: colors.textMuted }}>{t('festivals.noFestival')}</div>
         )}
       </div>
-
-      {/* Practices detail overlay */}
-      {selectedFestival?.practices && (
-        <div style={styles.overlay} onClick={() => setSelectedFestival(null)}>
-          <div style={{ ...styles.overlaySheet, background: colors.pageBg }} onClick={e => e.stopPropagation()}>
-            <div style={{ ...styles.overlayHeader, borderBottom: `1px solid ${colors.border}` }}>
-              <div style={{ ...styles.overlayTitle, fontFamily: font, color: colors.text }}>
-                {pick(selectedFestival.telugu, selectedFestival.english)}
-              </div>
-              <button style={styles.overlayClose} onClick={() => setSelectedFestival(null)}>
-                <X size={20} color={colors.iconColor} />
-              </button>
-            </div>
-            <div style={styles.overlayScroll}>
-              <PracticesCard practices={selectedFestival.practices} />
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
@@ -301,55 +340,6 @@ const styles = {
     fontSize: 14,
     marginTop: 60,
     fontFamily: "'Plus Jakarta Sans', sans-serif",
-  },
-  // Overlay styles
-  overlay: {
-    position: 'fixed',
-    inset: 0,
-    background: 'rgba(0,0,0,0.4)',
-    backdropFilter: 'blur(4px)',
-    WebkitBackdropFilter: 'blur(4px)',
-    zIndex: 200,
-    display: 'flex',
-    alignItems: 'flex-end',
-    justifyContent: 'center',
-  },
-  overlaySheet: {
-    borderRadius: '20px 20px 0 0',
-    width: '100%',
-    maxWidth: 480,
-    maxHeight: '85vh',
-    display: 'flex',
-    flexDirection: 'column',
-    overflow: 'hidden',
-  },
-  overlayHeader: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: '18px 20px 12px',
-    borderBottom: '1px solid rgba(0,0,0,0.05)',
-  },
-  overlayTitle: {
-    fontSize: 18,
-    fontWeight: 700,
-  },
-  overlayClose: {
-    background: 'none',
-    border: 'none',
-    cursor: 'pointer',
-    padding: 8,
-    borderRadius: 10,
-    display: 'flex',
-    WebkitTapHighlightColor: 'transparent',
-  },
-  overlayScroll: {
-    flex: 1,
-    overflowY: 'scroll',
-    padding: '16px 20px 40px',
-    WebkitOverflowScrolling: 'touch',
-    touchAction: 'pan-y',
-    overscrollBehavior: 'contain',
   },
   loadingBox: {
     display: 'flex',
