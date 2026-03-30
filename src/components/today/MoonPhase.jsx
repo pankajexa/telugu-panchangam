@@ -1,11 +1,15 @@
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
 
 /**
  * MoonPhase — Photorealistic moon with dramatic glow effects.
  * NASA moon photo with CSS gradient phase masking.
- * Always shows as a dark card with stars background.
+ * Dark deep-blue card at night, soft white/cream card during daytime.
  */
 const MoonPhase = memo(function MoonPhase({ tithiIndex = 0, paksha, pakshaEn, tithiName, t }) {
+  const isNight = useMemo(() => {
+    const h = new Date().getHours();
+    return h < 6 || h >= 18;
+  }, []);
   let illumination;
   if (tithiIndex <= 14) {
     illumination = (tithiIndex + 1) / 15;
@@ -21,9 +25,14 @@ const MoonPhase = memo(function MoonPhase({ tithiIndex = 0, paksha, pakshaEn, ti
 
   return (
     <div style={S.wrapper}>
-      {/* Dark sky background with stars */}
-      <div style={S.spaceBackground}>
-        {STARS.map((star, i) => (
+      {/* Sky background — dark at night, soft cream during day */}
+      <div style={{
+        ...S.spaceBackground,
+        background: isNight
+          ? 'radial-gradient(ellipse at 50% 40%, #1A2744 0%, #0F1B33 45%, #091428 100%)'
+          : 'radial-gradient(ellipse at 50% 40%, #F5F0E8 0%, #EDE6DA 45%, #E8E0D0 100%)',
+      }}>
+        {isNight && STARS.map((star, i) => (
           <div key={i} style={{
             position: 'absolute', borderRadius: '50%', background: '#FFF',
             width: star.s, height: star.s,
@@ -37,7 +46,9 @@ const MoonPhase = memo(function MoonPhase({ tithiIndex = 0, paksha, pakshaEn, ti
       {/* Atmospheric haze */}
       <div style={{
         ...S.atmosphericHaze,
-        background: `radial-gradient(circle, ${warmGlow} 0%, rgba(255,240,180,${g * 0.08}) 50%, transparent 70%)`,
+        background: isNight
+          ? `radial-gradient(circle, ${warmGlow} 0%, rgba(255,240,180,${g * 0.08}) 50%, transparent 70%)`
+          : `radial-gradient(circle, rgba(180,160,120,${0.1 + g * 0.15}) 0%, rgba(180,160,120,${g * 0.05}) 50%, transparent 70%)`,
       }} />
 
       {/* Moon body */}
@@ -45,12 +56,17 @@ const MoonPhase = memo(function MoonPhase({ tithiIndex = 0, paksha, pakshaEn, ti
         {/* Glow rings */}
         <div style={{
           ...S.glowRing,
-          boxShadow: `
-            0 0 ${20 + g * 30}px rgba(255,245,200,${0.15 + g * 0.2}),
-            0 0 ${40 + g * 60}px rgba(255,240,180,${0.08 + g * 0.12}),
-            0 0 ${80 + g * 80}px rgba(255,230,150,${g * 0.06}),
-            inset 0 0 ${10 + g * 15}px rgba(255,250,220,${0.1 + g * 0.15})
-          `,
+          boxShadow: isNight
+            ? `
+              0 0 ${20 + g * 30}px rgba(255,245,200,${0.15 + g * 0.2}),
+              0 0 ${40 + g * 60}px rgba(255,240,180,${0.08 + g * 0.12}),
+              0 0 ${80 + g * 80}px rgba(255,230,150,${g * 0.06}),
+              inset 0 0 ${10 + g * 15}px rgba(255,250,220,${0.1 + g * 0.15})
+            `
+            : `
+              0 0 ${15 + g * 20}px rgba(160,140,100,${0.1 + g * 0.12}),
+              0 0 ${30 + g * 40}px rgba(160,140,100,${0.05 + g * 0.08})
+            `,
         }} />
 
         {/* Dark moon base */}
@@ -88,11 +104,15 @@ const MoonPhase = memo(function MoonPhase({ tithiIndex = 0, paksha, pakshaEn, ti
       <div style={{ textAlign: 'center', position: 'relative', zIndex: 2, marginTop: 6 }}>
         <div style={{
           ...S.tithiName,
-          color: '#F0E8D4',
+          color: isNight ? '#F0E8D4' : '#3A3020',
+          textShadow: isNight ? '0 1px 6px rgba(0,0,0,0.6)' : '0 1px 3px rgba(255,255,255,0.5)',
         }}>
           {paksha || pakshaEn || ''}{tithiName ? ` ${tithiName}` : ''}
         </div>
-        <div style={S.illumination}>
+        <div style={{
+          ...S.illumination,
+          color: isNight ? 'rgba(255,248,220,0.45)' : 'rgba(80,70,50,0.5)',
+        }}>
           {percent}% {t ? t('today.illuminated') : 'Illuminated'}
         </div>
       </div>
@@ -150,7 +170,6 @@ const S = {
   },
   spaceBackground: {
     position: 'absolute', inset: 0,
-    background: 'radial-gradient(ellipse at 50% 40%, #1A2744 0%, #0F1B33 45%, #091428 100%)',
     borderRadius: 20,
   },
   atmosphericHaze: {
@@ -186,12 +205,11 @@ const S = {
     pointerEvents: 'none',
   },
   tithiName: {
-    fontSize: 13, fontWeight: 700, color: '#F0E8D4',
+    fontSize: 13, fontWeight: 700,
     letterSpacing: '0.03em', whiteSpace: 'nowrap',
-    textShadow: '0 1px 6px rgba(0,0,0,0.6)',
   },
   illumination: {
-    fontSize: 9, color: 'rgba(255,248,220,0.45)',
+    fontSize: 9,
     marginTop: 2, position: 'relative', zIndex: 1,
   },
 };
