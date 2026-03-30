@@ -3,10 +3,10 @@ import { useLanguage } from '../../context/LanguageContext';
 import { useTheme } from '../../context/ThemeContext';
 import { ChevronDown, ChevronUp, BookOpen, UtensilsCrossed, Clock, Music } from 'lucide-react';
 
-const PracticesCard = memo(function PracticesCard({ practices }) {
+const PracticesCard = memo(function PracticesCard({ practices, defaultExpanded = false }) {
   const { pick, font } = useLanguage();
   const { isNight, colors } = useTheme();
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(defaultExpanded);
 
   if (!practices) return null;
 
