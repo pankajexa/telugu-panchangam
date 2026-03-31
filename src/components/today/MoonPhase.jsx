@@ -29,7 +29,7 @@ const MoonPhase = memo(function MoonPhase({ tithiIndex = 0, paksha, pakshaEn, ti
       <div style={{
         ...S.spaceBackground,
         background: isNight
-          ? 'radial-gradient(ellipse at 50% 40%, #1A2744 0%, #0F1B33 45%, #091428 100%)'
+          ? 'radial-gradient(ellipse at 50% 40%, #1C2347 0%, #151B3D 45%, #101535 100%)'
           : 'radial-gradient(ellipse at 50% 40%, #F5F0E8 0%, #EDE6DA 45%, #E8E0D0 100%)',
       }}>
         {isNight && STARS.map((star, i) => (
