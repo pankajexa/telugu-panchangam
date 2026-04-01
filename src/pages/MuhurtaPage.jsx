@@ -1,12 +1,13 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, lazy, Suspense } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
 import { useLocation } from '../context/LocationContext';
 import { getPanchangamForDate } from '../data/panchangam';
-import { getSavedBirthData } from '../data/personalMuhurtha';
 import { Clock, Star, ChevronRight } from 'lucide-react';
-import BirthDataForm from '../components/muhurtha/BirthDataForm';
-import PersonalMuhurthaView from '../components/muhurtha/PersonalMuhurthaView';
+
+// Lazy-load personal muhurtha — only fetched when user clicks "Personal Muhurtha"
+const BirthDataForm = lazy(() => import('../components/muhurtha/BirthDataForm'));
+const PersonalMuhurthaView = lazy(() => import('../components/muhurtha/PersonalMuhurthaView'));
 
 const QualityBadge = ({ quality, t }) => {
   const config = {
@@ -252,7 +253,8 @@ export default function MuhurtaPage() {
   const data = useMemo(() => getPanchangamForDate(today, location), [today, location]);
 
   const [activeSection, setActiveSection] = useState('general');
-  const [birthData, setBirthData] = useState(() => getSavedBirthData());
+  const [birthData, setBirthData] = useState(null);
+  const [birthDataLoaded, setBirthDataLoaded] = useState(false);
 
   const handleBirthDataSave = useCallback((data) => {
     setBirthData(data);
@@ -264,7 +266,15 @@ export default function MuhurtaPage() {
 
   const toggleSection = useCallback((section) => {
     setActiveSection(prev => prev === section ? null : section);
-  }, []);
+    // Lazy-load birth data only when personal section is first opened
+    if (section === 'personal' && !birthDataLoaded) {
+      setBirthDataLoaded(true);
+      import('../data/personalMuhurtha').then(({ getSavedBirthData }) => {
+        const saved = getSavedBirthData();
+        if (saved) setBirthData(saved);
+      });
+    }
+  }, [birthDataLoaded]);
 
   if (!data) return null;
 
@@ -299,11 +309,18 @@ export default function MuhurtaPage() {
           <GeneralMuhurthaSection data={data} t={t} font={font} />
         )}
 
-        {/* Personal Section */}
+        {/* Personal Section — lazy-loaded */}
         {activeSection === 'personal' && (
-          birthData
-            ? <PersonalMuhurthaView birthData={birthData} onEdit={handleEditBirthData} />
-            : <BirthDataForm onSave={handleBirthDataSave} />
+          <Suspense fallback={
+            <div style={{ textAlign: 'center', padding: '40px 0' }}>
+              <div style={styles.spinner} />
+            </div>
+          }>
+            {birthData
+              ? <PersonalMuhurthaView birthData={birthData} onEdit={handleEditBirthData} />
+              : birthDataLoaded ? <BirthDataForm onSave={handleBirthDataSave} /> : null
+            }
+          </Suspense>
         )}
       </div>
     </div>
@@ -339,4 +356,11 @@ const styles = {
   },
   name: { fontSize: 14, fontWeight: 600 },
   time: { fontSize: 12, marginTop: 3, fontFamily: "'Plus Jakarta Sans', sans-serif" },
+  spinner: {
+    width: 24, height: 24, margin: '0 auto',
+    border: '3px solid rgba(230,59,46,0.15)',
+    borderTopColor: '#E63B2E',
+    borderRadius: '50%',
+    animation: 'spin 0.6s linear infinite',
+  },
 };
